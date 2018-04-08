@@ -41,3 +41,7 @@ public class Program
             .UseStartup<Startup>();
 }
 ```
+
+## Testing in development
+
+See the [developer docs](./CONTRIBUTING.md) for details on how to test Let's Encrypt in a non-production environment.
