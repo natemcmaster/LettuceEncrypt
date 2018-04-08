@@ -11,10 +11,6 @@ branches:
     - /^feature\/.*/
 build_script:
   - ps: .\build.ps1 -IsOfficialBuild
-environment:
-  global:
-    DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
-    DOTNET_CLI_TELEMETRY_OPTOUT: 1
 test: off
 os: Visual Studio 2017
 artifacts:
