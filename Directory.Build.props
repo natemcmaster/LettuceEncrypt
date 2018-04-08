@@ -15,9 +15,10 @@
     <DebugType>embedded</DebugType>
     <IsPackable>false</IsPackable>
     <LangVersion>Latest</LangVersion>
+    <!-- not all dependencies are signed
     <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)files\StrongName.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
-    <PublicSign Condition="'$(OS)' != 'Windows_NT'">true</PublicSign>
+    <PublicSign Condition="'$(OS)' != 'Windows_NT'">true</PublicSign> -->
 
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <GenerateFullPaths Condition="'$(VSCODE_PID)' != ''">true</GenerateFullPaths>
