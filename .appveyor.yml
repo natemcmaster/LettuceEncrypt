@@ -1,4 +1,7 @@
 ﻿version: 0.1.0.{build}
+install:
+  - ps: iwr https://raw.githubusercontent.com/dotnet/cli/release/2.1.3xx/scripts/obtain/dotnet-install.ps1 -outfile dotnet-install.ps1
+  - ps: .\dotnet-install.ps1 -Version 2.1.300-preview2-008530 -InstallDir $env:ProgramFiles/dotnet
 init:
   - git config --global core.autocrlf input
 clone_depth: 1

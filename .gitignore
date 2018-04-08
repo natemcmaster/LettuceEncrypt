@@ -3,3 +3,4 @@ obj/
 bin/
 .vs/
 .build/
+artifacts/

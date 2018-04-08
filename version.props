@@ -9,6 +9,7 @@
     <BuildNumber Condition=" '$(BuildNumber)' == '' ">0</BuildNumber>
     <FileVersion>$(VersionPrefix).$(BuildNumber)</FileVersion>
     <VersionSuffix Condition=" '$(VersionSuffix)' != '' ">$(VersionSuffix).$(BuildNumber)</VersionSuffix>
+    <NoWarn>$(NoWarn);NU5105</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
