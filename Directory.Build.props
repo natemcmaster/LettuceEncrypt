@@ -1,0 +1,27 @@
+<Project>
+  <Import Project="version.props" />
+
+  <PropertyGroup>
+    <Authors>Nate McMaster</Authors>
+    <Product>McMaster.AspNetCore.LetsEncrypt</Product>
+    <Copyright>© Nate McMaster</Copyright>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageLicenseUrl>https://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/natemcmaster/LetsEncrypt</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/natemcmaster/LetsEncrypt.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <SourceLinkCreate>true</SourceLinkCreate>
+    <DebugType>embedded</DebugType>
+    <IsPackable>false</IsPackable>
+    <LangVersion>Latest</LangVersion>
+    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)files\StrongName.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>true</SignAssembly>
+    <PublicSign Condition="'$(OS)' != 'Windows_NT'">true</PublicSign>
+
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <GenerateFullPaths Condition="'$(VSCODE_PID)' != ''">true</GenerateFullPaths>
+    <BaseOutputPath>$(MSBuildThisFileDirectory).build/$(MSBuildProjectName)/bin/</BaseOutputPath>
+    <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory).build/$(MSBuildProjectName)/obj/</BaseIntermediateOutputPath>
+  </PropertyGroup>
+</Project>
