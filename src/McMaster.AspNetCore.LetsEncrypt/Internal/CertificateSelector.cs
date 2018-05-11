@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Security.Cryptography.X509Certificates;
+using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Options;
@@ -23,7 +24,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             _certs.AddOrUpdate(hostName, certificate, (_, __) => certificate);
         }
 
-        public X509Certificate2 Select(IFeatureCollection features, string hostName)
+        public X509Certificate2 Select(ConnectionContext features, string hostName)
         {
             if (!_certs.TryGetValue(hostName, out var retVal))
             {
