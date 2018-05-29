@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) Nate McMaster.
+// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
+
+using System;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
@@ -18,7 +21,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
         private readonly IOptions<LetsEncryptOptions> _options;
         private readonly IHttpChallengeResponseStore _challengeStore;
         private readonly ILogger _logger;
-        private readonly AcmeClient client;
+        private readonly AcmeClient _client;
 
         public CertificateFactory(IOptions<LetsEncryptOptions> options,
             IHttpChallengeResponseStore challengeStore,
@@ -27,7 +30,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             _options = options;
             _challengeStore = challengeStore;
             _logger = logger;
-            client = new AcmeClient(_options.Value.AcmeServer);
+            _client = new AcmeClient(_options.Value.AcmeServer);
         }
 
         public async Task RegisterUserAsync(CancellationToken cancellationToken)
@@ -36,7 +39,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             var registration = "mailto:" + options.EmailAddress;
 
             _logger.LogInformation("Creating certificate registration for {registration}", registration);
-            var account = await client.NewRegistraton(registration);
+            var account = await _client.NewRegistraton(registration);
             _logger.LogResponse("NewRegistration", account);
 
             var tosUri = account.GetTermsOfServiceUri();
@@ -45,7 +48,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
 
             cancellationToken.ThrowIfCancellationRequested();
             _logger.LogDebug("Accepting the terms of service");
-            account = await client.UpdateRegistration(account);
+            account = await _client.UpdateRegistration(account);
             _logger.LogResponse("UpdateRegistration", account);
         }
 
@@ -93,7 +96,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             cancellationToken.ThrowIfCancellationRequested();
 
             _logger.LogDebug("Requesting authorization to create certificates for {hostname}", hostName);
-            var auth = await client.NewAuthorization(new AuthorizationIdentifier
+            var auth = await _client.NewAuthorization(new AuthorizationIdentifier
             {
                 Type = AuthorizationIdentifierTypes.Dns,
                 Value = hostName,
@@ -109,14 +112,14 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
                 throw new InvalidOperationException($"Did not receive challenge information for challenge type {ChallengeTypes.Http01}");
             }
 
-            var keyAuth = client.ComputeKeyAuthorization(httpChallenge);
+            var keyAuth = _client.ComputeKeyAuthorization(httpChallenge);
             _challengeStore.AddChallengeResponse(httpChallenge.Token, keyAuth);
 
             cancellationToken.ThrowIfCancellationRequested();
 
             _logger.LogDebug("Requesting completion of challenge to prove ownership of {hostname}", hostName);
 
-            var challengeCompletion = await client.CompleteChallenge(httpChallenge);
+            var challengeCompletion = await _client.CompleteChallenge(httpChallenge);
 
             _logger.LogResponse("CompleteChallenge", challengeCompletion);
 
@@ -131,7 +134,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
 
                 cancellationToken.ThrowIfCancellationRequested();
 
-                authorization = await client.GetAuthorization(challengeCompletion.Location);
+                authorization = await _client.GetAuthorization(challengeCompletion.Location);
 
                 _logger.LogResponse("GetAuthorization", authorization);
 
@@ -158,7 +161,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
 
         private Exception InvalidAuthorizationError(string hostName, AcmeResult<AuthorizationEntity> authorization)
         {
-            string reason = "unknown";
+            var reason = "unknown";
             try
             {
                 var errorStub = new { error = new { type = "", detail = "", status = -1 } };
@@ -185,7 +188,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
 
             _logger.LogInformation("Sending certifcate request for '{dn}'", dn);
 
-            var cert = await client.NewCertificate(csr);
+            var cert = await _client.NewCertificate(csr);
 
             _logger.LogResponse("NewCertificate", cert);
 
@@ -195,7 +198,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
 
         public void Dispose()
         {
-            client.Dispose();
+            _client.Dispose();
         }
     }
 }

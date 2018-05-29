@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) Nate McMaster.
+// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
+
+using System;
 using System.Collections.Concurrent;
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.Connections;
@@ -12,11 +15,11 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
     {
         private ConcurrentDictionary<string, X509Certificate2> _certs = new ConcurrentDictionary<string, X509Certificate2>(StringComparer.OrdinalIgnoreCase);
 
-        private readonly IOptions<LetsEncryptOptions> options;
+        private readonly IOptions<LetsEncryptOptions> _options;
 
         public CertificateSelector(IOptions<LetsEncryptOptions> options)
         {
-            this.options = options ?? throw new ArgumentNullException(nameof(options));
+            _options = options ?? throw new ArgumentNullException(nameof(options));
         }
 
         public void Use(string hostName, X509Certificate2 certificate)
@@ -28,7 +31,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
         {
             if (!_certs.TryGetValue(hostName, out var retVal))
             {
-                return options.Value.FallbackCertificate;
+                return _options.Value.FallbackCertificate;
             }
 
             return retVal;
