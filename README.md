@@ -1,6 +1,8 @@
 ASP.NET Core + Let's Encrypt
 ============================
 
+**Oct 2018**: Marking this project as "archived" on GitHub because I ran out of personal time to work on this and didn't get it up to a good enough quality to publish this. If you're interesting in continuing this project, please reach out to me: https://twitter.com/natemcmaster.
+
 The goal of this project is to make setting up HTTPS made easy.
 
 [Let's Encrypt](https://letsencrypt.org/) is a free, automated, and open Certificate Authority.
