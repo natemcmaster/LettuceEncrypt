@@ -22,6 +22,12 @@ jobs:
       version: '3.0.x'
       packageType: sdk
       includePreviewVersions: true
+  # .NET Core 2.2 is required for some build tools
+  - task: UseDotNet@2
+    displayName: Install .NET Core 2.2
+    inputs:
+      version: '2.2.x'
+      packageType: runtime
   - powershell: ./build.ps1 -ci
     displayName: Invoke build.ps1
     condition: eq(variables['kv-access-token'], '')
