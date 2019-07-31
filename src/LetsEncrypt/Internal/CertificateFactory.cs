@@ -10,9 +10,14 @@ using Certes;
 using Certes.Acme;
 using Certes.Acme.Resource;
 using Certes.Pkcs;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+
+#if NETCOREAPP2_1
+using IHostEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
+#endif
 
 namespace McMaster.AspNetCore.LetsEncrypt.Internal
 {
@@ -25,12 +30,14 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
 
         public CertificateFactory(IOptions<LetsEncryptOptions> options,
             IHttpChallengeResponseStore challengeStore,
-            ILogger logger)
+            ILogger logger,
+            IHostEnvironment env)
         {
             _options = options;
             _challengeStore = challengeStore;
             _logger = logger;
-            _client = new AcmeClient(_options.Value.AcmeServer);
+            var acmeUrl = _options.Value.GetAcmeServer(env);
+            _client = new AcmeClient(acmeUrl);
         }
 
         public async Task RegisterUserAsync(CancellationToken cancellationToken)

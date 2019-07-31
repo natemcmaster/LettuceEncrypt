@@ -10,6 +10,10 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
+#if NETCOREAPP2_1
+using IHostEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
+#endif
+
 namespace McMaster.AspNetCore.LetsEncrypt.Internal
 {
     /// <summary>
@@ -23,6 +27,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
         private readonly IOptions<LetsEncryptOptions> _options;
         private readonly ILogger<AcmeCertificateLoader> _logger;
 
+        private readonly IHostEnvironment _hostEnvironment;
         private volatile bool _hasRegistered;
 
         public AcmeCertificateLoader(
@@ -30,13 +35,15 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             IHttpChallengeResponseStore challengeStore,
             ICertificateStore certificateStore,
             IOptions<LetsEncryptOptions> options,
-            ILogger<AcmeCertificateLoader> logger)
+            ILogger<AcmeCertificateLoader> logger,
+            IHostEnvironment hostEnvironment)
         {
             _selector = selector;
             _challengeStore = challengeStore;
             _certificateStore = certificateStore;
             _options = options;
             _logger = logger;
+            _hostEnvironment = hostEnvironment;
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
@@ -57,7 +64,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
         {
             var errors = new List<Exception>();
 
-            using (var factory = new CertificateFactory(_options, _challengeStore, _logger))
+            using (var factory = new CertificateFactory(_options, _challengeStore, _logger, _hostEnvironment))
             {
                 foreach (var hostName in _options.Value.HostNames)
                 {
@@ -98,7 +105,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
 
             try
             {
-                _logger.LogInformation("Creating certificate for {hostname} using ACME server {acmeServer}", hostName, _options.Value.AcmeServer);
+                _logger.LogInformation("Creating certificate for {hostname} using ACME server {acmeServer}", hostName, _options.Value.GetAcmeServer(_hostEnvironment));
                 cert = await factory.CreateCertificateAsync(hostName, cancellationToken);
                 _logger.LogInformation("Created certificate {subjectName} ({thumbprint})", cert.Subject, cert.Thumbprint);
                 _certificateStore.Save(hostName, cert);

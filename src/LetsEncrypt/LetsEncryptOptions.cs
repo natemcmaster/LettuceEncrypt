@@ -4,6 +4,11 @@
 using System;
 using System.Security.Cryptography.X509Certificates;
 using Certes.Acme;
+using Microsoft.Extensions.Hosting;
+
+#if NETCOREAPP2_1
+using IHostEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
+#endif
 
 namespace McMaster.AspNetCore.LetsEncrypt
 {
@@ -12,6 +17,7 @@ namespace McMaster.AspNetCore.LetsEncrypt
     /// </summary>
     public class LetsEncryptOptions
     {
+        private Uri? _acmeServer;
         private string[] _hostNames = Array.Empty<string>();
 
         /// <summary>
@@ -19,8 +25,6 @@ namespace McMaster.AspNetCore.LetsEncrypt
         /// </summary>
         public LetsEncryptOptions()
         {
-            // Default to the production server.
-            AcmeServer = WellKnownServers.LetsEncrypt;
         }
 
         /// <summary>
@@ -48,15 +52,19 @@ namespace McMaster.AspNetCore.LetsEncrypt
         /// <summary>
         /// Use Let's Encrypt staging server.
         /// <para>
-        /// This is recommended during development of the application.
+        /// This is recommended during development of the application and is automatically enabled
+        /// if the hosting environment name is 'Development'.
         /// </para>
         /// </summary>
         public bool UseStagingServer
         {
-            get => AcmeServer == WellKnownServers.LetsEncryptStaging;
-            set => AcmeServer = value
-                    ? WellKnownServers.LetsEncryptStaging
-                    : WellKnownServers.LetsEncrypt;
+            get => _acmeServer == WellKnownServers.LetsEncryptStaging;
+            set
+            {
+                _acmeServer = value
+                   ? WellKnownServers.LetsEncryptStaging
+                   : WellKnownServers.LetsEncrypt;
+            }
         }
 
         /// <summary>
@@ -70,6 +78,17 @@ namespace McMaster.AspNetCore.LetsEncrypt
         /// <summary>
         /// The uri to the server that implements the ACME protocol for certificate generation.
         /// </summary>
-        internal Uri AcmeServer { get; set; }
+        /// <param name="env"></param>
+        internal Uri GetAcmeServer(IHostEnvironment env)
+        {
+            if (_acmeServer != null)
+            {
+                return _acmeServer;
+            }
+
+            return env.IsDevelopment()
+                ? WellKnownServers.LetsEncryptStaging
+                : WellKnownServers.LetsEncrypt;
+        }
     }
 }
