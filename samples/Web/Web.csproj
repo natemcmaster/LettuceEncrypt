@@ -1,14 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.App" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\McMaster.AspNetCore.LetsEncrypt\McMaster.AspNetCore.LetsEncrypt.csproj" />
+    <ProjectReference Include="..\..\src\LetsEncrypt\McMaster.AspNetCore.LetsEncrypt.csproj" />
   </ItemGroup>
 </Project>

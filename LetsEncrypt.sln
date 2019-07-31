@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web", "samples\Web\Web.cspr
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{CC50E6BF-ECAC-4B32-9DDF-68E0C09DEA4A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "McMaster.AspNetCore.LetsEncrypt", "src\McMaster.AspNetCore.LetsEncrypt\McMaster.AspNetCore.LetsEncrypt.csproj", "{195FD49D-AA3B-4936-A7D6-AD52784C7E84}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "McMaster.AspNetCore.LetsEncrypt", "src\LetsEncrypt\McMaster.AspNetCore.LetsEncrypt.csproj", "{195FD49D-AA3B-4936-A7D6-AD52784C7E84}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
