@@ -16,15 +16,17 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
         {
             _store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
             _store.Open(OpenFlags.ReadWrite);
-            this._logger = logger;
+            _logger = logger;
         }
 
-        public X509Certificate2 GetCertificate(string hostName)
+        public X509Certificate2? GetCertificate(string hostName)
         {
             var certs = _store.Certificates.Find(
                 X509FindType.FindBySubjectDistinguishedName,
                 "CN=" + hostName,
                 validOnly: true);
+
+            if (certs == null) return null;
 
             if (_logger.IsEnabled(LogLevel.Trace))
             {

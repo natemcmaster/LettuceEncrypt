@@ -1,29 +1,35 @@
 <Project>
-  <Import Project="version.props" />
-
   <PropertyGroup>
     <Authors>Nate McMaster</Authors>
     <Product>McMaster.AspNetCore.LetsEncrypt</Product>
-    <Copyright>© Nate McMaster</Copyright>
+    <Copyright>Copyright © Nate McMaster</Copyright>
     <NeutralLanguage>en-US</NeutralLanguage>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <PackageLicenseUrl>https://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/natemcmaster/LetsEncrypt</PackageProjectUrl>
     <RepositoryUrl>https://github.com/natemcmaster/LetsEncrypt.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <SourceLinkCreate>true</SourceLinkCreate>
-    <DebugType>embedded</DebugType>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <DebugType>portable</DebugType>
     <IsPackable>false</IsPackable>
-    <LangVersion>Latest</LangVersion>
+    <IncludeSymbols>true</IncludeSymbols>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <LangVersion>8.0</LangVersion>
+    <NullableContextOptions>enable</NullableContextOptions>
+    <NoWarn>$(NoWarn);NU5105</NoWarn>
     <!-- not all dependencies are signed
     <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)files\StrongName.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
     <PublicSign Condition="'$(OS)' != 'Windows_NT'">true</PublicSign> -->
 
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <GenerateFullPaths Condition="'$(VSCODE_PID)' != ''">true</GenerateFullPaths>
+    <GenerateFullPaths Condition="'$(TERM_PROGRAM)' == 'vscode'">true</GenerateFullPaths>
     <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
     <BaseOutputPath>$(MSBuildThisFileDirectory).build\$(MSBuildProjectName)\bin\</BaseOutputPath>
     <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory).build\$(MSBuildProjectName)\obj\</BaseIntermediateOutputPath>
   </PropertyGroup>
+
+  <ItemGroup Condition=" '$(CI)' == 'true' ">
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-19367-01" PrivateAssets="All" />
+  </ItemGroup>
 </Project>

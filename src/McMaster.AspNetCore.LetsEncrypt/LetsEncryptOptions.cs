@@ -43,7 +43,7 @@ namespace McMaster.AspNetCore.LetsEncrypt
         /// <summary>
         /// The email address used to register with letsencrypt.org.
         /// </summary>
-        public string EmailAddress { get; set; }
+        public string? EmailAddress { get; set; }
 
         /// <summary>
         /// Use Let's Encrypt staging server.
@@ -65,10 +65,10 @@ namespace McMaster.AspNetCore.LetsEncrypt
         /// This can be null if there is not fallback certificate.
         /// </para>
         /// </summary>
-        public X509Certificate2 FallbackCertificate { get; set; }
+        public X509Certificate2? FallbackCertificate { get; set; }
 
         /// <summary>
-        /// The uri to the server that implements thE ACME protocol for certificate generation.
+        /// The uri to the server that implements the ACME protocol for certificate generation.
         /// </summary>
         internal Uri AcmeServer { get; set; }
     }

@@ -27,7 +27,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             _certs.AddOrUpdate(hostName, certificate, (_, __) => certificate);
         }
 
-        public X509Certificate2 Select(ConnectionContext features, string hostName)
+        public X509Certificate2? Select(ConnectionContext features, string hostName)
         {
             if (!_certs.TryGetValue(hostName, out var retVal))
             {
