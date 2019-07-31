@@ -5,11 +5,10 @@ using System;
 using McMaster.AspNetCore.LetsEncrypt;
 using McMaster.AspNetCore.LetsEncrypt.Internal;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 
-namespace Microsoft.AspNetCore.LetsEncrypt
+namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
     /// Helper methods

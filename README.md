@@ -17,18 +17,21 @@ public class Program
 {
     public static void Main(string[] args)
     {
-        CreateWebHostBuilder(args).Build().Run();
+        CreateHostBuilder(args).Build().Run();
     }
 
-    public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-        WebHost.CreateDefaultBuilder(args)
+    public static IHostBuilder CreateHostBuilder(string[] args) =>
+        Host.CreateDefaultBuilder(args)
+            .ConfigureWebHostDefaults(webBuilder =>
+            {
+                webBuilder.UseStartup<Startup>();
+            })
             .UseLetsEncrypt(o =>
             {
                 o.HostNames = new[] { "example.com" };
                 o.AcceptTermsOfService = true;
                 o.EmailAddress = "admin@example.com";
-            })
-            .UseStartup<Startup>();
+            });
 }
 ```
 
