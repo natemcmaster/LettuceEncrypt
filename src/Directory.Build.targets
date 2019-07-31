@@ -1,0 +1,10 @@
+<Project>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-19351-01" PrivateAssets="all" />
+  </ItemGroup>
+
+  <Import Project="..\Directory.Build.targets" />
+  <Import Project="CodeSign.targets" />
+
+</Project>

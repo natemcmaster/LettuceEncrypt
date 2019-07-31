@@ -1,0 +1,63 @@
+trigger:
+- master
+
+pr:
+- '*'
+
+variables:
+- name: kv-access-token
+  value: ''
+- group: AzureKeyVault
+- name: BuildNumber
+  value: $[counter('buildnumber')]
+
+jobs:
+- job: Windows
+  pool:
+    vmImage: windows-2019
+  steps:
+  - task: UseDotNet@2
+    displayName: Install .NET Core 3.0
+    inputs:
+      version: '3.0.x'
+      packageType: sdk
+      includePreviewVersions: true
+  - powershell: ./build.ps1 -ci
+    displayName: Invoke build.ps1
+    condition: eq(variables['kv-access-token'], '')
+  - powershell: ./build.ps1 -ci /p:AzureKeyVaultClientSecret=$(kv-access-token)
+    displayName: Invoke build.ps1 with code signing
+    condition: ne(variables['kv-access-token'], '')
+  # - task: PublishTestResults@2
+  #   displayName: Upload test results
+  #   condition: always()
+  #   continueOnError: true
+  #   inputs:
+  #     testRunTitle: Windows
+  #     testRunner: vstest
+  #     testResultsFiles: '**/*.trx'
+  - task: PublishBuildArtifacts@1
+    displayName: Publish artifacts
+    inputs:
+      pathtoPublish: 'artifacts/'
+      artifactName: 'Packages'
+# - job: Linux
+#   pool:
+#     vmImage: 'Ubuntu-16.04'
+#   steps:
+#   - task: UseDotNet@2
+#     displayName: Install .NET Core 3.0
+#     inputs:
+#       version: '3.0.x'
+#       packageType: sdk
+#       includePreviewVersions: true
+#   - script: ./build.ps1 -ci
+#     displayName: Invoke build.ps1
+#   - task: PublishTestResults@2
+#     displayName: Upload test results
+#     condition: always()
+#     continueOnError: true
+#     inputs:
+#       testRunTitle: Linux
+#       testRunner: vstest
+#       testResultsFiles: '**/*.trx'

@@ -15,12 +15,15 @@
     <IncludeSymbols>true</IncludeSymbols>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <LangVersion>8.0</LangVersion>
-    <NullableContextOptions>enable</NullableContextOptions>
-    <NoWarn>$(NoWarn);NU5105</NoWarn>
     <!-- not all dependencies are signed
     <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)files\StrongName.snk</AssemblyOriginatorKeyFile>
-    <SignAssembly>true</SignAssembly>
-    <PublicSign Condition="'$(OS)' != 'Windows_NT'">true</PublicSign> -->
+    <SignAssembly>true</SignAssembly> -->
+    <AzureKeyVaultUrl>https://nmcmaster.vault.azure.net</AzureKeyVaultUrl>
+    <AzureKeyVaultClientId>6a27a2da-bb78-4baa-bd2b-150fe89ea039</AzureKeyVaultClientId>
+    <AzureKeyVaultClientSecret>$(KEYVAULT_CLIENT_SECRET)</AzureKeyVaultClientSecret>
+    <CodeSignCertName>DigiCertCodeSign</CodeSignCertName>
+    <NoWarn>$(NoWarn);NU5105</NoWarn>
+    <IsPackableFalseWarningTask>false</IsPackableFalseWarningTask>
 
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <GenerateFullPaths Condition="'$(TERM_PROGRAM)' == 'vscode'">true</GenerateFullPaths>
@@ -29,7 +32,5 @@
     <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory).build\$(MSBuildProjectName)\obj\</BaseIntermediateOutputPath>
   </PropertyGroup>
 
-  <ItemGroup Condition=" '$(CI)' == 'true' ">
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-19367-01" PrivateAssets="All" />
-  </ItemGroup>
+  <Import Project="version.props" />
 </Project>
