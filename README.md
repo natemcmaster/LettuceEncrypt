@@ -24,13 +24,14 @@ public class Program
         Host.CreateDefaultBuilder(args)
             .ConfigureWebHostDefaults(webBuilder =>
             {
-                webBuilder.UseStartup<Startup>();
-            })
-            .UseLetsEncrypt(o =>
-            {
-                o.HostNames = new[] { "example.com" };
-                o.AcceptTermsOfService = true;
-                o.EmailAddress = "admin@example.com";
+                webBuilder
+                    .UseStartup<Startup>()
+                    .UseLetsEncrypt(o =>
+                    {
+                        o.HostNames = new[] { "example.com" };
+                        o.AcceptTermsOfService = true;
+                        o.EmailAddress = "admin@example.com";
+                    });
             });
 }
 ```

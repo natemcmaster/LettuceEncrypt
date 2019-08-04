@@ -22,6 +22,7 @@
     <AzureKeyVaultClientSecret>$(KEYVAULT_CLIENT_SECRET)</AzureKeyVaultClientSecret>
     <CodeSignCertName>DigiCertCodeSign</CodeSignCertName>
     <NoWarn>$(NoWarn);NU5105</NoWarn>
+    <WarningsNotAsErrors>$(WarningsNotAsErrors);CS1591</WarningsNotAsErrors>
     <IsPackableFalseWarningTask>false</IsPackableFalseWarningTask>
 
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>

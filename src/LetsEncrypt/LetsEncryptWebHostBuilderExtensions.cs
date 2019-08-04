@@ -4,10 +4,9 @@
 using System;
 using McMaster.AspNetCore.LetsEncrypt;
 using McMaster.AspNetCore.LetsEncrypt.Internal;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Microsoft.Extensions.Hosting
+namespace Microsoft.AspNetCore.Hosting
 {
     /// <summary>
     /// Helper methods for configuring Let's Encrypt with an ASP.NET Core server.
@@ -21,7 +20,7 @@ namespace Microsoft.Extensions.Hosting
         /// <param name="builder">The web host builder</param>
         /// <param name="configure">Options for configuring certificate generation</param>
         /// <returns>The web host builder</returns>
-        public static IHostBuilder UseLetsEncrypt(this IHostBuilder builder, Action<LetsEncryptOptions> configure)
+        public static IWebHostBuilder UseLetsEncrypt(this IWebHostBuilder builder, Action<LetsEncryptOptions> configure)
         {
             builder.ConfigureServices((_, services) =>
             {
