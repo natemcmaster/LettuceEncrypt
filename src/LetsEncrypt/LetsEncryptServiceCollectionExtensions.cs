@@ -10,6 +10,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 
+#if NETCOREAPP2_1
+using IHostEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
+#endif
+
 namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
@@ -51,8 +55,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IConfigureOptions<LetsEncryptOptions>>(services =>
             {
                 var config = services.GetService<IConfiguration>();
+                var hostEnv = services.GetService<IHostEnvironment>();
                 return new ConfigureOptions<LetsEncryptOptions>(options =>
                     {
+                        options.UseStagingServer = hostEnv.IsDevelopment();
                         config.Bind("LetsEncrypt", options);
                     });
             });
