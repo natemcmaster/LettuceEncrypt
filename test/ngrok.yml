@@ -1,0 +1,5 @@
+tunnels:
+  http:
+    proto: http
+    addr: 5000
+    bind_tls: false

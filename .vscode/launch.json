@@ -6,9 +6,9 @@
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build",
-      "program": "${workspaceFolder}/.build/Web/bin/Debug/netcoreapp2.1/Web.dll",
+      "program": "${workspaceFolder}/.build/Web/bin/Debug/netcoreapp3.0/Web.dll",
       "args": [],
-      "cwd": "${workspaceFolder}/sample/Web",
+      "cwd": "${workspaceFolder}/samples/Web",
       "stopAtEntry": false,
       "internalConsoleOptions": "openOnSessionStart",
       "launchBrowser": {

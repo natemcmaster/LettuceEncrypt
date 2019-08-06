@@ -20,7 +20,7 @@ I recommend the following steps.
     sudo vim /etc/hosts
     ```
 
-    Add a new line for "127.0.0.1  http://TMP.ngrok.io"
+    Add a new line for "127.0.0.1  TMP.ngrok.io"
 
 ![vim](https://i.imgur.com/BtJQSaL.png)
 

@@ -4,6 +4,7 @@
 using System;
 using McMaster.AspNetCore.LetsEncrypt;
 using McMaster.AspNetCore.LetsEncrypt.Internal;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
@@ -11,12 +12,13 @@ using Microsoft.Extensions.Options;
 namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
-    /// Helper methods
+    /// Helper methods for configuring https://letsencrypt.org/.
     /// </summary>
     public static class LetsEncryptServiceCollectionExtensions
     {
         /// <summary>
-        /// Adds services for setting up let's encrypt when the application starts.
+        /// Use Let's Encrypt (<see href="https://letsencrypt.org/">https://letsencrypt.org/</see>) to automatically
+        /// generate HTTPS certificates for this server.
         /// </summary>
         /// <param name="services"></param>
         /// <param name="configure"></param>
@@ -30,9 +32,11 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddSingleton<IHostedService, AcmeCertificateLoader>()
                 .AddSingleton<IHttpChallengeResponseStore, InMemoryHttpChallengeResponseStore>()
                 .AddSingleton<ICertificateStore, X509CertStore>()
-                .AddSingleton<HttpChallengeResponseMiddleware>();
+                .AddSingleton<HttpChallengeResponseMiddleware>()
+                .AddSingleton<IStartupFilter, HttpChallengeStartupFilter>();
 
             services.Configure(configure);
+
             return services;
         }
     }

@@ -5,8 +5,6 @@ using System;
 using System.Collections.Concurrent;
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.Connections;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Options;
 
 namespace McMaster.AspNetCore.LetsEncrypt.Internal

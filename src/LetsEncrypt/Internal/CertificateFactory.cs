@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
@@ -28,7 +29,8 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
         private readonly ILogger _logger;
         private readonly AcmeClient _client;
 
-        public CertificateFactory(IOptions<LetsEncryptOptions> options,
+        public CertificateFactory(
+            IOptions<LetsEncryptOptions> options,
             IHttpChallengeResponseStore challengeStore,
             ILogger logger,
             IHostEnvironment env)
@@ -51,7 +53,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
 
             var tosUri = account.GetTermsOfServiceUri();
             account.Data.Agreement = tosUri;
-            EnsureAgreementToTermsOfServices(options, tosUri);
+            EnsureAgreementToTermsOfServices(tosUri);
 
             cancellationToken.ThrowIfCancellationRequested();
             _logger.LogDebug("Accepting the terms of service");
@@ -59,15 +61,24 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             _logger.LogResponse("UpdateRegistration", account);
         }
 
-        public async Task<X509Certificate2> CreateCertificateAsync(string hostName, CancellationToken cancellationToken)
+        public async Task<X509Certificate2> CreateCertificateAsync(CancellationToken cancellationToken)
         {
-            await ValidateDomainOwnershipAsync(hostName, cancellationToken);
-            return await CompleteCertificateRequestAsync(hostName, cancellationToken);
+            await Task.WhenAll(BeginValidateAllDomains(cancellationToken));
+            return await CompleteCertificateRequestAsync(cancellationToken);
         }
 
-        private void EnsureAgreementToTermsOfServices(LetsEncryptOptions options, Uri tosUri)
+        private IEnumerable<Task> BeginValidateAllDomains(CancellationToken cancellationToken)
         {
-            if (options.AcceptTermsOfService)
+            yield return ValidateDomainOwnershipAsync(_options.Value.DomainName, cancellationToken);
+            foreach (var domainName in _options.Value.AdditionalDomainNames)
+            {
+                yield return ValidateDomainOwnershipAsync(domainName, cancellationToken);
+            }
+        }
+
+        private void EnsureAgreementToTermsOfServices(Uri tosUri)
+        {
+            if (_options.Value.AcceptTermsOfService)
             {
                 return;
             }
@@ -87,6 +98,13 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
                 catch { }
 
                 var result = Console.ReadLine().Trim();
+
+                try
+                {
+                    Console.CursorVisible = false;
+                }
+                catch { }
+
                 if (string.IsNullOrEmpty(result)
                     || string.Equals("y", result, StringComparison.OrdinalIgnoreCase))
                 {
@@ -98,15 +116,15 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             throw new InvalidOperationException("Could not automatically accept the terms of service");
         }
 
-        private async Task ValidateDomainOwnershipAsync(string hostName, CancellationToken cancellationToken)
+        private async Task ValidateDomainOwnershipAsync(string domainName, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            _logger.LogDebug("Requesting authorization to create certificates for {hostname}", hostName);
+            _logger.LogDebug("Requesting authorization to create certificate for {domainName}", domainName);
             var auth = await _client.NewAuthorization(new AuthorizationIdentifier
             {
                 Type = AuthorizationIdentifierTypes.Dns,
-                Value = hostName,
+                Value = domainName,
             });
             _logger.LogResponse("NewAuthorization", auth);
 
@@ -124,7 +142,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
 
             cancellationToken.ThrowIfCancellationRequested();
 
-            _logger.LogDebug("Requesting completion of challenge to prove ownership of {hostname}", hostName);
+            _logger.LogDebug("Requesting completion of challenge to prove ownership of {domainName}", domainName);
 
             var challengeCompletion = await _client.CompleteChallenge(httpChallenge);
 
@@ -154,9 +172,9 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
                         await Task.Delay(delay);
                         continue;
                     case EntityStatus.Invalid:
-                        throw InvalidAuthorizationError(hostName, authorization);
+                        throw InvalidAuthorizationError(domainName, authorization);
                     case EntityStatus.Revoked:
-                        throw new InvalidOperationException($"The authorization to verify hostname '{hostName}' has been revoked.");
+                        throw new InvalidOperationException($"The authorization to verify domainName '{domainName}' has been revoked.");
                     case EntityStatus.Unknown:
                     default:
                         throw new ArgumentOutOfRangeException("Unexpected response from server while validating domain ownership.");
@@ -166,7 +184,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             throw new TimeoutException("Timed out waiting for domain ownership validation.");
         }
 
-        private Exception InvalidAuthorizationError(string hostName, AcmeResult<AuthorizationEntity> authorization)
+        private Exception InvalidAuthorizationError(string domainName, AcmeResult<AuthorizationEntity> authorization)
         {
             var reason = "unknown";
             try
@@ -180,26 +198,30 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
                 _logger.LogTrace("Could not determine reason why validation failed. Response: {resp}", authorization.Json);
             }
 
-            _logger.LogError("Failed to validate ownership of hostname '{hostName}'. Reason: {reason}", hostName, reason);
+            _logger.LogError("Failed to validate ownership of domainName '{domainName}'. Reason: {reason}", domainName, reason);
 
-            return new InvalidOperationException($"Failed to validate ownership of hostname '{hostName}'");
+            return new InvalidOperationException($"Failed to validate ownership of domainName '{domainName}'");
         }
 
-        private async Task<X509Certificate2> CompleteCertificateRequestAsync(string hostName, CancellationToken cancellationToken)
+        private async Task<X509Certificate2> CompleteCertificateRequestAsync(CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
+            var distinguishedName = "CN=" + _options.Value.DomainName;
+            _logger.LogDebug("Creating cert for {distinguishedName}", distinguishedName);
 
-            var csr = new CertificationRequestBuilder();
-            var dn = "CN=" + hostName;
-            csr.AddName(dn);
+            var csb = new CertificationRequestBuilder();
+            csb.AddName(distinguishedName);
+            foreach (var name in _options.Value.AdditionalDomainNames)
+            {
+                csb.SubjectAlternativeNames.Add(name);
+            }
 
-            _logger.LogInformation("Sending certifcate request for '{dn}'", dn);
+            var acmeCert = await _client.NewCertificate(csb);
 
-            var cert = await _client.NewCertificate(csr);
+            _logger.LogResponse("NewCertificate", acmeCert);
 
-            _logger.LogResponse("NewCertificate", cert);
-
-            var pfx = cert.ToPfx().Build(hostName, string.Empty);
+            var pfxBuilder = acmeCert.ToPfx();
+            var pfx = pfxBuilder.Build("Let's Encrypt - " + _options.Value.DomainName, string.Empty);
             return new X509Certificate2(pfx, string.Empty, X509KeyStorageFlags.Exportable);
         }
 

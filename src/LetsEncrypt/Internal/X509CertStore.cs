@@ -26,7 +26,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
                 "CN=" + hostName,
                 validOnly: true);
 
-            if (certs == null) return null;
+            if (certs == null || certs.Count == 0) return null;
 
             if (_logger.IsEnabled(LogLevel.Trace))
             {
@@ -36,9 +36,16 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
                 }
             }
 
-            return certs.Count > 0
-                ? certs[0]
-                : null;
+            X509Certificate2? certWithMostTtl = null;
+            foreach (var cert in certs)
+            {
+                if (certWithMostTtl == null || cert.NotAfter > certWithMostTtl.NotAfter)
+                {
+                    certWithMostTtl = cert;
+                }
+            }
+
+            return certWithMostTtl;
         }
 
         public void Save(string hostName, X509Certificate2 certificate)

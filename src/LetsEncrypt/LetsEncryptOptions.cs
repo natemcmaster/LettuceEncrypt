@@ -2,6 +2,8 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using Certes.Acme;
 using Microsoft.Extensions.Hosting;
@@ -18,23 +20,16 @@ namespace McMaster.AspNetCore.LetsEncrypt
     public class LetsEncryptOptions
     {
         private Uri? _acmeServer;
-        private string[] _hostNames = Array.Empty<string>();
 
         /// <summary>
-        /// Initialize an instance of <see cref="LetsEncryptOptions" />
+        /// The domain names for which to issue the HTTPS certificate.
         /// </summary>
-        public LetsEncryptOptions()
-        {
-        }
+        public string DomainName { get; set; } = string.Empty;
 
         /// <summary>
-        /// The domain names for which to generate certificates.
+        /// Additional domain names for which to issue the HTTPS certificate.
         /// </summary>
-        public string[] HostNames
-        {
-            get => _hostNames;
-            set => _hostNames = value ?? throw new ArgumentNullException(nameof(value));
-        }
+        public ICollection<string> AdditionalDomainNames { get; } = new List<string>();
 
         /// <summary>
         /// Indicate that you agree with Let's Encrypt's terms of service.
@@ -47,7 +42,7 @@ namespace McMaster.AspNetCore.LetsEncrypt
         /// <summary>
         /// The email address used to register with letsencrypt.org.
         /// </summary>
-        public string? EmailAddress { get; set; }
+        public string EmailAddress { get; set; } = string.Empty;
 
         /// <summary>
         /// Use Let's Encrypt staging server.

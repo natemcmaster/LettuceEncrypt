@@ -51,35 +51,49 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            if (_options.Value.HostNames.Length >= 0)
+            // load certificates in the background
+
+            Task.Factory.StartNew(async () =>
             {
-                // load certificates in the background
-                Task.Run(async () => await LoadCerts(cancellationToken));
-            }
+                const string errorMessage = "Failed to create certificate";
+
+                try
+                {
+                    await LoadCerts(cancellationToken);
+                }
+                catch (AggregateException ex) when (ex.InnerException != null)
+                {
+                    _logger.LogError(0, ex.InnerException, errorMessage);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(0, ex, errorMessage);
+                }
+            });
 
             return Task.CompletedTask;
         }
 
         private async Task LoadCerts(CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             var errors = new List<Exception>();
 
-            using (var factory = new CertificateFactory(_options, _challengeStore, _logger, _hostEnvironment))
-            {
-                foreach (var hostName in _options.Value.HostNames)
-                {
-                    cancellationToken.ThrowIfCancellationRequested();
+            using var factory = new CertificateFactory(_options, _challengeStore, _logger, _hostEnvironment);
 
-                    try
-                    {
-                        var cert = await GetOrCreateCertificate(factory, hostName, cancellationToken);
-                        _selector.Use(hostName, cert);
-                    }
-                    catch (Exception ex)
-                    {
-                        errors.Add(ex);
-                    }
+            try
+            {
+                var cert = await GetOrCreateCertificate(factory, cancellationToken);
+                _selector.Use(_options.Value.DomainName, cert);
+                foreach (var additionalName in _options.Value.AdditionalDomainNames)
+                {
+                    _selector.Use(additionalName, cert);
                 }
+            }
+            catch (Exception ex)
+            {
+                errors.Add(ex);
             }
 
             if (errors.Count > 0)
@@ -88,12 +102,13 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             }
         }
 
-        private async Task<X509Certificate2> GetOrCreateCertificate(CertificateFactory factory, string hostName, CancellationToken cancellationToken)
+        private async Task<X509Certificate2> GetOrCreateCertificate(CertificateFactory factory, CancellationToken cancellationToken)
         {
-            var cert = _certificateStore.GetCertificate(hostName);
+            var domainName = _options.Value.DomainName;
+            var cert = _certificateStore.GetCertificate(domainName);
             if (cert != null)
             {
-                _logger.LogDebug("Certificate for {hostname} already found.", hostName);
+                _logger.LogDebug("Certificate for {hostname} already found.", domainName);
                 return cert;
             }
 
@@ -105,15 +120,15 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
 
             try
             {
-                _logger.LogInformation("Creating certificate for {hostname} using ACME server {acmeServer}", hostName, _options.Value.GetAcmeServer(_hostEnvironment));
-                cert = await factory.CreateCertificateAsync(hostName, cancellationToken);
+                _logger.LogInformation("Creating certificate for {hostname} using ACME server {acmeServer}", domainName, _options.Value.GetAcmeServer(_hostEnvironment));
+                cert = await factory.CreateCertificateAsync(cancellationToken);
                 _logger.LogInformation("Created certificate {subjectName} ({thumbprint})", cert.Subject, cert.Thumbprint);
-                _certificateStore.Save(hostName, cert);
+                _certificateStore.Save(domainName, cert);
                 return cert;
             }
             catch (Exception ex)
             {
-                _logger.LogError(0, ex, "Failed to automatically create a certificate for {hostname}", hostName);
+                _logger.LogError(0, ex, "Failed to automatically create a certificate for {hostname}", domainName);
                 throw;
             }
         }

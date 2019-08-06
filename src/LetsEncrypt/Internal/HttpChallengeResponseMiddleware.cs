@@ -35,10 +35,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
                 return;
             }
 
-            if (_logger.IsEnabled(LogLevel.Information))
-            {
-                _logger.LogDebug("Confirmed challenge request for {token}", token);
-            }
+            _logger.LogDebug("Confirmed challenge request for {token}", token);
 
             context.Response.ContentLength = value.Length;
             context.Response.ContentType = "application/octet-stream";

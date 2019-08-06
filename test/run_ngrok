@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+set -ue
+
+DIR=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)
+
+home_config=""
+if [ -f "$HOME/.ngrok2/ngrok.yml" ]; then
+    home_config="--config $HOME/.ngrok2/ngrok.yml"
+fi
+
+ngrok start --all --config $DIR/ngrok.yml $home_config
