@@ -18,15 +18,15 @@ namespace McMaster.AspNetCore.LetsEncrypt
     public class LetsEncryptOptions
     {
         private Uri? _acmeServer;
-        private string[] _hostNames = Array.Empty<string>();
+        private string[] _domainNames = Array.Empty<string>();
 
         /// <summary>
         /// The domain names for which to generate certificates.
         /// </summary>
-        public string[] HostNames
+        public string[] DomainNames
         {
-            get => _hostNames;
-            set => _hostNames = value ?? throw new ArgumentNullException(nameof(value));
+            get => _domainNames;
+            set => _domainNames = value ?? throw new ArgumentNullException(nameof(value));
         }
 
         /// <summary>

@@ -29,7 +29,7 @@ I recommend the following steps.
 ```csharp
     .UseLetsEncrypt(o =>
     {
-        o.HostNames = new[] { "TMP.ngrok.io" };
+        o.DomainNames = new[] { "TMP.ngrok.io" };
         o.UseStagingServer = true; // <--- use staging
 
         o.AcceptTermsOfService = true;

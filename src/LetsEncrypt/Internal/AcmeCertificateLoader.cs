@@ -54,7 +54,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
         {
             // load certificates in the background
 
-            if (!LetsEncryptHostNamesWereConfigured())
+            if (!LetsEncryptDomainNamesWereConfigured())
             {
                 _logger.LogInformation("No domain names were configured for Let's Encrypt");
                 return Task.CompletedTask;
@@ -81,9 +81,9 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             return Task.CompletedTask;
         }
 
-        private bool LetsEncryptHostNamesWereConfigured()
+        private bool LetsEncryptDomainNamesWereConfigured()
         {
-            return _options.Value.HostNames
+            return _options.Value.DomainNames
                 .Where(w => !string.Equals("localhost", w, StringComparison.OrdinalIgnoreCase))
                 .Any();
         }
@@ -99,9 +99,9 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
         try
         {
             var cert = await GetOrCreateCertificate(factory, cancellationToken);
-            foreach (var hostName in _options.Value.HostNames)
+            foreach (var domainName in _options.Value.DomainNames)
             {
-                _selector.Use(hostName, cert);
+                _selector.Use(domainName, cert);
             }
         }
         catch (Exception ex)
@@ -117,11 +117,11 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
 
     private async Task<X509Certificate2> GetOrCreateCertificate(CertificateFactory factory, CancellationToken cancellationToken)
     {
-        var hostName = _options.Value.HostNames[0];
-        var cert = _certificateStore.GetCertificate(hostName);
+        var domainName = _options.Value.DomainNames[0];
+        var cert = _certificateStore.GetCertificate(domainName);
         if (cert != null)
         {
-            _logger.LogDebug("Certificate for {hostname} already found.", hostName);
+            _logger.LogDebug("Certificate for {hostname} already found.", domainName);
             return cert;
         }
 
@@ -133,15 +133,15 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
 
         try
         {
-            _logger.LogInformation("Creating certificate for {hostname} using ACME server {acmeServer}", hostName, _options.Value.GetAcmeServer(_hostEnvironment));
+            _logger.LogInformation("Creating certificate for {hostname} using ACME server {acmeServer}", domainName, _options.Value.GetAcmeServer(_hostEnvironment));
             cert = await factory.CreateCertificateAsync(cancellationToken);
             _logger.LogInformation("Created certificate {subjectName} ({thumbprint})", cert.Subject, cert.Thumbprint);
-            _certificateStore.Save(hostName, cert);
+            _certificateStore.Save(domainName, cert);
             return cert;
         }
         catch (Exception ex)
         {
-            _logger.LogError(0, ex, "Failed to automatically create a certificate for {hostname}", hostName);
+            _logger.LogError(0, ex, "Failed to automatically create a certificate for {hostname}", domainName);
             throw;
         }
     }

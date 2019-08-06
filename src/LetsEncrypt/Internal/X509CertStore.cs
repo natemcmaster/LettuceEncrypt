@@ -19,11 +19,11 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             _logger = logger;
         }
 
-        public X509Certificate2? GetCertificate(string hostName)
+        public X509Certificate2? GetCertificate(string domainName)
         {
             var certs = _store.Certificates.Find(
                 X509FindType.FindBySubjectDistinguishedName,
-                "CN=" + hostName,
+                "CN=" + domainName,
                 validOnly: true);
 
             if (certs == null || certs.Count == 0) return null;
@@ -48,7 +48,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             return certWithMostTtl;
         }
 
-        public void Save(string hostName, X509Certificate2 certificate)
+        public void Save(string domainName, X509Certificate2 certificate)
         {
             try
             {

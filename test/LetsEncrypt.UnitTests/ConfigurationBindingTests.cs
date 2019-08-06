@@ -16,8 +16,8 @@ namespace LetsEncrypt.Tests
             var data = new Dictionary<string, string>
             {
                 ["LetsEncrypt:AcceptTermsOfService"] = "true",
-                ["LetsEncrypt:HostNames:0"] = "one.com",
-                ["LetsEncrypt:HostNames:1"] = "two.com",
+                ["LetsEncrypt:DomainNames:0"] = "one.com",
+                ["LetsEncrypt:DomainNames:1"] = "two.com",
             };
             var config = new ConfigurationBuilder()
                 .AddInMemoryCollection(data)
@@ -31,7 +31,7 @@ namespace LetsEncrypt.Tests
             var options = services.GetRequiredService<IOptions<LetsEncryptOptions>>();
 
             Assert.True(options.Value.AcceptTermsOfService);
-            Assert.Collection(options.Value.HostNames,
+            Assert.Collection(options.Value.DomainNames,
                 one => Assert.Equal("one.com", one),
                 two => Assert.Equal("two.com", two));
         }

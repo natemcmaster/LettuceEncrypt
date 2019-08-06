@@ -20,14 +20,14 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             _options = options ?? throw new ArgumentNullException(nameof(options));
         }
 
-        public void Use(string hostName, X509Certificate2 certificate)
+        public void Use(string domainName, X509Certificate2 certificate)
         {
-            _certs.AddOrUpdate(hostName, certificate, (_, __) => certificate);
+            _certs.AddOrUpdate(domainName, certificate, (_, __) => certificate);
         }
 
-        public X509Certificate2? Select(ConnectionContext features, string hostName)
+        public X509Certificate2? Select(ConnectionContext features, string domainName)
         {
-            if (!_certs.TryGetValue(hostName, out var retVal))
+            if (!_certs.TryGetValue(domainName, out var retVal))
             {
                 return _options.Value.FallbackCertificate;
             }

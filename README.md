@@ -33,7 +33,7 @@ A few required options should be set, typically via the appsettings.json file.
         "AcceptTermsOfService": true,
 
         // You must at least one domain name
-        "HostNames": [ "example.com", "www.example.com" ],
+        "DomainNames": [ "example.com", "www.example.com" ],
 
         // You must specify an email address to register with letsencrypt.org
         "EmailAddress": "it-admin@example.com"
