@@ -54,12 +54,16 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddSingleton<IConfigureOptions<LetsEncryptOptions>>(services =>
             {
-                var config = services.GetService<IConfiguration>();
-                var hostEnv = services.GetService<IHostEnvironment>();
+                var config = services.GetService<IConfiguration?>();
+                var hostEnv = services.GetService<IHostEnvironment?>();
                 return new ConfigureOptions<LetsEncryptOptions>(options =>
                     {
-                        options.UseStagingServer = hostEnv.IsDevelopment();
-                        config.Bind("LetsEncrypt", options);
+                        if (hostEnv != null)
+                        {
+                            options.UseStagingServer = hostEnv.IsDevelopment();
+                        }
+
+                        config?.Bind("LetsEncrypt", options);
                     });
             });
 
