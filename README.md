@@ -10,31 +10,33 @@ When configured correctly, this API will automatically contact the <https://lets
 
 ## Usage
 
-The primary API usage is to call `IServiceColleciton.AddLetsEncrypt` and set a few required options.
+The primary API usage is to call `IServiceColleciton.AddLetsEncrypt` in the `Startup` class `ConfigureServices` method.
 
 ```csharp
 public class Startup
 {
     public void ConfigureServices(IServiceCollection services)
     {
-        services.AddLetsEncrypt(o =>
-            {
-                // Must be set.
-                o.DomainName = "example.com";
+        services.AddLetsEncrypt();
+    }
+}
+```
 
-                // Set this to automatically accept Let's Encrypt's terms of service
-                o.AcceptTermsOfService = true;
+A few required options should be set, typically via the appsettings.json file.
 
-                // The email address to register with your application
-                o.EmailAddress = "admin@example.com";
+```jsonc
+// appsettings.json
+{
+    "LetsEncrypt": {
+        // Set this to automatically accept Let's Encrypt's terms of service.
+        // If you don't set this in config, you will need to press "y" whenever the application starts
+        "AcceptTermsOfService": true,
 
-                // Use the staging server when developing your app
-                // to avoid rate limits until you're app is ready for production
-                // if you omit this setting, the staging server will be used by default when
-                // the host environment name is 'Development', but otherwise uses Let's Encrypt
-                // production servers.
-                o.UseStagingServer = true;
-            });
+        // You must at least one domain name
+        "HostNames": [ "example.com", "www.example.com" ],
+
+        // You must specify an email address to register with letsencrypt.org
+        "EmailAddress": "it-admin@example.com"
     }
 }
 ```

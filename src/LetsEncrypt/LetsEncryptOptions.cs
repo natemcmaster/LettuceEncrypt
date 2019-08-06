@@ -2,8 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using Certes.Acme;
 using Microsoft.Extensions.Hosting;
@@ -20,16 +18,16 @@ namespace McMaster.AspNetCore.LetsEncrypt
     public class LetsEncryptOptions
     {
         private Uri? _acmeServer;
+        private string[] _hostNames = Array.Empty<string>();
 
         /// <summary>
-        /// The domain names for which to issue the HTTPS certificate.
+        /// The domain names for which to generate certificates.
         /// </summary>
-        public string DomainName { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Additional domain names for which to issue the HTTPS certificate.
-        /// </summary>
-        public ICollection<string> AdditionalDomainNames { get; } = new List<string>();
+        public string[] HostNames
+        {
+            get => _hostNames;
+            set => _hostNames = value ?? throw new ArgumentNullException(nameof(value));
+        }
 
         /// <summary>
         /// Indicate that you agree with Let's Encrypt's terms of service.

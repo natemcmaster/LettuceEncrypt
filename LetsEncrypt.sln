@@ -11,6 +11,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{CC50E6BF-ECA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "McMaster.AspNetCore.LetsEncrypt", "src\LetsEncrypt\McMaster.AspNetCore.LetsEncrypt.csproj", "{195FD49D-AA3B-4936-A7D6-AD52784C7E84}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{F832E417-FA9F-4DB4-8E82-3D56054E47B1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LetsEncrypt.UnitTests", "test\LetsEncrypt.UnitTests\LetsEncrypt.UnitTests.csproj", "{0BFCC67B-4746-4158-8056-E93C879D9C80}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -48,9 +52,22 @@ Global
 		{195FD49D-AA3B-4936-A7D6-AD52784C7E84}.Release|x64.Build.0 = Release|Any CPU
 		{195FD49D-AA3B-4936-A7D6-AD52784C7E84}.Release|x86.ActiveCfg = Release|Any CPU
 		{195FD49D-AA3B-4936-A7D6-AD52784C7E84}.Release|x86.Build.0 = Release|Any CPU
+		{0BFCC67B-4746-4158-8056-E93C879D9C80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0BFCC67B-4746-4158-8056-E93C879D9C80}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0BFCC67B-4746-4158-8056-E93C879D9C80}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{0BFCC67B-4746-4158-8056-E93C879D9C80}.Debug|x64.Build.0 = Debug|Any CPU
+		{0BFCC67B-4746-4158-8056-E93C879D9C80}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0BFCC67B-4746-4158-8056-E93C879D9C80}.Debug|x86.Build.0 = Debug|Any CPU
+		{0BFCC67B-4746-4158-8056-E93C879D9C80}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0BFCC67B-4746-4158-8056-E93C879D9C80}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0BFCC67B-4746-4158-8056-E93C879D9C80}.Release|x64.ActiveCfg = Release|Any CPU
+		{0BFCC67B-4746-4158-8056-E93C879D9C80}.Release|x64.Build.0 = Release|Any CPU
+		{0BFCC67B-4746-4158-8056-E93C879D9C80}.Release|x86.ActiveCfg = Release|Any CPU
+		{0BFCC67B-4746-4158-8056-E93C879D9C80}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{014A3D8E-1DFB-470B-AF44-7E7DFA16E060} = {C1D11C9E-C330-450D-9FD4-13A679A3D707}
 		{195FD49D-AA3B-4936-A7D6-AD52784C7E84} = {CC50E6BF-ECAC-4B32-9DDF-68E0C09DEA4A}
+		{0BFCC67B-4746-4158-8056-E93C879D9C80} = {F832E417-FA9F-4DB4-8E82-3D56054E47B1}
 	EndGlobalSection
 EndGlobal

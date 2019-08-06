@@ -50,14 +50,13 @@ Remove-Item -Recurse $artifacts -ErrorAction Ignore
 exec dotnet build --configuration $Configuration '-warnaserror:CS1591' @MSBuildArgs
 exec dotnet pack --no-restore --no-build --configuration $Configuration -o $artifacts @MSBuildArgs
 
-# [string[]] $testArgs=@()
-# if ($env:TF_BUILD) {
-#     $testArgs += '--logger', 'trx'
-# }
+[string[]] $testArgs=@()
+if ($env:TF_BUILD) {
+    $testArgs += '--logger', 'trx'
+}
 
-# exec dotnet test --no-restore --no-build --configuration $Configuration '-clp:Summary' `
-#     "$PSScriptRoot/test/Plugins.Tests/McMaster.NETCore.Plugins.Tests.csproj" `
-#     @testArgs `
-#     @MSBuildArgs
+exec dotnet test --no-restore --no-build --configuration $Configuration '-clp:Summary' `
+    @testArgs `
+    @MSBuildArgs
 
 write-host -f magenta 'Done'
