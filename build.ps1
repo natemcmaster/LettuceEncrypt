@@ -30,6 +30,8 @@ if (!$Configuration) {
 
 if ($ci) {
     $MSBuildArgs += '-p:CI=true'
+
+    & dotnet --info
 }
 
 $isPr = $env:APPVEYOR_PULL_REQUEST_HEAD_COMMIT -or ($env:BUILD_REASON -eq 'PullRequest')
