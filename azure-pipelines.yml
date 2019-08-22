@@ -22,14 +22,12 @@ stages:
       displayName: Install .NET Core 3.0
       inputs:
         version: '3.0.x'
-        packageType: sdk
         includePreviewVersions: true
     # .NET Core 2.1 is required for some build tools and tests
     - task: UseDotNet@2
       displayName: Install .NET Core 2.1
       inputs:
         version: '2.1.x'
-        packageType: runtime
     - powershell: ./build.ps1 -ci
       displayName: Invoke build.ps1
       condition: eq(variables['kv-access-token'], '')
@@ -57,14 +55,12 @@ stages:
       displayName: Install .NET Core 3.0
       inputs:
         version: '3.0.x'
-        packageType: sdk
         includePreviewVersions: true
     # .NET Core 2.1 is required for some build tools and tests
     - task: UseDotNet@2
       displayName: Install .NET Core 2.1
       inputs:
         version: '2.1.x'
-        packageType: runtime
     - script: ./build.ps1 -ci
       displayName: Invoke build.ps1
     - task: PublishTestResults@2
