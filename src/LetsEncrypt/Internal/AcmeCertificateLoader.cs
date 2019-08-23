@@ -62,7 +62,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
 
             Task.Factory.StartNew(async () =>
             {
-                const string errorMessage = "Failed to create certificate";
+                const string ErrorMessage = "Failed to create certificate";
 
                 try
                 {
@@ -70,11 +70,11 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
                 }
                 catch (AggregateException ex) when (ex.InnerException != null)
                 {
-                    _logger.LogError(0, ex.InnerException, errorMessage);
+                    _logger.LogError(0, ex.InnerException, ErrorMessage);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(0, ex, errorMessage);
+                    _logger.LogError(0, ex, ErrorMessage);
                 }
             });
 

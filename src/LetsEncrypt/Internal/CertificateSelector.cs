@@ -11,7 +11,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
 {
     internal class CertificateSelector
     {
-        private ConcurrentDictionary<string, X509Certificate2> _certs = new ConcurrentDictionary<string, X509Certificate2>(StringComparer.OrdinalIgnoreCase);
+        private readonly ConcurrentDictionary<string, X509Certificate2> _certs = new ConcurrentDictionary<string, X509Certificate2>(StringComparer.OrdinalIgnoreCase);
 
         private readonly IOptions<LetsEncryptOptions> _options;
 

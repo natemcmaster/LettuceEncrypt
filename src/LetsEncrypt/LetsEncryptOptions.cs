@@ -52,12 +52,9 @@ namespace McMaster.AspNetCore.LetsEncrypt
         public bool UseStagingServer
         {
             get => _acmeServer == WellKnownServers.LetsEncryptStaging;
-            set
-            {
-                _acmeServer = value
+            set => _acmeServer = value
                    ? WellKnownServers.LetsEncryptStaging
                    : WellKnownServers.LetsEncrypt;
-            }
         }
 
         /// <summary>

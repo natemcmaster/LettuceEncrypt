@@ -26,7 +26,10 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
                 "CN=" + domainName,
                 validOnly: true);
 
-            if (certs == null || certs.Count == 0) return null;
+            if (certs == null || certs.Count == 0)
+            {
+                return null;
+            }
 
             if (_logger.IsEnabled(LogLevel.Trace))
             {
