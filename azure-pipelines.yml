@@ -1,3 +1,5 @@
+# https://docs.microsoft.com/azure/devops/pipelines/yaml-schema
+
 trigger:
 - master
 
@@ -5,14 +7,13 @@ pr:
 - '*'
 
 variables:
-- name: kv-access-token
-  value: ''
 - group: AzureKeyVault
 - name: BuildNumber
   value: $[counter('buildnumber')]
 
 stages:
-- stage: Build
+- stage: build
+  displayName: Build and Test
   jobs:
   - job: Windows
     pool:
@@ -23,17 +24,14 @@ stages:
       inputs:
         version: '3.0.x'
         includePreviewVersions: true
-    # .NET Core 2.1 is required for some build tools and tests
     - task: UseDotNet@2
       displayName: Install .NET Core 2.1
       inputs:
         version: '2.1.x'
     - powershell: ./build.ps1 -ci
       displayName: Invoke build.ps1
-      condition: eq(variables['kv-access-token'], '')
-    - powershell: ./build.ps1 -ci /p:AzureKeyVaultClientSecret=$(kv-access-token)
-      displayName: Invoke build.ps1 with code signing
-      condition: ne(variables['kv-access-token'], '')
+      env:
+        KEYVAULT_CLIENT_SECRET: $(kv-access-token)
     - task: PublishTestResults@2
       displayName: Upload test results
       condition: always()
@@ -42,11 +40,9 @@ stages:
         testRunTitle: Windows
         testRunner: vstest
         testResultsFiles: '**/*.trx'
-    - task: PublishBuildArtifacts@1
+    - publish: 'artifacts/'
+      artifact: 'Packages'
       displayName: Publish artifacts
-      inputs:
-        pathtoPublish: 'artifacts/'
-        artifactName: 'Packages'
   - job: Linux
     pool:
       vmImage: 'Ubuntu-16.04'
@@ -56,7 +52,6 @@ stages:
       inputs:
         version: '3.0.x'
         includePreviewVersions: true
-    # .NET Core 2.1 is required for some build tools and tests
     - task: UseDotNet@2
       displayName: Install .NET Core 2.1
       inputs:
@@ -71,3 +66,72 @@ stages:
         testRunTitle: Linux
         testRunner: vstest
         testResultsFiles: '**/*.trx'
+
+- stage: Staging
+  condition: ne(variables['build.reason'], 'PullRequest')
+  jobs:
+  - deployment: myget
+    displayName: MyGet.org
+    environment: myget
+    pool:
+      vmImage: windows-2019
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: NuGetToolInstaller@1
+            displayName: 'Install latest NuGet'
+            inputs:
+              checkLatest: true
+          - task: NuGetCommand@2
+            displayName: 'Verify NuGet signing'
+            inputs:
+              command: custom
+              arguments: 'verify -all $(Pipeline.Workspace)/Packages/**/*.nupkg'
+          - task: NuGetCommand@2
+            displayName: 'NuGet push'
+            inputs:
+              command: push
+              packagesToPush: '$(Pipeline.Workspace)/Packages/**/*.nupkg'
+              nuGetFeedType: external
+              publishFeedCredentials: myget.org
+- stage: Prod
+  condition: and(ne(variables['build.reason'], 'PullRequest'), or(eq(variables['IsReleaseBuild'], 'true'), eq(variables['IsStable'], 'true')))
+  dependsOn: Staging
+  jobs:
+  - deployment: nuget
+    displayName: NuGet.org
+    environment: nuget
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: NuGetToolInstaller@1
+            displayName: 'Install latest NuGet'
+            inputs:
+              checkLatest: true
+          - task: NuGetCommand@2
+            displayName: 'Push NuGet packages'
+            inputs:
+              command: push
+              packagesToPush: '$(Pipeline.Workspace)/Packages/**/*.nupkg'
+              nuGetFeedType: external
+              publishFeedCredentials: nuget.org
+  - deployment: github
+    displayName: GitHub.com
+    environment: github
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: GitHubRelease@0
+            displayName: 'GitHub release (create)'
+            inputs:
+              gitHubConnection: 'GitHub natemcmaster'
+              repositoryName: natemcmaster/LetsEncrypt
+              tagSource: manual
+              tag: 'v$(Build.BuildNumber)'
+              title: '$(Build.BuildNumber)'
+              releaseNotesSource: input
+              assets: '$(Pipeline.Workspace)/Packages/**/*'
+              isDraft: true
