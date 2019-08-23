@@ -7,6 +7,8 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting.Server;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -29,6 +31,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
         private readonly ILogger<AcmeCertificateLoader> _logger;
 
         private readonly IHostEnvironment _hostEnvironment;
+        private readonly IServer _server;
         private volatile bool _hasRegistered;
 
         public AcmeCertificateLoader(
@@ -37,7 +40,8 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             ICertificateStore certificateStore,
             IOptions<LetsEncryptOptions> options,
             ILogger<AcmeCertificateLoader> logger,
-            IHostEnvironment hostEnvironment)
+            IHostEnvironment hostEnvironment,
+            IServer server)
         {
             _selector = selector;
             _challengeStore = challengeStore;
@@ -45,6 +49,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             _options = options;
             _logger = logger;
             _hostEnvironment = hostEnvironment;
+            _server = server;
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
@@ -52,6 +57,13 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
+            if (!(_server is KestrelServer))
+            {
+                var serverType = _server.GetType().FullName;
+                _logger.LogWarning("LetsEncrypt can only be used with Kestrel and is not supported on {serverType} servers. Skipping certificate provisioning.", serverType);
+                return Task.CompletedTask;
+            }
+
             // load certificates in the background
 
             if (!LetsEncryptDomainNamesWereConfigured())
@@ -89,61 +101,61 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
         }
 
         private async Task LoadCerts(CancellationToken cancellationToken)
-    {
-        cancellationToken.ThrowIfCancellationRequested();
-
-        var errors = new List<Exception>();
-
-        using var factory = new CertificateFactory(_options, _challengeStore, _logger, _hostEnvironment);
-
-        try
         {
-            var cert = await GetOrCreateCertificate(factory, cancellationToken);
-            foreach (var domainName in _options.Value.DomainNames)
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var errors = new List<Exception>();
+
+            using var factory = new CertificateFactory(_options, _challengeStore, _logger, _hostEnvironment);
+
+            try
             {
-                _selector.Use(domainName, cert);
+                var cert = await GetOrCreateCertificate(factory, cancellationToken);
+                foreach (var domainName in _options.Value.DomainNames)
+                {
+                    _selector.Use(domainName, cert);
+                }
+            }
+            catch (Exception ex)
+            {
+                errors.Add(ex);
+            }
+
+            if (errors.Count > 0)
+            {
+                throw new AggregateException(errors);
             }
         }
-        catch (Exception ex)
-        {
-            errors.Add(ex);
-        }
 
-        if (errors.Count > 0)
+        private async Task<X509Certificate2> GetOrCreateCertificate(CertificateFactory factory, CancellationToken cancellationToken)
         {
-            throw new AggregateException(errors);
+            var domainName = _options.Value.DomainNames[0];
+            var cert = _certificateStore.GetCertificate(domainName);
+            if (cert != null)
+            {
+                _logger.LogDebug("Certificate for {hostname} already found.", domainName);
+                return cert;
+            }
+
+            if (!_hasRegistered)
+            {
+                _hasRegistered = true;
+                await factory.RegisterUserAsync(cancellationToken);
+            }
+
+            try
+            {
+                _logger.LogInformation("Creating certificate for {hostname} using ACME server {acmeServer}", domainName, _options.Value.GetAcmeServer(_hostEnvironment));
+                cert = await factory.CreateCertificateAsync(cancellationToken);
+                _logger.LogInformation("Created certificate {subjectName} ({thumbprint})", cert.Subject, cert.Thumbprint);
+                _certificateStore.Save(domainName, cert);
+                return cert;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(0, ex, "Failed to automatically create a certificate for {hostname}", domainName);
+                throw;
+            }
         }
     }
-
-    private async Task<X509Certificate2> GetOrCreateCertificate(CertificateFactory factory, CancellationToken cancellationToken)
-    {
-        var domainName = _options.Value.DomainNames[0];
-        var cert = _certificateStore.GetCertificate(domainName);
-        if (cert != null)
-        {
-            _logger.LogDebug("Certificate for {hostname} already found.", domainName);
-            return cert;
-        }
-
-        if (!_hasRegistered)
-        {
-            _hasRegistered = true;
-            await factory.RegisterUserAsync(cancellationToken);
-        }
-
-        try
-        {
-            _logger.LogInformation("Creating certificate for {hostname} using ACME server {acmeServer}", domainName, _options.Value.GetAcmeServer(_hostEnvironment));
-            cert = await factory.CreateCertificateAsync(cancellationToken);
-            _logger.LogInformation("Created certificate {subjectName} ({thumbprint})", cert.Subject, cert.Thumbprint);
-            _certificateStore.Save(domainName, cert);
-            return cert;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(0, ex, "Failed to automatically create a certificate for {hostname}", domainName);
-            throw;
-        }
-    }
-}
 }
