@@ -12,7 +12,7 @@ variables:
   value: $[counter('buildnumber')]
 
 stages:
-- stage: build
+- stage: Build
   displayName: Build and Test
   jobs:
   - job: Windows
@@ -97,7 +97,9 @@ stages:
               publishFeedCredentials: myget.org
 - stage: Prod
   condition: and(ne(variables['build.reason'], 'PullRequest'), or(eq(variables['IsReleaseBuild'], 'true'), eq(variables['IsStable'], 'true')))
-  dependsOn: Staging
+  dependsOn:
+  - Build
+  - Staging
   jobs:
   - deployment: nuget
     displayName: NuGet.org
