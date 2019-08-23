@@ -1,18 +1,28 @@
 ASP.NET Core + Let's Encrypt
 ============================
 
-The goal of this project is to make setting up HTTPS made easy.
+<div>
+   <p align="center"><img src="https://letsencrypt.org/images/le-logo-wide.png" width="300" /></p>
+   <p align="center">
+HTTPS made easy.
+    </p>
+</div>
+
+---------------------------
 
 [Let's Encrypt](https://letsencrypt.org/) is a free, automated, and open Certificate Authority.
 This project provides API for ASP.NET Core projects to use Let's Encrypt.
 
-When configured correctly, this API will automatically contact the <https://letsencrypt.org> CA and generate an TLS/SSL certificate. It then automatically configures Kestrel to use this certificate for all HTTPs traffic.
+When enabled, your web server will use the Let's Encrypt certificate authority
+and **automatically** generate an HTTPS certificate when the server starts up. It then configures Kestrel to use this certificate for all HTTPs traffic.
 
 ## Usage
 
-The primary API usage is to call `IServiceColleciton.AddLetsEncrypt` in the `Startup` class `ConfigureServices` method.
+The primary API usage is to call `IServiceCollection.AddLetsEncrypt` in the `Startup` class `ConfigureServices` method.
 
 ```csharp
+using Microsoft.Extensions.DependencyInjection;
+
 public class Startup
 {
     public void ConfigureServices(IServiceCollection services)

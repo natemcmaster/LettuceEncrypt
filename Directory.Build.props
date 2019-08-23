@@ -33,4 +33,6 @@
   </PropertyGroup>
 
   <Import Project="version.props" />
+  <Import Project="$(MSBuildProjectDirectory)/releasenotes.props"
+          Condition="Exists('$(MSBuildProjectDirectory)/releasenotes.props')" />
 </Project>
