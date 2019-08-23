@@ -10,6 +10,13 @@ HTTPS made easy.
 
 ---------------------------
 
+[![Build Status][azdo-badge]][azdo-url] [![Nuget][nuget-badge]][nuget-url]
+
+[azdo-badge]: https://dev.azure.com/natemcmaster/github/_apis/build/status/LetsEncrypt?branchName=master
+[azdo-url]: https://dev.azure.com/natemcmaster/github/_build/latest?definitionId=10&branchName=master
+[nuget-badge]: https://img.shields.io/nuget/v/McMaster.AspNetCore.LetsEncrypt?color=blue
+[nuget-url]: https://nuget.org/packages/McMaster.AspNetCore.LetsEncrypt
+
 [Let's Encrypt](https://letsencrypt.org/) is a free, automated, and open Certificate Authority.
 This project provides API for ASP.NET Core projects to use Let's Encrypt.
 
