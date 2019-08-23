@@ -27,11 +27,8 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <param name="services"></param>
         /// <returns></returns>
-        public static IServiceCollection AddLetsEncrypt(this IServiceCollection services)
-        {
-            services.AddLetsEncrypt(_ => { });
-            return services;
-        }
+        public static ILetsEncryptServiceBuilder AddLetsEncrypt(this IServiceCollection services)
+            => services.AddLetsEncrypt(_ => { });
 
         /// <summary>
         /// Use Let's Encrypt (<see href="https://letsencrypt.org/">https://letsencrypt.org/</see>) to automatically
@@ -40,7 +37,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="services"></param>
         /// <param name="configure">A callback to configure options.</param>
         /// <returns></returns>
-        public static IServiceCollection AddLetsEncrypt(this IServiceCollection services, Action<LetsEncryptOptions> configure)
+        public static ILetsEncryptServiceBuilder AddLetsEncrypt(this IServiceCollection services, Action<LetsEncryptOptions> configure)
         {
             services.AddTransient<IConfigureOptions<KestrelServerOptions>, KestrelOptionsSetup>();
 
@@ -69,7 +66,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.Configure(configure);
 
-            return services;
+            return new LetsEncryptServiceBuilder(services);
         }
     }
 }

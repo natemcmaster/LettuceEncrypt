@@ -26,6 +26,7 @@ namespace LetsEncrypt.Tests
             var services = new ServiceCollection()
                 .AddSingleton<IConfiguration>(config)
                 .AddLetsEncrypt()
+                .Services
                 .BuildServiceProvider(true);
 
             var options = services.GetRequiredService<IOptions<LetsEncryptOptions>>();
@@ -53,6 +54,7 @@ namespace LetsEncrypt.Tests
                 {
                     o.EmailAddress = "code";
                 })
+                .Services
                 .BuildServiceProvider(true);
 
             var options = services.GetRequiredService<IOptions<LetsEncryptOptions>>();
