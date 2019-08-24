@@ -1,5 +1,16 @@
 <Project>
   <PropertyGroup>
+    <Description>Provides API for configuring ASP.NET Core to use Let's Encrypt.org to automaticaly generate HTTPS certificates.</Description>
+    <PackageDescription>$(Description)
+
+Let's Encrypt is a free, automated, and open Certificate Authority. When this package is installed and enabled, your web server will
+use the Let's Encrypt certificate authority and automatically generate an HTTPS certificate when the server starts up.
+It then configures Kestrel to use this certificate for all HTTPS traffic.
+
+This only works with Kestrel, which is the default server configuration for ASP.NET Core projects. Other servers, such as IIS and nginx, are not supported.
+    <PackageDescription>
+    <PackageIconUrl>https://letsencrypt.org/images/le-logo-standard.png</PackageIconUrl>
+    <PackageTags>lets-encrypt;aspnetcore;https;certificates</PackageTags>
     <Authors>Nate McMaster</Authors>
     <Product>McMaster.AspNetCore.LetsEncrypt</Product>
     <Copyright>Copyright © Nate McMaster</Copyright>
@@ -7,7 +18,7 @@
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/natemcmaster/LetsEncrypt</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/natemcmaster/LetsEncrypt.git</RepositoryUrl>
+    <RepositoryUrl>https://github.com/natemcmaster/LetsEncrypt</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <DebugType>portable</DebugType>
@@ -33,8 +44,8 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <VersionPrefix>0.1.0</VersionPrefix>
-    <VersionSuffix>rc</VersionSuffix>
+    <VersionPrefix>0.2.0</VersionPrefix>
+    <VersionSuffix>alpha</VersionSuffix>
     <IncludePreReleaseLabelInPackageVersion Condition="'$(IsStableBuild)' != 'true'">true</IncludePreReleaseLabelInPackageVersion>
     <BuildNumber Condition=" '$(BuildNumber)' == '' ">$([MSBuild]::ValueOrDefault($(BUILD_NUMBER), 0)</BuildNumber>
     <VersionSuffix>$(VersionSuffix).$(BuildNumber)</VersionSuffix>
@@ -42,6 +53,10 @@
     <PackageVersion>$(VersionPrefix)</PackageVersion>
     <PackageVersion Condition="'$(IncludePreReleaseLabelInPackageVersion)' == 'true'">$(PackageVersion)-$(VersionSuffix)</PackageVersion>
     <InformationalVersion Condition="'$(RepositoryCommit)' != ''">$(PackageVersion)+$(RepositoryCommit)</InformationalVersion>
+    <PackageDescription Condition="'$(RepositoryCommit)' != ''">$(PackageDescription)
+
+This package was build from source code at $(RepositoryUrl)/tree/$(RepositoryCommit)
+    </PackageDescription>
   </PropertyGroup>
 
   <Import Project="$(MSBuildProjectDirectory)/releasenotes.props"

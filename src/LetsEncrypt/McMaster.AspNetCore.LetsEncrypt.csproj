@@ -1,13 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Description>Provides API for configuring ASP.NET Core to use Let's Encrypt.org to automaticaly generate HTTPS certificates.</Description>
-    <PackageTags>lets-encrypt;aspnetcore;tls;https</PackageTags>
     <TargetFrameworks>netstandard2.0;netcoreapp3.0</TargetFrameworks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Nullable>enable</Nullable>
     <IsPackable>true</IsPackable>
-    <WarningsNotAsErrors>$(WarningsNotAsErrors);1591</WarningsNotAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
