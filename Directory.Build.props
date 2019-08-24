@@ -8,7 +8,7 @@ use the Let's Encrypt certificate authority and automatically generate an HTTPS 
 It then configures Kestrel to use this certificate for all HTTPS traffic.
 
 This only works with Kestrel, which is the default server configuration for ASP.NET Core projects. Other servers, such as IIS and nginx, are not supported.
-    <PackageDescription>
+    </PackageDescription>
     <PackageIconUrl>https://letsencrypt.org/images/le-logo-standard.png</PackageIconUrl>
     <PackageTags>lets-encrypt;aspnetcore;https;certificates</PackageTags>
     <Authors>Nate McMaster</Authors>
