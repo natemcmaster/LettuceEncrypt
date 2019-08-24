@@ -23,9 +23,9 @@ This project provides API for ASP.NET Core projects to use Let's Encrypt.
 When enabled, your web server will use the Let's Encrypt certificate authority
 and **automatically** generate an HTTPS certificate when the server starts up. It then configures Kestrel to use this certificate for all HTTPs traffic.
 
-## Usage
-
 > :warning: This only works with [Kestrel](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/servers/kestrel), which is the default server configuration for ASP.NET Core projects. Other servers, such as IIS and nginx, are not supported.
+
+## Usage
 
 The primary API usage is to call `IServiceCollection.AddLetsEncrypt` in the `Startup` class `ConfigureServices` method.
 
