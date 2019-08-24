@@ -25,7 +25,7 @@ and **automatically** generate an HTTPS certificate when the server starts up. I
 
 ## Usage
 
-This only works with [Kestrel](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/servers/kestrel), which is the default server configuration for ASP.NET Core projects. Other servers, such as IIS and nginx, are not supported.
+> :warning: This only works with [Kestrel](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/servers/kestrel), which is the default server configuration for ASP.NET Core projects. Other servers, such as IIS and nginx, are not supported.
 
 The primary API usage is to call `IServiceCollection.AddLetsEncrypt` in the `Startup` class `ConfigureServices` method.
 
