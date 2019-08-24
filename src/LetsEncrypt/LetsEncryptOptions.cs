@@ -6,7 +6,7 @@ using System.Security.Cryptography.X509Certificates;
 using Certes.Acme;
 using Microsoft.Extensions.Hosting;
 
-#if NETCOREAPP2_1
+#if NETSTANDARD2_0
 using IHostEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
 #endif
 
