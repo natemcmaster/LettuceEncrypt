@@ -1,0 +1,17 @@
+McMaster.AspNetCore.LetsEncrypt.ILetsEncryptServiceBuilder
+McMaster.AspNetCore.LetsEncrypt.ILetsEncryptServiceBuilder.Services.get -> Microsoft.Extensions.DependencyInjection.IServiceCollection
+McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions
+McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.AcceptTermsOfService.get -> bool
+McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.AcceptTermsOfService.set -> void
+McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.DomainNames.get -> string[]
+McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.DomainNames.set -> void
+McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.EmailAddress.get -> string
+McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.EmailAddress.set -> void
+McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.FallbackCertificate.get -> System.Security.Cryptography.X509Certificates.X509Certificate2
+McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.FallbackCertificate.set -> void
+McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.LetsEncryptOptions() -> void
+McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.UseStagingServer.get -> bool
+McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.UseStagingServer.set -> void
+Microsoft.Extensions.DependencyInjection.LetsEncryptServiceCollectionExtensions
+static Microsoft.Extensions.DependencyInjection.LetsEncryptServiceCollectionExtensions.AddLetsEncrypt(this Microsoft.Extensions.DependencyInjection.IServiceCollection services) -> McMaster.AspNetCore.LetsEncrypt.ILetsEncryptServiceBuilder
+static Microsoft.Extensions.DependencyInjection.LetsEncryptServiceCollectionExtensions.AddLetsEncrypt(this Microsoft.Extensions.DependencyInjection.IServiceCollection services, System.Action<McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions> configure) -> McMaster.AspNetCore.LetsEncrypt.ILetsEncryptServiceBuilder

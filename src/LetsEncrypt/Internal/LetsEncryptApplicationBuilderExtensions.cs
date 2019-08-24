@@ -8,7 +8,7 @@ namespace Microsoft.AspNetCore.Builder
     /// <summary>
     /// Helper methods
     /// </summary>
-    public static class LetsEncryptApplicationBuilderExtensions
+    internal static class LetsEncryptApplicationBuilderExtensions
     {
         /// <summary>
         /// Adds middleware use to verify domain ownership.
