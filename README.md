@@ -27,6 +27,8 @@ and **automatically** generate an HTTPS certificate when the server starts up. I
 
 ## Usage
 
+Install this package into your project using NuGet ([see details here][nuget-url]).
+
 The primary API usage is to call `IServiceCollection.AddLetsEncrypt` in the `Startup` class `ConfigureServices` method.
 
 ```csharp
