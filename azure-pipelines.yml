@@ -96,7 +96,7 @@ stages:
               nuGetFeedType: external
               publishFeedCredentials: myget.org
 - stage: Prod
-  condition: and(ne(variables['build.reason'], 'PullRequest'), or(eq(variables['IsReleaseBuild'], 'true'), eq(variables['IsStable'], 'true')))
+  condition: and(ne(variables['build.reason'], 'PullRequest'), or(eq(variables['IsReleaseBuild'], 'true'), eq(variables['IsStableBuild'], 'true')))
   dependsOn: Staging
   jobs:
   - deployment: nuget
