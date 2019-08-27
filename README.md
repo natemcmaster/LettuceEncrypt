@@ -25,6 +25,8 @@ and **automatically** generate an HTTPS certificate when the server starts up. I
 
 > :warning: This only works with [Kestrel](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/servers/kestrel), which is the default server configuration for ASP.NET Core projects. Other servers, such as IIS and nginx, are not supported.
 
+> :cloud: Azure App Services (aka WebApps) are not supported with this package. **You can still get free Let's Encrypt certificates**, but it requires a different configuration method. See ["Securing An Azure App Service with Let's Encrypt"](https://www.hanselman.com/blog/SecuringAnAzureAppServiceWebsiteUnderSSLInMinutesWithLetsEncrypt.aspx) by Scott Hanselman for more details.
+
 ## Usage
 
 Install this package into your project using NuGet ([see details here][nuget-url]).
