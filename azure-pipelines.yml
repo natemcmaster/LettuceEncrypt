@@ -11,127 +11,55 @@ variables:
 - name: BuildNumber
   value: $[counter('buildnumber')]
 
-stages:
-- stage: Build
-  displayName: Build and Test
-  jobs:
-  - job: Windows
-    pool:
-      vmImage: windows-2019
-    steps:
-    - task: UseDotNet@2
-      displayName: Install .NET Core 3.0
-      inputs:
-        version: '3.0.x'
-        includePreviewVersions: true
-    - task: UseDotNet@2
-      displayName: Install .NET Core 2.1
-      inputs:
-        version: '2.1.x'
-    - powershell: ./build.ps1 -ci
-      displayName: Invoke build.ps1
-      env:
-        KEYVAULT_CLIENT_SECRET: $(kv-access-token)
-    - task: PublishTestResults@2
-      displayName: Upload test results
-      condition: always()
-      continueOnError: true
-      inputs:
-        testRunTitle: Windows
-        testRunner: vstest
-        testResultsFiles: '**/*.trx'
-    - publish: 'artifacts/'
-      artifact: 'Packages'
-      displayName: Publish artifacts
-  - job: Linux
-    pool:
-      vmImage: 'Ubuntu-16.04'
-    steps:
-    - task: UseDotNet@2
-      displayName: Install .NET Core 3.0
-      inputs:
-        version: '3.0.x'
-        includePreviewVersions: true
-    - task: UseDotNet@2
-      displayName: Install .NET Core 2.1
-      inputs:
-        version: '2.1.x'
-    - script: ./build.ps1 -ci
-      displayName: Invoke build.ps1
-    - task: PublishTestResults@2
-      displayName: Upload test results
-      condition: always()
-      continueOnError: true
-      inputs:
-        testRunTitle: Linux
-        testRunner: vstest
-        testResultsFiles: '**/*.trx'
-
-- stage: Staging
-  condition: ne(variables['build.reason'], 'PullRequest')
-  jobs:
-  - deployment: myget
-    displayName: MyGet.org
-    environment: myget
-    pool:
-      vmImage: windows-2019 # required for nuget verify command
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - task: NuGetToolInstaller@1
-            displayName: 'Install latest NuGet'
-            inputs:
-              checkLatest: true
-          - task: NuGetCommand@2
-            displayName: 'Verify NuGet signing'
-            inputs:
-              command: custom
-              arguments: 'verify -all $(Pipeline.Workspace)/packages/**/*.nupkg'
-          - task: NuGetCommand@2
-            displayName: 'NuGet push'
-            inputs:
-              command: push
-              packagesToPush: '$(Pipeline.Workspace)/packages/**/*.nupkg'
-              nuGetFeedType: external
-              publishFeedCredentials: myget.org
-- stage: Prod
-  condition: and(ne(variables['build.reason'], 'PullRequest'), or(eq(variables['IsReleaseBuild'], 'true'), eq(variables['IsStableBuild'], 'true')))
-  dependsOn: Staging
-  jobs:
-  - deployment: nuget
-    displayName: NuGet.org
-    environment: nuget
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - task: NuGetToolInstaller@1
-            displayName: 'Install latest NuGet'
-            inputs:
-              checkLatest: true
-          - task: NuGetCommand@2
-            displayName: 'Push NuGet packages'
-            inputs:
-              command: push
-              packagesToPush: '$(Pipeline.Workspace)/packages/**/*.nupkg'
-              nuGetFeedType: external
-              publishFeedCredentials: nuget.org
-  - deployment: github
-    displayName: GitHub.com
-    environment: github
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - task: GitHubRelease@0
-            displayName: 'GitHub release (create)'
-            inputs:
-              gitHubConnection: 'GitHub natemcmaster'
-              repositoryName: natemcmaster/LetsEncrypt
-              tagSource: manual
-              tag: 'v$(Build.BuildNumber)'
-              title: '$(Build.BuildNumber)'
-              releaseNotesSource: input
-              assets: '$(Pipeline.Workspace)/packages/**/*'
-              isDraft: true
+jobs:
+- job: Windows
+  pool:
+    vmImage: windows-2019
+  steps:
+  - task: UseDotNet@2
+    displayName: Install .NET Core 3.0
+    inputs:
+      version: '3.0.x'
+      includePreviewVersions: true
+  - task: UseDotNet@2
+    displayName: Install .NET Core 2.1
+    inputs:
+      version: '2.1.x'
+  - powershell: ./build.ps1 -ci
+    displayName: Invoke build.ps1
+    env:
+      KEYVAULT_CLIENT_SECRET: $(kv-access-token)
+  - task: PublishTestResults@2
+    displayName: Upload test results
+    condition: always()
+    continueOnError: true
+    inputs:
+      testRunTitle: Windows
+      testRunner: vstest
+      testResultsFiles: '**/*.trx'
+  - publish: 'artifacts/'
+    artifact: 'Packages'
+    displayName: Publish artifacts
+- job: Linux
+  pool:
+    vmImage: 'Ubuntu-16.04'
+  steps:
+  - task: UseDotNet@2
+    displayName: Install .NET Core 3.0
+    inputs:
+      version: '3.0.x'
+      includePreviewVersions: true
+  - task: UseDotNet@2
+    displayName: Install .NET Core 2.1
+    inputs:
+      version: '2.1.x'
+  - script: ./build.ps1 -ci
+    displayName: Invoke build.ps1
+  - task: PublishTestResults@2
+    displayName: Upload test results
+    condition: always()
+    continueOnError: true
+    inputs:
+      testRunTitle: Linux
+      testRunner: vstest
+      testResultsFiles: '**/*.trx'
