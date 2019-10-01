@@ -25,9 +25,9 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             _certs.AddOrUpdate(domainName, certificate, (_, __) => certificate);
         }
 
-        public X509Certificate2? Select(ConnectionContext features, string domainName)
+        public X509Certificate2? Select(ConnectionContext features, string? domainName)
         {
-            if (!_certs.TryGetValue(domainName, out var retVal))
+            if (domainName == null || !_certs.TryGetValue(domainName, out var retVal))
             {
                 return _options.Value.FallbackCertificate;
             }

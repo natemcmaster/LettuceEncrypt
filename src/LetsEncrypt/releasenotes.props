@@ -1,6 +1,10 @@
 <Project>
   <PropertyGroup>
     <PackageReleaseNotes Condition="'$(VersionPrefix)' == '0.1.0'">
+Bug fixes:
+* Fix #19 - handle HTTPS requests that don't have a domain name
+    </PackageReleaseNotes>
+    <PackageReleaseNotes Condition="'$(VersionPrefix)' == '0.1.0'">
 Initial release. See https://github.com/natemcmaster/LetsEncrypt/#Usage for instructions.
     </PackageReleaseNotes>
 
