@@ -1,19 +1,28 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 16
+# Visual Studio Version 16
 VisualStudioVersion = 16.0.0.0
 MinimumVisualStudioVersion = 16.0.0.0
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{C1D11C9E-C330-450D-9FD4-13A679A3D707}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web", "samples\Web\Web.csproj", "{014A3D8E-1DFB-470B-AF44-7E7DFA16E060}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Web", "samples\Web\Web.csproj", "{014A3D8E-1DFB-470B-AF44-7E7DFA16E060}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{CC50E6BF-ECAC-4B32-9DDF-68E0C09DEA4A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "McMaster.AspNetCore.LetsEncrypt", "src\LetsEncrypt\McMaster.AspNetCore.LetsEncrypt.csproj", "{195FD49D-AA3B-4936-A7D6-AD52784C7E84}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "McMaster.AspNetCore.LetsEncrypt", "src\LetsEncrypt\McMaster.AspNetCore.LetsEncrypt.csproj", "{195FD49D-AA3B-4936-A7D6-AD52784C7E84}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{F832E417-FA9F-4DB4-8E82-3D56054E47B1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LetsEncrypt.UnitTests", "test\LetsEncrypt.UnitTests\LetsEncrypt.UnitTests.csproj", "{0BFCC67B-4746-4158-8056-E93C879D9C80}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LetsEncrypt.UnitTests", "test\LetsEncrypt.UnitTests\LetsEncrypt.UnitTests.csproj", "{0BFCC67B-4746-4158-8056-E93C879D9C80}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "files", "files", "{A92C89F3-2206-4BB0-8279-7DDA81FD1F5B}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		azure-pipelines.yml = azure-pipelines.yml
+		Directory.Build.props = Directory.Build.props
+		Directory.Build.targets = Directory.Build.targets
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,9 +32,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{014A3D8E-1DFB-470B-AF44-7E7DFA16E060}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -65,9 +71,15 @@ Global
 		{0BFCC67B-4746-4158-8056-E93C879D9C80}.Release|x86.ActiveCfg = Release|Any CPU
 		{0BFCC67B-4746-4158-8056-E93C879D9C80}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{014A3D8E-1DFB-470B-AF44-7E7DFA16E060} = {C1D11C9E-C330-450D-9FD4-13A679A3D707}
 		{195FD49D-AA3B-4936-A7D6-AD52784C7E84} = {CC50E6BF-ECAC-4B32-9DDF-68E0C09DEA4A}
 		{0BFCC67B-4746-4158-8056-E93C879D9C80} = {F832E417-FA9F-4DB4-8E82-3D56054E47B1}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EA50A4AB-48E4-4D43-8EFD-2BC849EA7AF8}
 	EndGlobalSection
 EndGlobal

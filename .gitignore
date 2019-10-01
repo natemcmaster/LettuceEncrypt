@@ -4,3 +4,4 @@ bin/
 .vs/
 .build/
 artifacts/
+*.user

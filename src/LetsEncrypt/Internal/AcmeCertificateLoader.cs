@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -32,6 +33,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
 
         private readonly IHostEnvironment _hostEnvironment;
         private readonly IServer _server;
+        private readonly IConfiguration _config;
         private volatile bool _hasRegistered;
 
         public AcmeCertificateLoader(
@@ -41,7 +43,8 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             IOptions<LetsEncryptOptions> options,
             ILogger<AcmeCertificateLoader> logger,
             IHostEnvironment hostEnvironment,
-            IServer server)
+            IServer server,
+            IConfiguration config)
         {
             _selector = selector;
             _challengeStore = challengeStore;
@@ -50,6 +53,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             _logger = logger;
             _hostEnvironment = hostEnvironment;
             _server = server;
+            _config = config;
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
@@ -61,6 +65,13 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             {
                 var serverType = _server.GetType().FullName;
                 _logger.LogWarning("LetsEncrypt can only be used with Kestrel and is not supported on {serverType} servers. Skipping certificate provisioning.", serverType);
+                return Task.CompletedTask;
+            }
+
+            if (_config.GetValue<bool>("UseIISIntegration"))
+            {
+                _logger.LogWarning("LetsEncrypt does not work with apps hosting in IIS. IIS does not allow for dynamic HTTPS certificate binding, " +
+                    "so if you want to use Let's Encrypt, you'll need to use a different tool to do so.");
                 return Task.CompletedTask;
             }
 
