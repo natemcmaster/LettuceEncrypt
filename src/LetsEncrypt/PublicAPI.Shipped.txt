@@ -22,6 +22,10 @@ McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.FallbackCertificate.set -> vo
 McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.KeyAlgorithm.get -> McMaster.AspNetCore.LetsEncrypt.KeyAlgorithm
 McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.KeyAlgorithm.set -> void
 McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.LetsEncryptOptions() -> void
+McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.RenewalCheckPeriod.get -> System.TimeSpan?
+McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.RenewalCheckPeriod.set -> void
+McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.RenewDaysInAdvance.get -> System.TimeSpan?
+McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.RenewDaysInAdvance.set -> void
 McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.UseStagingServer.get -> bool
 McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.UseStagingServer.set -> void
 Microsoft.Extensions.DependencyInjection.LetsEncryptServiceCollectionExtensions
