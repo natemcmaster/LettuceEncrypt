@@ -210,7 +210,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             {
                 CommonName = commonName,
             };
-            var privateKey = KeyFactory.NewKey(KeyAlgorithm.ES256);
+            var privateKey = KeyFactory.NewKey(_options.Value.KeyAlgorithm);
             var acmeCert = await order.Generate(csrInfo, privateKey);
 
 
