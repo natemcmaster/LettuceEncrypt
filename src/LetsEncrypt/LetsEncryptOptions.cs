@@ -67,7 +67,7 @@ namespace McMaster.AspNetCore.LetsEncrypt
         public X509Certificate2? FallbackCertificate { get; set; }
 
         /// <summary>
-        /// Asymetric encryption algorithm
+        /// Asymetric encryption algorithm: RS256, ES256, ES384, ES512
         /// </summary>
         public KeyAlgorithm KeyAlgorithm { get; set; } = KeyAlgorithm.ES256;
 
