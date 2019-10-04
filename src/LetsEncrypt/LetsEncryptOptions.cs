@@ -53,8 +53,8 @@ namespace McMaster.AspNetCore.LetsEncrypt
         {
             get => _acmeServer == WellKnownServers.LetsEncryptStaging;
             set => _acmeServer = value
-                   ? WellKnownServers.LetsEncryptStaging
-                   : WellKnownServers.LetsEncrypt;
+                   ? WellKnownServers.LetsEncryptStagingV2
+                   : WellKnownServers.LetsEncryptV2;
         }
 
         /// <summary>
@@ -82,8 +82,8 @@ namespace McMaster.AspNetCore.LetsEncrypt
             }
 
             return env.IsDevelopment()
-                ? WellKnownServers.LetsEncryptStaging
-                : WellKnownServers.LetsEncrypt;
+                ? WellKnownServers.LetsEncryptStagingV2
+                : WellKnownServers.LetsEncryptV2;
         }
     }
 }
