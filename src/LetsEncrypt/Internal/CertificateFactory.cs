@@ -219,7 +219,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             var acmeCert = await order.Generate(csrInfo, privateKey);
 
 
-            _logger.LogDebug("NewCertificate", acmeCert);
+            _logger.LogAcmeAction("NewCertificate", acmeCert);
 
             var pfxBuilder = acmeCert.ToPfx(privateKey);
             var pfx = pfxBuilder.Build("Let's Encrypt - " + _options.Value.DomainNames, string.Empty);
