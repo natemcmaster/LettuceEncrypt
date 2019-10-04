@@ -9,6 +9,8 @@ McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.EmailAddress.get -> string
 McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.EmailAddress.set -> void
 McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.FallbackCertificate.get -> System.Security.Cryptography.X509Certificates.X509Certificate2
 McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.FallbackCertificate.set -> void
+McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.KeyAlgorithm.get -> Certes.KeyAlgorithm
+McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.KeyAlgorithm.set -> void
 McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.LetsEncryptOptions() -> void
 McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.UseStagingServer.get -> bool
 McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.UseStagingServer.set -> void

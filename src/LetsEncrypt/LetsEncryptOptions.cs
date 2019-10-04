@@ -3,6 +3,7 @@
 
 using System;
 using System.Security.Cryptography.X509Certificates;
+using Certes;
 using Certes.Acme;
 using Microsoft.Extensions.Hosting;
 
@@ -64,6 +65,11 @@ namespace McMaster.AspNetCore.LetsEncrypt
         /// </para>
         /// </summary>
         public X509Certificate2? FallbackCertificate { get; set; }
+
+        /// <summary>
+        /// Asymetric encryption algorithm
+        /// </summary>
+        public KeyAlgorithm KeyAlgorithm { get; set; } = KeyAlgorithm.ES256;
 
         /// <summary>
         /// The uri to the server that implements the ACME protocol for certificate generation.
