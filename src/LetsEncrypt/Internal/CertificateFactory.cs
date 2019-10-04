@@ -26,14 +26,14 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
     {
         private readonly IOptions<LetsEncryptOptions> _options;
         private readonly IHttpChallengeResponseStore _challengeStore;
-        private readonly ILogger _logger;
+        private readonly ILogger<CertificateFactory> _logger;
         private readonly AcmeContext _context;
         private IAccountContext? _account;
 
         public CertificateFactory(
             IOptions<LetsEncryptOptions> options,
             IHttpChallengeResponseStore challengeStore,
-            ILogger logger,
+            ILogger<CertificateFactory> logger,
             IHostEnvironment env)
         {
             _options = options;
@@ -56,12 +56,13 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
 
             _logger.LogInformation("Creating certificate registration for {email}", options.EmailAddress);
             _account = await _context.NewAccount(options.EmailAddress, termsOfServiceAgreed: true);
-            _logger.LogResource("NewRegistration", _account);
+            _logger.LogAcmeAction("NewRegistration", _account);
 
         }
 
         public async Task<X509Certificate2> CreateCertificateAsync(CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             var order = await _context.NewOrder(_options.Value.DomainNames);
 
             cancellationToken.ThrowIfCancellationRequested();
@@ -122,11 +123,16 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             throw new InvalidOperationException("Could not automatically accept the terms of service");
         }
 
-        private async Task ValidateDomainOwnershipAsync(IAuthorizationContext authorization, CancellationToken cancellationToken)
+        private async Task ValidateDomainOwnershipAsync(IAuthorizationContext authorizationContext, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var httpChallenge = await authorization.Http();
+            var authorization = await authorizationContext.Resource();
+            var domainName = authorization.Identifier.Value;
+
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var httpChallenge = await authorizationContext.Http();
 
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -140,14 +146,12 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
 
             cancellationToken.ThrowIfCancellationRequested();
 
-            _logger.LogDebug("Requesting completion of challenge to prove ownership of domain");
+            _logger.LogDebug("Requesting completion of challenge to prove ownership of domain {domainName}", domainName);
 
             var challange = await httpChallenge.Validate();
 
             var retries = 60;
             var delay = TimeSpan.FromSeconds(2);
-
-            //AcmeResult<AuthorizationEntity> authorization;
 
             while (retries > 0)
             {
@@ -155,11 +159,11 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
 
                 cancellationToken.ThrowIfCancellationRequested();
 
-                var resource = await authorization.Resource();
+                authorization = await authorizationContext.Resource();
 
-                _logger.LogDebug("GetAuthorization", resource);
+                _logger.LogAcmeAction("GetAuthorization", authorization);
 
-                switch (resource.Status)
+                switch (authorization.Status)
                 {
                     case AuthorizationStatus.Valid:
                         return;
@@ -167,12 +171,11 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
                         await Task.Delay(delay);
                         continue;
                     case AuthorizationStatus.Invalid:
-                        //throw InvalidAuthorizationError(domainName, authorization);
-                        throw new InvalidOperationException($"Failed to validate ownership of domainName");
+                        throw InvalidAuthorizationError(authorization);
                     case AuthorizationStatus.Revoked:
-                        throw new InvalidOperationException($"The authorization to verify domainName has been revoked.");
+                        throw new InvalidOperationException($"The authorization to verify domainName '{domainName}' has been revoked.");
                     case AuthorizationStatus.Expired:
-                        throw new InvalidOperationException($"The authorization to verify domainName has expired.");
+                        throw new InvalidOperationException($"The authorization to verify domainName '{domainName}' has expired.");
                     default:
                         throw new ArgumentOutOfRangeException("Unexpected response from server while validating domain ownership.");
                 }
@@ -181,18 +184,18 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             throw new TimeoutException("Timed out waiting for domain ownership validation.");
         }
 
-        private Exception InvalidAuthorizationError(string domainName, AcmeResult<AuthorizationEntity> authorization)
+        private Exception InvalidAuthorizationError(Authorization authorization)
         {
             var reason = "unknown";
+            var domainName = authorization.Identifier.Value;
             try
             {
-                var errorStub = new { error = new { type = "", detail = "", status = -1 } };
-                var data = JsonConvert.DeserializeAnonymousType(authorization.Json, errorStub);
-                reason = $"{data.error.type}: {data.error.detail}, Code = {data.error.status}";
+                var error = authorization.Challenges.First(a => a.Error != null).Error;
+                reason = $"{error.Type}: {error.Detail}, Code = {error.Status}";
             }
             catch
             {
-                _logger.LogTrace("Could not determine reason why validation failed. Response: {resp}", authorization.Json);
+                _logger.LogTrace("Could not determine reason why validation failed. Response: {resp}", authorization);
             }
 
             _logger.LogError("Failed to validate ownership of domainName '{domainName}'. Reason: {reason}", domainName, reason);
