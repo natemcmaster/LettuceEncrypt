@@ -26,8 +26,8 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
     internal class AcmeCertificateLoader : IHostedService
     {
         private readonly CertificateSelector _selector;
-        private readonly IHttpChallengeResponseStore _challengeStore;
         private readonly ICertificateStore _certificateStore;
+        private readonly CertificateFactory _factory;
         private readonly IOptions<LetsEncryptOptions> _options;
         private readonly ILogger<AcmeCertificateLoader> _logger;
 
@@ -38,8 +38,8 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
 
         public AcmeCertificateLoader(
             CertificateSelector selector,
-            IHttpChallengeResponseStore challengeStore,
             ICertificateStore certificateStore,
+            CertificateFactory factory,
             IOptions<LetsEncryptOptions> options,
             ILogger<AcmeCertificateLoader> logger,
             IHostEnvironment hostEnvironment,
@@ -47,8 +47,8 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             IConfiguration config)
         {
             _selector = selector;
-            _challengeStore = challengeStore;
             _certificateStore = certificateStore;
+            _factory = factory;
             _options = options;
             _logger = logger;
             _hostEnvironment = hostEnvironment;
@@ -117,12 +117,9 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
 
             var errors = new List<Exception>();
 
-            // TODO: move into constructor
-            var factory = new CertificateFactory(_options, _challengeStore, _logger, _hostEnvironment);
-
             try
             {
-                var cert = await GetOrCreateCertificate(factory, cancellationToken);
+                var cert = await GetOrCreateCertificate(cancellationToken);
                 foreach (var domainName in _options.Value.DomainNames)
                 {
                     _selector.Use(domainName, cert);
@@ -139,7 +136,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             }
         }
 
-        private async Task<X509Certificate2> GetOrCreateCertificate(CertificateFactory factory, CancellationToken cancellationToken)
+        private async Task<X509Certificate2> GetOrCreateCertificate(CancellationToken cancellationToken)
         {
             var domainName = _options.Value.DomainNames[0];
             var cert = _certificateStore.GetCertificate(domainName);
@@ -152,13 +149,13 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             if (!_hasRegistered)
             {
                 _hasRegistered = true;
-                await factory.RegisterUserAsync(cancellationToken);
+                await _factory.RegisterUserAsync(cancellationToken);
             }
 
             try
             {
                 _logger.LogInformation("Creating certificate for {hostname} using ACME server {acmeServer}", domainName, _options.Value.GetAcmeServer(_hostEnvironment));
-                cert = await factory.CreateCertificateAsync(cancellationToken);
+                cert = await _factory.CreateCertificateAsync(cancellationToken);
                 _logger.LogInformation("Created certificate {subjectName} ({thumbprint})", cert.Subject, cert.Thumbprint);
                 _certificateStore.Save(domainName, cert);
                 return cert;
