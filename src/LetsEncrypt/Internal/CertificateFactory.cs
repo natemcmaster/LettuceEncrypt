@@ -130,6 +130,8 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             var authorization = await authorizationContext.Resource();
             var domainName = authorization.Identifier.Value;
 
+            _logger.LogDebug("Requesting authorization to create certificate for {domainName}", domainName);
+
             cancellationToken.ThrowIfCancellationRequested();
 
             var httpChallenge = await authorizationContext.Http();
