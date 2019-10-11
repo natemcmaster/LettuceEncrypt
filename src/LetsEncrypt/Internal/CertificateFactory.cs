@@ -208,7 +208,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             var distinguishedName = "CN=" + _options.Value.DomainNames[0];
             _logger.LogDebug("Creating cert for {distinguishedName}", distinguishedName);
 
-            var privateKey = KeyFactory.NewKey(_options.Value.KeyAlgorithm);
+            var privateKey = KeyFactory.NewKey((Certes.KeyAlgorithm)_options.Value.KeyAlgorithm);
             var csb = new CertificationRequestBuilder(privateKey);
             csb.AddName(distinguishedName);
             foreach (var name in _options.Value.DomainNames.Skip(1))
