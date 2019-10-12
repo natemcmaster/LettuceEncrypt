@@ -1,6 +1,9 @@
 <Project>
   <PropertyGroup>
     <PackageReleaseNotes Condition="'$(VersionPrefix)' == '0.2.0'">
+Features:
+* @mbican: add API for configuring the private key algorithm (#20)
+      
 Bug fixes:
 
 * Fix #19 - handle HTTPS requests that don't have a domain name
