@@ -66,6 +66,11 @@ namespace McMaster.AspNetCore.LetsEncrypt
         public X509Certificate2? FallbackCertificate { get; set; }
 
         /// <summary>
+        /// Asymetric encryption algorithm: RS256, ES256, ES384, ES512
+        /// </summary>
+        public KeyAlgorithm KeyAlgorithm { get; set; } = KeyAlgorithm.ES256;
+
+        /// <summary>
         /// The uri to the server that implements the ACME protocol for certificate generation.
         /// </summary>
         /// <param name="env"></param>
