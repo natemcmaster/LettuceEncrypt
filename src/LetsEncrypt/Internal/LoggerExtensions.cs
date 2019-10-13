@@ -15,7 +15,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
                 return;
             }
 
-            logger.LogDebug("ACMEv2 action: {name}", actionName);
+            logger.LogTrace("ACMEv2 action: {name}", actionName);
         }
     }
 }
