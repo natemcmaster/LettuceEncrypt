@@ -193,7 +193,8 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             try
             {
                 var error = authorization.Challenges.First(a => a.Error != null).Error;
-                reason = $"{error.Type}: {error.Detail}, Code = {error.Status}";
+                var errors = authorization.Challenges.Where(a => a.Error != null).Select(error => "{error.Type}: {error.Detail}, Code = {error.Status}");
+                reason = string.Join(";", errors);
             }
             catch
             {
