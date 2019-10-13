@@ -150,7 +150,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
 
             _logger.LogDebug("Requesting completion of challenge to prove ownership of domain {domainName}", domainName);
 
-            var challange = await httpChallenge.Validate();
+            var challenge = await httpChallenge.Validate();
 
             var retries = 60;
             var delay = TimeSpan.FromSeconds(2);
