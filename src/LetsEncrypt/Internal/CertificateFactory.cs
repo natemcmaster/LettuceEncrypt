@@ -26,14 +26,14 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
     {
         private readonly IOptions<LetsEncryptOptions> _options;
         private readonly IHttpChallengeResponseStore _challengeStore;
-        private readonly ILogger<CertificateFactory> _logger;
+        private readonly ILogger _logger;
         private readonly AcmeContext _context;
         private IAccountContext? _account;
 
         public CertificateFactory(
             IOptions<LetsEncryptOptions> options,
             IHttpChallengeResponseStore challengeStore,
-            ILogger<CertificateFactory> logger,
+            ILogger logger,
             IHostEnvironment env)
         {
             _options = options;
@@ -215,7 +215,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             {
                 CommonName = commonName,
             };
-            var privateKey = KeyFactory.NewKey(_options.Value.KeyAlgorithm);
+            var privateKey = KeyFactory.NewKey((Certes.KeyAlgorithm)_options.Value.KeyAlgorithm);
             var acmeCert = await order.Generate(csrInfo, privateKey);
 
 
