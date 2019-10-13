@@ -192,9 +192,9 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             var domainName = authorization.Identifier.Value;
             try
             {
-                var error = authorization.Challenges.First(a => a.Error != null).Error;
-                var errors = authorization.Challenges.Where(a => a.Error != null).Select(error => "{error.Type}: {error.Detail}, Code = {error.Status}");
-                reason = string.Join(";", errors);
+                var errors = authorization.Challenges.Where(a => a.Error != null).Select(a => a.Error)
+                    .Select(error => $"{error.Type}: {error.Detail}, Code = {error.Status}");
+                reason = string.Join("; ", errors);
             }
             catch
             {
