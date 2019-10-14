@@ -117,7 +117,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
 
             var errors = new List<Exception>();
 
-            using var factory = new CertificateFactory(_options, _challengeStore, _logger, _hostEnvironment);
+            var factory = new CertificateFactory(_options, _challengeStore, _logger, _hostEnvironment);
 
             try
             {

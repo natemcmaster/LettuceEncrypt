@@ -8,14 +8,14 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
 {
     internal static class LoggerExtensions
     {
-        public static void LogResponse<T>(this ILogger logger, string actionName, AcmeResult<T> response)
+        public static void LogAcmeAction(this ILogger logger, string actionName, object result)
         {
             if (!logger.IsEnabled(LogLevel.Trace))
             {
                 return;
             }
 
-            logger.LogTrace("ACME action: {name}, json response: {data}", actionName, response.Json);
+            logger.LogTrace("ACMEv2 action: {name}", actionName);
         }
     }
 }
