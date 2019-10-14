@@ -1,5 +1,10 @@
 McMaster.AspNetCore.LetsEncrypt.ILetsEncryptServiceBuilder
 McMaster.AspNetCore.LetsEncrypt.ILetsEncryptServiceBuilder.Services.get -> Microsoft.Extensions.DependencyInjection.IServiceCollection
+McMaster.AspNetCore.LetsEncrypt.KeyAlgorithm
+McMaster.AspNetCore.LetsEncrypt.KeyAlgorithm.RS256 = 0 -> McMaster.AspNetCore.LetsEncrypt.KeyAlgorithm
+McMaster.AspNetCore.LetsEncrypt.KeyAlgorithm.ES256 = 1 -> McMaster.AspNetCore.LetsEncrypt.KeyAlgorithm
+McMaster.AspNetCore.LetsEncrypt.KeyAlgorithm.ES384 = 2 -> McMaster.AspNetCore.LetsEncrypt.KeyAlgorithm
+McMaster.AspNetCore.LetsEncrypt.KeyAlgorithm.ES512 = 3 -> McMaster.AspNetCore.LetsEncrypt.KeyAlgorithm
 McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions
 McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.AcceptTermsOfService.get -> bool
 McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.AcceptTermsOfService.set -> void
@@ -9,6 +14,8 @@ McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.EmailAddress.get -> string
 McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.EmailAddress.set -> void
 McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.FallbackCertificate.get -> System.Security.Cryptography.X509Certificates.X509Certificate2
 McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.FallbackCertificate.set -> void
+McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.KeyAlgorithm.get -> McMaster.AspNetCore.LetsEncrypt.KeyAlgorithm
+McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.KeyAlgorithm.set -> void
 McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.LetsEncryptOptions() -> void
 McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.UseStagingServer.get -> bool
 McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.UseStagingServer.set -> void

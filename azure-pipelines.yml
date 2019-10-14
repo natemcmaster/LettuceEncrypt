@@ -20,7 +20,6 @@ jobs:
     displayName: Install .NET Core 3.0
     inputs:
       version: '3.0.x'
-      includePreviewVersions: true
   - task: UseDotNet@2
     displayName: Install .NET Core 2.1
     inputs:
@@ -48,7 +47,6 @@ jobs:
     displayName: Install .NET Core 3.0
     inputs:
       version: '3.0.x'
-      includePreviewVersions: true
   - task: UseDotNet@2
     displayName: Install .NET Core 2.1
     inputs:
