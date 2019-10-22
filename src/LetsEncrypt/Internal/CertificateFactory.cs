@@ -10,11 +10,9 @@ using System.Threading.Tasks;
 using Certes;
 using Certes.Acme;
 using Certes.Acme.Resource;
-using Certes.Pkcs;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 
 #if NETSTANDARD2_0
 using IHostEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;

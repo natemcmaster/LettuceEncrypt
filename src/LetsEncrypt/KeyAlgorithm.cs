@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace McMaster.AspNetCore.LetsEncrypt
+﻿namespace McMaster.AspNetCore.LetsEncrypt
 {
     /// <summary>
     /// The supported algorithms.
