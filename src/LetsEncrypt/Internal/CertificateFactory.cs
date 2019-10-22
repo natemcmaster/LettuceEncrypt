@@ -25,6 +25,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
         private readonly IOptions<LetsEncryptOptions> _options;
         private readonly IHttpChallengeResponseStore _challengeStore;
         private readonly ILogger _logger;
+        private readonly IEnumerable<ICertificateRepository> _certificateRepositories;
         private readonly AcmeContext _context;
         private IAccountContext? _account;
 
@@ -32,11 +33,13 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             IOptions<LetsEncryptOptions> options,
             IHttpChallengeResponseStore challengeStore,
             ILogger logger,
-            IHostEnvironment env)
+            IHostEnvironment env,
+            IEnumerable<ICertificateRepository> certificateRepositories)
         {
             _options = options;
             _challengeStore = challengeStore;
             _logger = logger;
+            _certificateRepositories = certificateRepositories;
             var acmeUrl = _options.Value.GetAcmeServer(env);
             _context = new AcmeContext(acmeUrl);
         }
@@ -70,7 +73,14 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             await Task.WhenAll(BeginValidateAllAuthorizations(authorizations, cancellationToken));
 
             cancellationToken.ThrowIfCancellationRequested();
-            return await CompleteCertificateRequestAsync(order, cancellationToken);
+            var cert = await CompleteCertificateRequestAsync(order, cancellationToken);
+
+            var saveCertTasks = _certificateRepositories.Select(repo => repo.SaveAsync(cert));
+            var timeoutTask = Task.Delay(TimeSpan.FromMinutes(5), cancellationToken);
+
+            await Task.WhenAll(saveCertTasks.Concat(new[] { timeoutTask }));
+
+            return cert;
         }
 
         private IEnumerable<Task> BeginValidateAllAuthorizations(IEnumerable<IAuthorizationContext> authorizations, CancellationToken cancellationToken)

@@ -1,5 +1,10 @@
 <Project>
   <PropertyGroup>
+    <PackageReleaseNotes Condition="'$(VersionPrefix)' == '0.3.0'">
+Features:
+
+* New API for persisting HTTPS certificates to a directory as .pfx files
+    </PackageReleaseNotes>
     <PackageReleaseNotes Condition="'$(VersionPrefix)' == '0.2.0'">
 Important update! LetsEncrypt.org is deprecating v1 of their protocol, which earlier versions of this package used.
 You should update to 0.2.0 soon to avoid interruption to your ability to automaticaly provision HTTPS certs.

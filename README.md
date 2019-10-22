@@ -68,6 +68,19 @@ A few required options should be set, typically via the appsettings.json file.
 }
 ```
 
+## Additional options
+
+### Save generated certificates to folder
+
+```c#
+    public void ConfigureServices(IServiceCollection services)
+    {
+        services
+            .AddLetsEncrypt()
+            .PersistCertificatesToDirectory(new DirectoryInfo("C:/data/MyCertificates/"), "Password123");
+    }
+```
+
 ## Testing in development
 
 See the [developer docs](./test/Integration/) for details on how to test Let's Encrypt in a non-production environment.
@@ -111,6 +124,6 @@ In this scenario, ASP.NET Core is hosted by the Kestrel server (the default, in-
 
 In this scenario, HTTPS traffic is decrypted by a different web server that is beyond the control of ASP.NET Core. This library cannot support this scenario because HTTPS certificates must be configured by the reverse proxy server.
 
-This is commonly done by web hosting providers. For example, :cloud: Azure App Services (aka WebApps) often runs older versions of ASP.NET Core in a reverse proxy. 
+This is commonly done by web hosting providers. For example, :cloud: Azure App Services (aka WebApps) often runs older versions of ASP.NET Core in a reverse proxy.
 
 If you are running the reverse proxy, you can still get free HTTPS certificates from Let's Encrypt, but you'll need to use a different method. See ["Let's Encrypt Nginx"](https://www.google.com/search?q=let%27s%20encrypt%20nginx) for details.

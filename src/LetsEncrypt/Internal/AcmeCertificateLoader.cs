@@ -34,6 +34,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
         private readonly IHostEnvironment _hostEnvironment;
         private readonly IServer _server;
         private readonly IConfiguration _config;
+        private readonly IEnumerable<ICertificateRepository> _certificateRepositories;
         private volatile bool _hasRegistered;
 
         public AcmeCertificateLoader(
@@ -44,7 +45,8 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             ILogger<AcmeCertificateLoader> logger,
             IHostEnvironment hostEnvironment,
             IServer server,
-            IConfiguration config)
+            IConfiguration config,
+            IEnumerable<ICertificateRepository> certificateRepositories)
         {
             _selector = selector;
             _challengeStore = challengeStore;
@@ -54,6 +56,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             _hostEnvironment = hostEnvironment;
             _server = server;
             _config = config;
+            _certificateRepositories = certificateRepositories;
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
@@ -117,7 +120,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
 
             var errors = new List<Exception>();
 
-            var factory = new CertificateFactory(_options, _challengeStore, _logger, _hostEnvironment);
+            var factory = new CertificateFactory(_options, _challengeStore, _logger, _hostEnvironment, _certificateRepositories);
 
             try
             {
