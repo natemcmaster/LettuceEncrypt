@@ -3,7 +3,7 @@
     <PackageReleaseNotes Condition="'$(VersionPrefix)' == '0.3.0'">
 Features:
 
-* New API for persisting HTTPS certificates to a directory as .pfx files
+* New API for persisting HTTPS certificates to a directory as .pfx files. See https://github.com/natemcmaster/LetsEncrypt/issues/4.
     </PackageReleaseNotes>
     <PackageReleaseNotes Condition="'$(VersionPrefix)' == '0.2.0'">
 Important update! LetsEncrypt.org is deprecating v1 of their protocol, which earlier versions of this package used.
