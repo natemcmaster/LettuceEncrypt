@@ -162,7 +162,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
                 _logger.LogInformation("Creating certificate for {hostname} using ACME server {acmeServer}", domainName, _options.Value.GetAcmeServer(_hostEnvironment));
                 cert = await factory.CreateCertificateAsync(cancellationToken);
                 _logger.LogInformation("Created certificate {subjectName} ({thumbprint})", cert.Subject, cert.Thumbprint);
-                _certificateStore.Save(domainName, cert);
+                _certificateStore.Save(cert);
                 return cert;
             }
             catch (Exception ex)
