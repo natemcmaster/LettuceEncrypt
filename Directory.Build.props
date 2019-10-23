@@ -9,7 +9,6 @@ It then configures Kestrel to use this certificate for all HTTPS traffic.
 
 This only works with Kestrel, which is the default server configuration for ASP.NET Core projects. Other servers, such as IIS and nginx, are not supported.
     </PackageDescription>
-    <PackageIconUrl>https://letsencrypt.org/images/le-logo-standard.png</PackageIconUrl>
     <PackageTags>lets-encrypt;aspnetcore;https;certificates</PackageTags>
     <Authors>Nate McMaster</Authors>
     <Product>McMaster.AspNetCore.LetsEncrypt</Product>
@@ -23,6 +22,7 @@ This only works with Kestrel, which is the default server configuration for ASP.
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <DebugType>portable</DebugType>
     <IsPackable>false</IsPackable>
+    <WarnOnPackingNonPackableProject>false</WarnOnPackingNonPackableProject>
     <IncludeSymbols>true</IncludeSymbols>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <LangVersion>8.0</LangVersion>

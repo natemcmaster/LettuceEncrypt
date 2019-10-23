@@ -5,7 +5,12 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Nullable>enable</Nullable>
     <IsPackable>true</IsPackable>
+    <PackageIcon>images/le-logo-standard.png</PackageIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="$(PackageIcon)" Pack="true" PackagePath="images/" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Certes" Version="2.3.3" />
