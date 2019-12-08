@@ -2,12 +2,8 @@
 
 ## Supported Versions
 
-The follow table shows which releases of this project are supported with security updates.
-
-| Version | Supported          |
-| ------- | ------------------ |
-| 0.2.x   | :white_check_mark: |
-| 0.1.x   | :x:                |
+It is highly recommended that you update to use the highest version of this library as possible.
+Only the latest version of this library will be supported with security updates.
 
 ## Reporting a Vulnerability
 
