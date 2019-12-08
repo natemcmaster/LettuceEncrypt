@@ -2,7 +2,7 @@
 
 ## Supported Versions
 
-It is highly recommended that you update to use the highest version of this library as possible.
+It is highly recommended that you use the newest versions of this library as they are released.
 Only the latest version of this library will be supported with security updates.
 
 ## Reporting a Vulnerability
