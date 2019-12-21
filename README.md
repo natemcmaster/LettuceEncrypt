@@ -25,7 +25,7 @@ and **automatically** generate an HTTPS certificate when the server starts up. I
 
 ## Will this work for me?
 
-That depends on [which kind of web server you are using.](#web-server-scenarios). This library only works with [Kestrel](https://docs.microsoft.com/aspnet/core/fundamentals/servers/kestrel), which is the default server configuration for ASP.NET Core projects. Other servers, such as IIS and HTTP.sys, are not supported. Furthermore, this only works when Kestrel is the edge server.
+That depends on [which kind of web server you are using](#web-server-scenarios). This library only works with [Kestrel](https://docs.microsoft.com/aspnet/core/fundamentals/servers/kestrel), which is the default server configuration for ASP.NET Core projects. Other servers, such as IIS and HTTP.sys, are not supported. Furthermore, this only works when Kestrel is the edge server.
 
 Not sure? [Read "Web Server Scenarios" below for more details.](#web-server-scenarios)
 
@@ -78,7 +78,7 @@ I recommend also reading [Microsoft's official documentation on hosting and depl
 
 ### ASP.NET Core with Kestrel
 
-:white_check_mark: Supported by this library
+:white_check_mark: supported
 
 ![Diagram of Kestrel on the edge with Kestrel](https://i.imgur.com/vhQTgUe.png)
 
@@ -86,7 +86,7 @@ In this scenario, ASP.NET Core is hosted by the Kestrel server (the default, in-
 
 ### ASP.NET Core with IIS
 
-:x: Supported by this library
+:x: NOT supported
 
 ![Diagram of Kestrel on the edge with IIS](https://i.imgur.com/PmrcLkN.png)
 
@@ -95,7 +95,7 @@ In this scenario, ASP.NET Core is hosted by IIS and that web server exposes its 
 
 ### ASP.NET Core with Kestrel Behind a TCP Load Balancer (aka SSL pass-thru)
 
-:white_check_mark: Supported by this library
+:white_check_mark: supported
 
 ![Diagram of TCP Load Balancer](https://i.imgur.com/txqLTv5.png)
 
@@ -103,7 +103,7 @@ In this scenario, ASP.NET Core is hosted by the Kestrel server (the default, in-
 
 ### ASP.NET Core with Kestrel Behind a Reverse Proxy
 
-:x: NOT supported by this library
+:x: NOT supported
 
 ![Diagram of reverse proxy](https://i.imgur.com/LA4jms7.png)
 
