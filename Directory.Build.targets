@@ -1,6 +1,6 @@
 <Project InitialTargets="UpdateCiSettings">
 
-  <Target Name="UpdateCiSettings" Condition="'$(CI)' == 'true' AND '$(OS)' == 'Windows_NT'">
+  <Target Name="UpdateCiSettings" Condition="'$(CI)' == 'true'">
     <Message Importance="High" Text="##vso[build.updatebuildnumber]$(PackageVersion)" />
   </Target>
 
