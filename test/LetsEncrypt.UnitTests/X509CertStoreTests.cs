@@ -4,6 +4,7 @@ using Moq;
 using System;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace LetsEncrypt.UnitTests
@@ -13,7 +14,7 @@ namespace LetsEncrypt.UnitTests
         [Fact]
         public void ItFindsCertByCommonName()
         {
-            var commonName = "x509store.letsencrypt.test.natemcmaster.com";
+            var commonName = "x509store.read.letsencrypt.test.natemcmaster.com";
             using var x509store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
             x509store.Open(OpenFlags.ReadWrite);
             var testCert = CreateTestCert(commonName);
@@ -33,6 +34,40 @@ namespace LetsEncrypt.UnitTests
             finally
             {
 
+                x509store.Remove(testCert);
+            }
+        }
+
+        [Fact]
+        public async Task ItSavesCertifiates()
+        {
+            var commonName = "x509store.save.letsencrypt.test.natemcmaster.com";
+            var testCert = CreateTestCert(commonName);
+            using var x509store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
+            x509store.Open(OpenFlags.ReadWrite);
+
+            try
+            {
+                var logger = new Mock<ILogger<X509CertStore>>();
+                logger.Setup(l => l.IsEnabled(It.IsAny<LogLevel>())).Returns(true);
+                using var certStore = new X509CertStore(logger.Object)
+                {
+                    AllowInvalidCerts = true
+                };
+                await certStore.SaveAsync(testCert, default);
+
+                var certificates = x509store.Certificates.Find(
+                    X509FindType.FindByThumbprint,
+                    testCert.Thumbprint,
+                    validOnly: false);
+
+                var foundCert = Assert.Single(certificates);
+
+                Assert.NotNull(foundCert);
+                Assert.Equal(testCert, foundCert);
+            }
+            finally
+            {
                 x509store.Remove(testCert);
             }
         }
