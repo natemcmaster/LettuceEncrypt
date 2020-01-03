@@ -118,27 +118,25 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var errors = new List<Exception>();
+            var factory = new CertificateFactory(_options, _challengeStore, _logger, _hostEnvironment);
 
-            var factory = new CertificateFactory(_options, _challengeStore, _logger, _hostEnvironment, _certificateRepositories);
-
-            try
+            var cert = await GetOrCreateCertificate(factory, cancellationToken);
+            foreach (var domainName in _options.Value.DomainNames)
             {
-                var cert = await GetOrCreateCertificate(factory, cancellationToken);
-                foreach (var domainName in _options.Value.DomainNames)
-                {
-                    _selector.Use(domainName, cert);
-                }
-            }
-            catch (Exception ex)
-            {
-                errors.Add(ex);
+                _selector.Use(domainName, cert);
             }
 
-            if (errors.Count > 0)
+            var saveTasks = new List<Task>
             {
-                throw new AggregateException(errors);
+                Task.Delay(TimeSpan.FromMinutes(5), cancellationToken)
+            };
+
+            foreach (var repo in _certificateRepositories)
+            {
+                saveTasks.Add(repo.SaveAsync(cert, cancellationToken));
             }
+
+            await Task.WhenAll(saveTasks);
         }
 
         private async Task<X509Certificate2> GetOrCreateCertificate(CertificateFactory factory, CancellationToken cancellationToken)
@@ -162,7 +160,6 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
                 _logger.LogInformation("Creating certificate for {hostname} using ACME server {acmeServer}", domainName, _options.Value.GetAcmeServer(_hostEnvironment));
                 cert = await factory.CreateCertificateAsync(cancellationToken);
                 _logger.LogInformation("Created certificate {subjectName} ({thumbprint})", cert.Subject, cert.Thumbprint);
-                _certificateStore.Save(cert);
                 return cert;
             }
             catch (Exception ex)

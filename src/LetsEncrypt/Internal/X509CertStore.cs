@@ -3,11 +3,13 @@
 
 using System;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
 namespace McMaster.AspNetCore.LetsEncrypt.Internal
 {
-    internal class X509CertStore : ICertificateStore, IDisposable
+    internal class X509CertStore : ICertificateStore, ICertificateRepository, IDisposable
     {
         private readonly X509Store _store;
         private readonly ILogger<X509CertStore> _logger;
@@ -53,7 +55,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             return certWithMostTtl;
         }
 
-        public void Save(X509Certificate2 certificate)
+        public Task SaveAsync(X509Certificate2 certificate, CancellationToken cancellationToken)
         {
             try
             {
@@ -64,6 +66,8 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
                 _logger.LogError(0, ex, "Failed to save certificate to store");
                 throw;
             }
+
+            return Task.CompletedTask;
         }
 
         public void Dispose()
