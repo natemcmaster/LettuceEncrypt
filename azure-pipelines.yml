@@ -36,6 +36,12 @@ jobs:
       testRunTitle: Windows
       testRunner: vstest
       testResultsFiles: '**/*.trx'
+  - task: PublishCodeCoverageResults@1
+    displayName: Publish code coverage results
+    continueOnError: true
+    inputs:
+      codeCoverageTool: cobertura
+      summaryFileLocation: coverlet/reports/Cobertura.xml
   - publish: 'artifacts/'
     artifact: 'Packages'
     displayName: Publish artifacts

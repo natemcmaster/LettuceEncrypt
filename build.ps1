@@ -41,7 +41,6 @@ if (-not (Test-Path variable:\IsCoreCLR)) {
 
 $CodeSign = $sign -or ($ci -and -not $isPr -and $IsWindows)
 if ($CodeSign) {
-    exec dotnet tool restore
     $MSBuildArgs += '-p:CodeSign=true'
 }
 
@@ -49,6 +48,7 @@ $artifacts = "$PSScriptRoot/artifacts/"
 
 Remove-Item -Recurse $artifacts -ErrorAction Ignore
 
+exec dotnet tool restore
 exec dotnet build --configuration $Configuration '-warnaserror:CS1591' @MSBuildArgs
 exec dotnet pack --no-restore --no-build --configuration $Configuration -o $artifacts @MSBuildArgs
 
@@ -58,7 +58,15 @@ if ($env:TF_BUILD) {
 }
 
 exec dotnet test --no-restore --no-build --configuration $Configuration '-clp:Summary' `
+    --collect:"XPlat Code Coverage" `
     @testArgs `
     @MSBuildArgs
+
+if ($ci) {
+    exec dotnet tool run reportgenerator `
+        "-reports:$PSScriptRoot/**/coverage.cobertura.xml" `
+        "-targetdir:$PSScriptRoot/coverlet/reports" `
+        "-reporttypes:Cobertura"
+}
 
 write-host -f magenta 'Done'
