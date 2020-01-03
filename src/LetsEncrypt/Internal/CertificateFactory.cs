@@ -75,7 +75,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             cancellationToken.ThrowIfCancellationRequested();
             var cert = await CompleteCertificateRequestAsync(order, cancellationToken);
 
-            var saveCertTasks = _certificateRepositories.Select(repo => repo.SaveAsync(cert));
+            var saveCertTasks = _certificateRepositories.Select(repo => repo.SaveAsync(cert, cancellationToken));
             var timeoutTask = Task.Delay(TimeSpan.FromMinutes(5), cancellationToken);
 
             await Task.WhenAll(saveCertTasks.Concat(new[] { timeoutTask }));

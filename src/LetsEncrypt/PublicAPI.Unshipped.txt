@@ -1,4 +1,4 @@
 McMaster.AspNetCore.LetsEncrypt.FileSystemStorageExtensions
 McMaster.AspNetCore.LetsEncrypt.ICertificateRepository
-McMaster.AspNetCore.LetsEncrypt.ICertificateRepository.SaveAsync(System.Security.Cryptography.X509Certificates.X509Certificate2 certificate) -> System.Threading.Tasks.Task
+McMaster.AspNetCore.LetsEncrypt.ICertificateRepository.SaveAsync(System.Security.Cryptography.X509Certificates.X509Certificate2 certificate, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task
 static McMaster.AspNetCore.LetsEncrypt.FileSystemStorageExtensions.PersistCertificatesToDirectory(this McMaster.AspNetCore.LetsEncrypt.ILetsEncryptServiceBuilder builder, System.IO.DirectoryInfo directory, string pfxPassword) -> McMaster.AspNetCore.LetsEncrypt.ILetsEncryptServiceBuilder

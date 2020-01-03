@@ -21,7 +21,7 @@ namespace LetsEncrypt.UnitTests
 
             Assert.False(dir.Exists, "Directory should not exist yet created");
 
-            await repo.SaveAsync(cert);
+            await repo.SaveAsync(cert, default);
 
             dir.Refresh();
             Assert.True(dir.Exists, "Directory was created");
