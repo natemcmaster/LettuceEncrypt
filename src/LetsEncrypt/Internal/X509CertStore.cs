@@ -12,6 +12,8 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
         private readonly X509Store _store;
         private readonly ILogger<X509CertStore> _logger;
 
+        public bool AllowInvalidCerts { get; set; }
+
         public X509CertStore(ILogger<X509CertStore> logger)
         {
             _store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
@@ -24,7 +26,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             var certs = _store.Certificates.Find(
                 X509FindType.FindBySubjectDistinguishedName,
                 "CN=" + domainName,
-                validOnly: true);
+                validOnly: !AllowInvalidCerts);
 
             if (certs == null || certs.Count == 0)
             {
@@ -51,7 +53,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             return certWithMostTtl;
         }
 
-        public void Save(string domainName, X509Certificate2 certificate)
+        public void Save(X509Certificate2 certificate)
         {
             try
             {
