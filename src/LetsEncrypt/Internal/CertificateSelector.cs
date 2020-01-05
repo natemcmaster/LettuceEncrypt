@@ -20,7 +20,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             _options = options ?? throw new ArgumentNullException(nameof(options));
         }
 
-        public void Use(string domainName, X509Certificate2 certificate)
+        public virtual void Use(string domainName, X509Certificate2 certificate)
         {
             _certs.AddOrUpdate(domainName, certificate, (_, __) => certificate);
         }
