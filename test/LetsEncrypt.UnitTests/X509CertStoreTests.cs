@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using System;
+using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Xunit;
@@ -24,7 +25,7 @@ namespace LetsEncrypt.UnitTests
         [Fact]
         public void ItFindsCertByCommonName()
         {
-            var commonName = "x509store.read.letsencrypt.test.natemcmaster.com";
+            var commonName = Path.GetRandomFileName() + ".x509store.letsencrypt.test.natemcmaster.com";
             using var x509store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
             x509store.Open(OpenFlags.ReadWrite);
             var testCert = CreateTestCert(commonName);
@@ -50,9 +51,9 @@ namespace LetsEncrypt.UnitTests
         }
 
         [Fact]
-        public async Task ItSavesCertifiates()
+        public async Task ItSavesCertificates()
         {
-            var commonName = "x509store.save.letsencrypt.test.natemcmaster.com";
+            var commonName = Path.GetRandomFileName() + ".x509store.letsencrypt.test.natemcmaster.com";
             var testCert = CreateTestCert(commonName);
             using var x509store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
             x509store.Open(OpenFlags.ReadWrite);
