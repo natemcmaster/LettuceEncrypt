@@ -6,6 +6,7 @@ using System;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace LetsEncrypt.UnitTests
 {
@@ -13,6 +14,13 @@ namespace LetsEncrypt.UnitTests
 
     public class X509CertStoreTests
     {
+        private readonly ITestOutputHelper _output;
+
+        public X509CertStoreTests(ITestOutputHelper output)
+        {
+            _output = output;
+        }
+
         [Fact]
         public void ItFindsCertByCommonName()
         {
@@ -21,6 +29,9 @@ namespace LetsEncrypt.UnitTests
             x509store.Open(OpenFlags.ReadWrite);
             var testCert = CreateTestCert(commonName);
             x509store.Add(testCert);
+
+            _output.WriteLine($"Adding cert {testCert.Thumbprint} to My/CurrentUser");
+
             try
             {
                 using var certStore = new X509CertStore(NullLogger<X509CertStore>.Instance)
@@ -58,6 +69,8 @@ namespace LetsEncrypt.UnitTests
                     X509FindType.FindByThumbprint,
                     testCert.Thumbprint,
                     validOnly: false);
+
+                _output.WriteLine($"Searching for cert {testCert.Thumbprint} to My/CurrentUser");
 
                 var foundCert = Assert.Single(certificates);
 
