@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Options;
@@ -20,7 +21,20 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             _options = options ?? throw new ArgumentNullException(nameof(options));
         }
 
-        public virtual void Use(string domainName, X509Certificate2 certificate)
+        public ICollection<string> SupportedDomains => _certs.Keys;
+
+        public virtual void Add(X509Certificate2 certificate)
+        {
+            var commonName = certificate.GetNameInfo(X509NameType.SimpleName, false);
+            AddWithDomainName(commonName, certificate);
+
+            foreach (var subjectAltName in X509CertificateHelpers.GetDnsFromExtensions(certificate))
+            {
+                AddWithDomainName(subjectAltName, certificate);
+            }
+        }
+
+        private void AddWithDomainName(string domainName, X509Certificate2 certificate)
         {
             _certs.AddOrUpdate(domainName, certificate, (_, __) => certificate);
         }

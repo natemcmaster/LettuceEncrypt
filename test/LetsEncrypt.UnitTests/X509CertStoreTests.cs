@@ -1,29 +1,41 @@
 ﻿using McMaster.AspNetCore.LetsEncrypt.Internal;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using System;
-using System.Security.Cryptography;
+using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace LetsEncrypt.UnitTests
 {
+    using static TestUtils;
+
     public class X509CertStoreTests
     {
+        private readonly ITestOutputHelper _output;
+
+        public X509CertStoreTests(ITestOutputHelper output)
+        {
+            _output = output;
+        }
+
         [Fact]
         public void ItFindsCertByCommonName()
         {
-            var commonName = "x509store.read.letsencrypt.test.natemcmaster.com";
+            var commonName = Path.GetRandomFileName() + ".x509store.letsencrypt.test.natemcmaster.com";
             using var x509store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
             x509store.Open(OpenFlags.ReadWrite);
             var testCert = CreateTestCert(commonName);
             x509store.Add(testCert);
+
+            _output.WriteLine($"Adding cert {testCert.Thumbprint} to My/CurrentUser");
+
             try
             {
-                var logger = new Mock<ILogger<X509CertStore>>();
-                logger.Setup(l => l.IsEnabled(It.IsAny<LogLevel>())).Returns(true);
-                using var certStore = new X509CertStore(logger.Object)
+                using var certStore = new X509CertStore(NullLogger<X509CertStore>.Instance)
                 {
                     AllowInvalidCerts = true
                 };
@@ -39,18 +51,16 @@ namespace LetsEncrypt.UnitTests
         }
 
         [Fact]
-        public async Task ItSavesCertifiates()
+        public async Task ItSavesCertificates()
         {
-            var commonName = "x509store.save.letsencrypt.test.natemcmaster.com";
+            var commonName = Path.GetRandomFileName() + ".x509store.letsencrypt.test.natemcmaster.com";
             var testCert = CreateTestCert(commonName);
             using var x509store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
             x509store.Open(OpenFlags.ReadWrite);
 
             try
             {
-                var logger = new Mock<ILogger<X509CertStore>>();
-                logger.Setup(l => l.IsEnabled(It.IsAny<LogLevel>())).Returns(true);
-                using var certStore = new X509CertStore(logger.Object)
+                using var certStore = new X509CertStore(NullLogger<X509CertStore>.Instance)
                 {
                     AllowInvalidCerts = true
                 };
@@ -60,6 +70,8 @@ namespace LetsEncrypt.UnitTests
                     X509FindType.FindByThumbprint,
                     testCert.Thumbprint,
                     validOnly: false);
+
+                _output.WriteLine($"Searching for cert {testCert.Thumbprint} to My/CurrentUser");
 
                 var foundCert = Assert.Single(certificates);
 
@@ -112,18 +124,6 @@ namespace LetsEncrypt.UnitTests
                 x509store.Remove(testCert1);
                 x509store.Remove(testCert2);
             }
-        }
-
-        private X509Certificate2 CreateTestCert(string commonName, DateTimeOffset? expires = null)
-        {
-            expires ??= DateTimeOffset.Now.AddMinutes(2);
-            var key = RSA.Create(2048);
-            var csr = new CertificateRequest(
-                "CN=" + commonName,
-                key,
-                HashAlgorithmName.SHA512,
-                RSASignaturePadding.Pkcs1);
-            return csr.CreateSelfSigned(DateTimeOffset.Now.AddMinutes(-1), expires.Value);
         }
     }
 }
