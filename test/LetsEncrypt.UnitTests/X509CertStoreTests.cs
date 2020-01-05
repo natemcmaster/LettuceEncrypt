@@ -1,14 +1,16 @@
 ﻿using McMaster.AspNetCore.LetsEncrypt.Internal;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using System;
-using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Xunit;
 
 namespace LetsEncrypt.UnitTests
 {
+    using static TestUtils;
+
     public class X509CertStoreTests
     {
         [Fact]
@@ -21,9 +23,7 @@ namespace LetsEncrypt.UnitTests
             x509store.Add(testCert);
             try
             {
-                var logger = new Mock<ILogger<X509CertStore>>();
-                logger.Setup(l => l.IsEnabled(It.IsAny<LogLevel>())).Returns(true);
-                using var certStore = new X509CertStore(logger.Object)
+                using var certStore = new X509CertStore(NullLogger<X509CertStore>.Instance)
                 {
                     AllowInvalidCerts = true
                 };
@@ -48,9 +48,7 @@ namespace LetsEncrypt.UnitTests
 
             try
             {
-                var logger = new Mock<ILogger<X509CertStore>>();
-                logger.Setup(l => l.IsEnabled(It.IsAny<LogLevel>())).Returns(true);
-                using var certStore = new X509CertStore(logger.Object)
+                using var certStore = new X509CertStore(NullLogger<X509CertStore>.Instance)
                 {
                     AllowInvalidCerts = true
                 };
@@ -112,18 +110,6 @@ namespace LetsEncrypt.UnitTests
                 x509store.Remove(testCert1);
                 x509store.Remove(testCert2);
             }
-        }
-
-        private X509Certificate2 CreateTestCert(string commonName, DateTimeOffset? expires = null)
-        {
-            expires ??= DateTimeOffset.Now.AddMinutes(2);
-            var key = RSA.Create(2048);
-            var csr = new CertificateRequest(
-                "CN=" + commonName,
-                key,
-                HashAlgorithmName.SHA512,
-                RSASignaturePadding.Pkcs1);
-            return csr.CreateSelfSigned(DateTimeOffset.Now.AddMinutes(-1), expires.Value);
         }
     }
 }

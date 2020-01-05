@@ -20,7 +20,7 @@ namespace LetsEncrypt.UnitTests
 
             var selector = new Mock<CertificateSelector>(Options.Create(new LetsEncryptOptions()));
             selector
-                .Setup(s => s.Use(It.IsAny<string>(), testCert))
+                .Setup(s => s.Add(testCert))
                 .Verifiable();
 
             var source1 = CreateCertSource(certs);

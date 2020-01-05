@@ -29,7 +29,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
 
                 foreach (var cert in certs)
                 {
-                    _selector.Use(string.Empty, cert);
+                    _selector.Add(cert);
                 }
             }
         }

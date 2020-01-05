@@ -60,7 +60,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             else
             {
                 _logger.LogDebug("Using the " + AspNetHttpsOidFriendlyName + " for 'localhost' requests");
-                _certSelector.Use("localhost", certs[0]);
+                _certSelector.Add(certs[0]);
             }
         }
 

@@ -121,10 +121,8 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             var factory = new CertificateFactory(_options, _challengeStore, _logger, _hostEnvironment);
 
             var cert = await GetOrCreateCertificate(factory, cancellationToken);
-            foreach (var domainName in _options.Value.DomainNames)
-            {
-                _selector.Use(domainName, cert);
-            }
+
+            _selector.Add(cert);
 
             var saveTasks = new List<Task>
             {
