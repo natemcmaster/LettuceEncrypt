@@ -42,7 +42,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IConfigureOptions<KestrelServerOptions>, KestrelOptionsSetup>();
 
             services.AddSingleton<CertificateSelector>()
-                .AddSingleton<IHostedService, DeveloperCertLoader>()
+                .AddSingleton<IHostedService, StartupCertificateLoader>()
+                .AddSingleton<ICertificateSource, DeveloperCertLoader>()
                 .AddSingleton<IHostedService, AcmeCertificateLoader>()
                 .AddSingleton<IHttpChallengeResponseStore, InMemoryHttpChallengeResponseStore>()
                 .AddSingleton<X509CertStore>()
