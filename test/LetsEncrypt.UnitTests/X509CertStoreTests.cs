@@ -1,12 +1,11 @@
-﻿using McMaster.AspNetCore.LetsEncrypt.Internal;
+﻿using System;
+using System.Security.Cryptography.X509Certificates;
+using System.Threading.Tasks;
+using McMaster.AspNetCore.LetsEncrypt.Internal;
 using McMaster.Extensions.Xunit;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using System;
-using System.IO;
-using System.Security.Cryptography.X509Certificates;
-using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
 

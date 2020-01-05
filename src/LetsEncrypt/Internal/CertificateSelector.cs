@@ -36,7 +36,18 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
 
         private void AddWithDomainName(string domainName, X509Certificate2 certificate)
         {
-            _certs.AddOrUpdate(domainName, certificate, (_, __) => certificate);
+            _certs.AddOrUpdate(
+                domainName,
+                certificate,
+                (_, currentCert) =>
+                {
+                    if (currentCert == null || certificate.NotAfter >= currentCert.NotAfter)
+                    {
+                        return certificate;
+                    }
+
+                    return currentCert;
+                });
         }
 
         public X509Certificate2? Select(ConnectionContext features, string? domainName)
@@ -47,6 +58,11 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             }
 
             return retVal;
+        }
+
+        public void Reset(string domainName)
+        {
+            _certs.TryRemove(domainName, out var _);
         }
     }
 }

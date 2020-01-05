@@ -1,8 +1,10 @@
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using McMaster.AspNetCore.LetsEncrypt;
 using McMaster.AspNetCore.LetsEncrypt.Internal;
+using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Options;
+using Moq;
 using Xunit;
 
 namespace LetsEncrypt.UnitTests
@@ -43,6 +45,30 @@ namespace LetsEncrypt.UnitTests
             Assert.Equal(
                 new HashSet<string>(domainNames),
                 new HashSet<string>(selector.SupportedDomains));
+        }
+
+        [Fact]
+        public void ItSelectsCertificateWithLongestTTL()
+        {
+            const string CommonName = "test.natemcmaster.com";
+            var fiveDays = CreateTestCert(CommonName, DateTimeOffset.Now.AddDays(5));
+            var tenDays = CreateTestCert(CommonName, DateTimeOffset.Now.AddDays(10));
+
+            var selector = new CertificateSelector(Options.Create(new LetsEncryptOptions()));
+
+            selector.Add(fiveDays);
+            selector.Add(tenDays);
+
+            Assert.Same(tenDays, selector.Select(Mock.Of<ConnectionContext>(), CommonName));
+
+            selector.Reset(CommonName);
+
+            Assert.Null(selector.Select(Mock.Of<ConnectionContext>(), CommonName));
+
+            selector.Add(tenDays);
+            selector.Add(fiveDays);
+
+            Assert.Same(tenDays, selector.Select(Mock.Of<ConnectionContext>(), CommonName));
         }
     }
 }

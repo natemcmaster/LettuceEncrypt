@@ -2,7 +2,6 @@ using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using McMaster.AspNetCore.LetsEncrypt.Internal;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Xunit;
@@ -35,7 +34,7 @@ namespace LetsEncrypt.UnitTests
         [Fact]
         public async Task ItDoesNotLoadCertUnlessDevEnvironment()
         {
-             var env = new Mock<IHostEnvironment>();
+            var env = new Mock<IHostEnvironment>();
             env.SetupGet(e => e.EnvironmentName).Returns("Staging");
 
             var loader = new DeveloperCertLoader(env.Object, NullLogger<DeveloperCertLoader>.Instance);
