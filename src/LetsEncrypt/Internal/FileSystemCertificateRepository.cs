@@ -10,10 +10,10 @@ namespace McMaster.AspNetCore.LetsEncrypt
 {
     internal class FileSystemCertificateRepository : ICertificateRepository
     {
-        private readonly string _pfxPassword;
+        private readonly string? _pfxPassword;
         private readonly DirectoryInfo _directory;
 
-        public FileSystemCertificateRepository(DirectoryInfo directory, string pfxPassword)
+        public FileSystemCertificateRepository(DirectoryInfo directory, string? pfxPassword)
         {
             _pfxPassword = pfxPassword;
             _directory = directory;
