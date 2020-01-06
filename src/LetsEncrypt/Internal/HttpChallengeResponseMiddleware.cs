@@ -37,7 +37,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
 
             _logger.LogDebug("Confirmed challenge request for {token}", token);
 
-            context.Response.ContentLength = value.Length;
+            context.Response.ContentLength = value?.Length ?? 0;
             context.Response.ContentType = "application/octet-stream";
             await context.Response.WriteAsync(value, context.RequestAborted);
         }

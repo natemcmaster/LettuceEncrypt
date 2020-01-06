@@ -61,8 +61,8 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             private static readonly char s_delimiter;
             private static readonly string? s_separator;
 
-            private static bool s_successfullyInitialized = false;
-            private static Exception? s_initializationException;
+            private static readonly bool s_successfullyInitialized = false;
+            private static readonly Exception? s_initializationException;
 
             public static string Identifier
             {
