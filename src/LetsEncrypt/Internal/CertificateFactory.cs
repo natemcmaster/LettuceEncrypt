@@ -37,9 +37,11 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             _options = options;
             _challengeStore = challengeStore;
             _logger = logger;
-            var acmeUrl = _options.Value.GetAcmeServer(env);
-            _context = new AcmeContext(acmeUrl);
+            AcmeServer = GetAcmeServer(_options.Value, env);
+            _context = new AcmeContext(AcmeServer);
         }
+
+        public Uri AcmeServer { get; }
 
         public async Task RegisterUserAsync(CancellationToken cancellationToken)
         {
@@ -71,6 +73,20 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
 
             cancellationToken.ThrowIfCancellationRequested();
             return await CompleteCertificateRequestAsync(order, cancellationToken);
+        }
+
+        /// <summary>
+        /// The uri to the server that implements the ACME protocol for certificate generation.
+        /// </summary>
+        internal static Uri GetAcmeServer(LetsEncryptOptions options, IHostEnvironment env)
+        {
+            var useStaging = options.UseStagingServerExplicitlySet
+                ? options.UseStagingServer
+                : env.IsDevelopment();
+
+            return useStaging
+                ? WellKnownServers.LetsEncryptStagingV2
+                : WellKnownServers.LetsEncryptV2;
         }
 
         private IEnumerable<Task> BeginValidateAllAuthorizations(IEnumerable<IAuthorizationContext> authorizations, CancellationToken cancellationToken)

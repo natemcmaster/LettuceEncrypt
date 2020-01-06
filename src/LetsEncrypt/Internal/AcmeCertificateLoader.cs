@@ -155,8 +155,12 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
 
             try
             {
-                _logger.LogInformation("Creating certificate for {hostname} using ACME server {acmeServer}", domainName, _options.Value.GetAcmeServer(_hostEnvironment));
+                _logger.LogInformation("Creating certificate for {hostname} using ACME server {acmeServer}",
+                    domainName,
+                    factory.AcmeServer);
+
                 cert = await factory.CreateCertificateAsync(cancellationToken);
+
                 _logger.LogInformation("Created certificate {subjectName} ({thumbprint})", cert.Subject, cert.Thumbprint);
                 return cert;
             }

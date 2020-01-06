@@ -3,8 +3,6 @@
 
 using System;
 using System.Security.Cryptography.X509Certificates;
-using Certes.Acme;
-using Microsoft.Extensions.Hosting;
 
 #if NETSTANDARD2_0
 using IHostEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
@@ -17,8 +15,8 @@ namespace McMaster.AspNetCore.LetsEncrypt
     /// </summary>
     public class LetsEncryptOptions
     {
-        private Uri? _acmeServer;
         private string[] _domainNames = Array.Empty<string>();
+        private bool? _useStagingServer;
 
         /// <summary>
         /// The domain names for which to generate certificates.
@@ -51,11 +49,11 @@ namespace McMaster.AspNetCore.LetsEncrypt
         /// </summary>
         public bool UseStagingServer
         {
-            get => _acmeServer == WellKnownServers.LetsEncryptStaging;
-            set => _acmeServer = value
-                   ? WellKnownServers.LetsEncryptStagingV2
-                   : WellKnownServers.LetsEncryptV2;
+            get => _useStagingServer ?? false;
+            set => _useStagingServer = value;
         }
+
+        internal bool UseStagingServerExplicitlySet => _useStagingServer.HasValue;
 
         /// <summary>
         /// A certificate to use if a certifcates cannot be created automatically.
@@ -69,21 +67,5 @@ namespace McMaster.AspNetCore.LetsEncrypt
         /// Asymetric encryption algorithm: RS256, ES256, ES384, ES512
         /// </summary>
         public KeyAlgorithm KeyAlgorithm { get; set; } = KeyAlgorithm.ES256;
-
-        /// <summary>
-        /// The uri to the server that implements the ACME protocol for certificate generation.
-        /// </summary>
-        /// <param name="env"></param>
-        internal Uri GetAcmeServer(IHostEnvironment env)
-        {
-            if (_acmeServer != null)
-            {
-                return _acmeServer;
-            }
-
-            return env.IsDevelopment()
-                ? WellKnownServers.LetsEncryptStagingV2
-                : WellKnownServers.LetsEncryptV2;
-        }
     }
 }
