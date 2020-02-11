@@ -1,0 +1,8 @@
+McMaster.AspNetCore.LetsEncrypt.AzureKeyVaultCertificateRepositoryOptions
+McMaster.AspNetCore.LetsEncrypt.AzureKeyVaultCertificateRepositoryOptions.AzureKeyVaultCertificateRepositoryOptions() -> void
+McMaster.AspNetCore.LetsEncrypt.AzureKeyVaultCertificateRepositoryOptions.Credentials.get -> Azure.Core.TokenCredential
+McMaster.AspNetCore.LetsEncrypt.AzureKeyVaultCertificateRepositoryOptions.Credentials.set -> void
+McMaster.AspNetCore.LetsEncrypt.AzureKeyVaultCertificateRepositoryOptions.Url.get -> string
+McMaster.AspNetCore.LetsEncrypt.AzureKeyVaultCertificateRepositoryOptions.Url.set -> void
+Microsoft.Extensions.DependencyInjection.AzureKeyVaultExtensions
+static Microsoft.Extensions.DependencyInjection.AzureKeyVaultExtensions.AddKeyVaultCertificateRepository(this McMaster.AspNetCore.LetsEncrypt.ILetsEncryptServiceBuilder builder, System.Action<McMaster.AspNetCore.LetsEncrypt.AzureKeyVaultCertificateRepositoryOptions> config = null) -> McMaster.AspNetCore.LetsEncrypt.ILetsEncryptServiceBuilder
