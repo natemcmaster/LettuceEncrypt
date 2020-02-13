@@ -68,19 +68,6 @@ A few required options should be set, typically via the appsettings.json file.
 }
 ```
 
-## Additional options
-
-### Save generated certificates to folder
-
-```c#
-    public void ConfigureServices(IServiceCollection services)
-    {
-        services
-            .AddLetsEncrypt()
-            .PersistCertificatesToDirectory(new DirectoryInfo("C:/data/MyCertificates/"), "Password123");
-    }
-```
-
 ## Testing in development
 
 See the [developer docs](./test/Integration/) for details on how to test Let's Encrypt in a non-production environment.
