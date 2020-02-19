@@ -3,6 +3,7 @@
 
 using System;
 using McMaster.AspNetCore.LetsEncrypt;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -16,8 +17,8 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <param name="builder">A LetsEncrypt service builder.</param>
         /// <returns>The original LetsEncrypt service builder.</returns>
-        public static ILetsEncryptServiceBuilder AddKeyVaultCertificateRepository(this ILetsEncryptServiceBuilder builder)
-            => builder.AddKeyVaultCertificateRepository(_ => { });
+        public static ILetsEncryptServiceBuilder AddAzureKeyVaultCertificateSource(this ILetsEncryptServiceBuilder builder)
+            => builder.AddAzureKeyVaultCertificateSource(_ => { });
 
         /// <summary>
         /// Adds key vault certificate repository for LetsEncrypt.
@@ -25,13 +26,38 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="builder">A LetsEncrypt service builder.</param>
         /// <param name="config">Configuration for KeyVault connections.</param>
         /// <returns>The original LetsEncrypt service builder.</returns>
-        public static ILetsEncryptServiceBuilder AddKeyVaultCertificateRepository(this ILetsEncryptServiceBuilder builder, Action<AzureKeyVaultCertificateRepositoryOptions> config)
+        public static ILetsEncryptServiceBuilder AddAzureKeyVaultCertificateSource(this ILetsEncryptServiceBuilder builder, Action<AzureKeyVaultCertificateRepositoryOptions> config)
         {
-            builder.Services
-                .AddSingleton<AzureKeyVaultCertificateRepository>()
-                .AddSingleton<ICertificateSource>(x => x.GetRequiredService<AzureKeyVaultCertificateRepository>())
-                .AddSingleton<ICertificateRepository>(x => x.GetRequiredService<AzureKeyVaultCertificateRepository>());
+            builder.Services.TryAddSingleton<AzureKeyVaultCertificateRepository>();
+            builder.Services.TryAddEnumerable(ServiceDescriptor.Transient<ICertificateSource, AzureKeyVaultCertificateRepository>(x => x.GetRequiredService<AzureKeyVaultCertificateRepository>()));
 
+            return builder.ConfigureOptions(config);
+        }
+
+        /// <summary>
+        /// Persists certificates to configured key vault.
+        /// </summary>
+        /// <param name="builder">A LetsEncrypt service builder.</param>
+        /// <returns>The original LetsEncrypt service builder.</returns>
+        public static ILetsEncryptServiceBuilder PersistCertificatesToAzureKeyVault(this ILetsEncryptServiceBuilder builder)
+            => builder.PersistCertificatesToAzureKeyVault(_ => { });
+
+        /// <summary>
+        /// Persists certificates to configured key vault.
+        /// </summary>
+        /// <param name="builder">A LetsEncrypt service builder.</param>
+        /// <param name="config">Configuration for KeyVault connections.</param>
+        /// <returns>The original LetsEncrypt service builder.</returns>
+        public static ILetsEncryptServiceBuilder PersistCertificatesToAzureKeyVault(this ILetsEncryptServiceBuilder builder, Action<AzureKeyVaultCertificateRepositoryOptions> config)
+        {
+            builder.Services.TryAddSingleton<AzureKeyVaultCertificateRepository>();
+            builder.Services.TryAddEnumerable(ServiceDescriptor.Transient<ICertificateRepository, AzureKeyVaultCertificateRepository>(x => x.GetRequiredService<AzureKeyVaultCertificateRepository>()));
+
+            return builder.ConfigureOptions(config);
+        }
+
+        private static ILetsEncryptServiceBuilder ConfigureOptions(this ILetsEncryptServiceBuilder builder, Action<AzureKeyVaultCertificateRepositoryOptions> config)
+        {
             var options = builder.Services
                 .AddOptions<AzureKeyVaultCertificateRepositoryOptions>()
                 .Configure(config);
@@ -42,5 +68,6 @@ namespace Microsoft.Extensions.DependencyInjection
 
             return builder;
         }
+
     }
 }

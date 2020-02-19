@@ -11,10 +11,11 @@ namespace Web
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddLetsEncrypt()
-                .AddKeyVaultCertificateRepository(o =>
+                .AddAzureKeyVaultCertificateSource(o =>
                 {
                     o.AzureKeyVaultEndpoint = "https://[url].vault.azure.net/";
-                });
+                })
+                .PersistCertificatesToAzureKeyVault();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

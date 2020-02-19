@@ -58,10 +58,11 @@ In order to test KeyVault storage/retrieval, follow these steps:
 public void ConfigureServices(IServiceCollection services)
 {
     services.AddLetsEncrypt()
-        .AddKeyVaultCertificateRepository(o =>
+        .AddAzureKeyVaultCertificateSource(o =>
         {
             o.AzureKeyVaultEndpoint = "https://[url].vault.azure.net/";
-        });
+        })
+        .PersistCertificatesToAzureKeyVault();
 }
 ```
 
@@ -71,11 +72,12 @@ public void ConfigureServices(IServiceCollection services)
 public void ConfigureServices(IServiceCollection services)
 {
     services.AddLetsEncrypt()
-        .AddKeyVaultCertificateRepository(o =>
+        .AddAzureKeyVaultCertificateSource(o =>
         {
             o.Credentials = new SomeCredentials();
             o.AzureKeyVaultEndpoint = "https://[url].vault.azure.net/";
-        });
+        })
+        .PersistCertificatesToAzureKeyVault();
 }
 ```
 
