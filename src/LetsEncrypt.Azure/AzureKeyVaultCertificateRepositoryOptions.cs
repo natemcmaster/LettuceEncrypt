@@ -22,7 +22,7 @@ namespace McMaster.AspNetCore.LetsEncrypt
         [Url]
         [Required]
 #endif
-        public string Url { get; set; } = null!;
+        public string AzureKeyVaultEndpoint { get; set; } = null!;
 
         /// <summary>
         /// Gets or sets the credentials used for connecting to the key vault. If null, will use <see cref="DefaultAzureCredential" />.

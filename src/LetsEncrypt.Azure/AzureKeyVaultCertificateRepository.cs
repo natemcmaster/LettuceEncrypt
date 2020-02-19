@@ -137,7 +137,10 @@ namespace McMaster.AspNetCore.LetsEncrypt
 
             var value = options.Value;
 
-            return new CertificateClient(vaultUri: new Uri(value.Url), credential: value.Credentials ?? new DefaultAzureCredential());
+            var vaultUri = new Uri(value.AzureKeyVaultEndpoint);
+            var credentials = value.Credentials ?? new DefaultAzureCredential();
+
+            return new CertificateClient(vaultUri, credentials);
         }
     }
 }

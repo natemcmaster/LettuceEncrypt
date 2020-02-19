@@ -15,24 +15,29 @@ namespace Microsoft.Extensions.DependencyInjection
         /// Adds key vault certificate repository for LetsEncrypt.
         /// </summary>
         /// <param name="builder">A LetsEncrypt service builder.</param>
+        /// <returns>The original LetsEncrypt service builder.</returns>
+        public static ILetsEncryptServiceBuilder AddKeyVaultCertificateRepository(this ILetsEncryptServiceBuilder builder)
+            => builder.AddKeyVaultCertificateRepository(_ => { });
+
+        /// <summary>
+        /// Adds key vault certificate repository for LetsEncrypt.
+        /// </summary>
+        /// <param name="builder">A LetsEncrypt service builder.</param>
         /// <param name="config">Configuration for KeyVault connections.</param>
         /// <returns>The original LetsEncrypt service builder.</returns>
-        public static ILetsEncryptServiceBuilder AddKeyVaultCertificateRepository(this ILetsEncryptServiceBuilder builder, Action<AzureKeyVaultCertificateRepositoryOptions>? config = null)
+        public static ILetsEncryptServiceBuilder AddKeyVaultCertificateRepository(this ILetsEncryptServiceBuilder builder, Action<AzureKeyVaultCertificateRepositoryOptions> config)
         {
             builder.Services
                 .AddSingleton<AzureKeyVaultCertificateRepository>()
                 .AddSingleton<ICertificateSource>(x => x.GetRequiredService<AzureKeyVaultCertificateRepository>())
                 .AddSingleton<ICertificateRepository>(x => x.GetRequiredService<AzureKeyVaultCertificateRepository>());
 
-            var options = builder.Services.AddOptions<AzureKeyVaultCertificateRepositoryOptions>();
-
-            if (config != null)
-            {
-                options.Configure(config);
-            }
+            var options = builder.Services
+                .AddOptions<AzureKeyVaultCertificateRepositoryOptions>()
+                .Configure(config);
 
 #if FEATURE_VALIDATE_DATA_ANNOTATIONS
-            options.ValidateDataAnnotations();
+                options.ValidateDataAnnotations();
 #endif
 
             return builder;

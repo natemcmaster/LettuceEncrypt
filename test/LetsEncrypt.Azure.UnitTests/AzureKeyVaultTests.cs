@@ -30,7 +30,7 @@ namespace LetsEncrypt.Azure.UnitTests
                 .AddLetsEncrypt()
                 .AddKeyVaultCertificateRepository(options =>
                 {
-                    options.Url = "http://something";
+                    options.AzureKeyVaultEndpoint = "http://something";
                 })
                 .Services.BuildServiceProvider();
 
