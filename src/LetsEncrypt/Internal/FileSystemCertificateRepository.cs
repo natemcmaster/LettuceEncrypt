@@ -11,17 +11,17 @@ namespace McMaster.AspNetCore.LetsEncrypt
     internal class FileSystemCertificateRepository : ICertificateRepository
     {
         private readonly string? _pfxPassword;
-        private readonly DirectoryInfo _directory;
+        private readonly DirectoryInfo _certDir;
 
         public FileSystemCertificateRepository(DirectoryInfo directory, string? pfxPassword)
         {
             _pfxPassword = pfxPassword;
-            _directory = directory;
+            _certDir = directory.CreateSubdirectory("certs");
         }
 
         public Task SaveAsync(X509Certificate2 certificate, CancellationToken cancellationToken)
         {
-            _directory.Create();
+            _certDir.Create();
 
             var tmpFile = Path.GetTempFileName();
             File.WriteAllBytes(
@@ -29,7 +29,7 @@ namespace McMaster.AspNetCore.LetsEncrypt
                 certificate.Export(X509ContentType.Pfx, _pfxPassword));
 
             var fileName = certificate.Thumbprint + ".pfx";
-            var output = Path.Combine(_directory.FullName, fileName);
+            var output = Path.Combine(_certDir.FullName, fileName);
 
             // File.Move is an atomic operation on most operating systems. By writing to a temporary file
             // first and then moving it, it avoids potential race conditions with readers.

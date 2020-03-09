@@ -2,7 +2,6 @@
 using System;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using McMaster.AspNetCore.LetsEncrypt;
@@ -23,7 +22,7 @@ namespace LetsEncrypt.UnitTests
             var dir = new DirectoryInfo(Path.Combine(AppContext.BaseDirectory, Path.GetRandomFileName()));
             var repo = new FileSystemCertificateRepository(dir, password);
             var cert = CreateTestCert("localhost");
-            var expectedFile = Path.Combine(dir.FullName, cert.Thumbprint + ".pfx");
+            var expectedFile = Path.Combine(dir.FullName, "certs", cert.Thumbprint + ".pfx");
             await repo.SaveAsync(cert, default);
 
             Assert.NotNull(new X509Certificate2(expectedFile));
@@ -33,11 +32,11 @@ namespace LetsEncrypt.UnitTests
         public async Task ItCreatesCertOnDiskAsync()
         {
             var dir = new DirectoryInfo(Path.Combine(AppContext.BaseDirectory, Path.GetRandomFileName()));
+            Assert.False(dir.Exists, "Directory should not exist yet created");
+
             var repo = new FileSystemCertificateRepository(dir, "testpassword");
             var cert = CreateTestCert("localhost");
-            var expectedFile = Path.Combine(dir.FullName, cert.Thumbprint + ".pfx");
-
-            Assert.False(dir.Exists, "Directory should not exist yet created");
+            var expectedFile = Path.Combine(dir.FullName, "certs", cert.Thumbprint + ".pfx");
 
             await repo.SaveAsync(cert, default);
 
@@ -53,7 +52,7 @@ namespace LetsEncrypt.UnitTests
             var services = new ServiceCollection()
                 .AddLogging()
                 .AddLetsEncrypt()
-                .PersistCertificatesToDirectory(dir, "testpassword")
+                .PersistDataToDirectory(dir, "testpassword")
                 .Services
                 .BuildServiceProvider(validateScopes: true);
 
