@@ -1,3 +1,6 @@
+McMaster.AspNetCore.LetsEncrypt.FileSystemStorageExtensions
+McMaster.AspNetCore.LetsEncrypt.ICertificateRepository
+McMaster.AspNetCore.LetsEncrypt.ICertificateRepository.SaveAsync(System.Security.Cryptography.X509Certificates.X509Certificate2 certificate, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task
 McMaster.AspNetCore.LetsEncrypt.ILetsEncryptServiceBuilder
 McMaster.AspNetCore.LetsEncrypt.ILetsEncryptServiceBuilder.Services.get -> Microsoft.Extensions.DependencyInjection.IServiceCollection
 McMaster.AspNetCore.LetsEncrypt.KeyAlgorithm
@@ -20,5 +23,6 @@ McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.LetsEncryptOptions() -> void
 McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.UseStagingServer.get -> bool
 McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.UseStagingServer.set -> void
 Microsoft.Extensions.DependencyInjection.LetsEncryptServiceCollectionExtensions
+static McMaster.AspNetCore.LetsEncrypt.FileSystemStorageExtensions.PersistDataToDirectory(this McMaster.AspNetCore.LetsEncrypt.ILetsEncryptServiceBuilder builder, System.IO.DirectoryInfo directory, string pfxPassword) -> McMaster.AspNetCore.LetsEncrypt.ILetsEncryptServiceBuilder
 static Microsoft.Extensions.DependencyInjection.LetsEncryptServiceCollectionExtensions.AddLetsEncrypt(this Microsoft.Extensions.DependencyInjection.IServiceCollection services) -> McMaster.AspNetCore.LetsEncrypt.ILetsEncryptServiceBuilder
 static Microsoft.Extensions.DependencyInjection.LetsEncryptServiceCollectionExtensions.AddLetsEncrypt(this Microsoft.Extensions.DependencyInjection.IServiceCollection services, System.Action<McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions> configure) -> McMaster.AspNetCore.LetsEncrypt.ILetsEncryptServiceBuilder

@@ -70,15 +70,17 @@ A few required options should be set, typically via the appsettings.json file.
 
 ## Additional options
 
-### Save generated certificates to folder
+### Save generated certificates and account information to a directory
 
 ```c#
-    public void ConfigureServices(IServiceCollection services)
-    {
-        services
-            .AddLetsEncrypt()
-            .PersistCertificatesToDirectory(new DirectoryInfo("C:/data/MyCertificates/"), "Password123");
-    }
+using McMaster.AspNetCore.LetsEncrypt;
+
+public void ConfigureServices(IServiceCollection services)
+{
+    services
+        .AddLetsEncrypt()
+        .PersistDataToDirectory(new DirectoryInfo("C:/data/LetsEncrypt/"), "Password123");
+}
 ```
 
 ## Testing in development
