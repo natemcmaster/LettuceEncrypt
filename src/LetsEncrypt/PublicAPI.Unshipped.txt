@@ -1,0 +1,2 @@
+McMaster.AspNetCore.LetsEncrypt.ICertificateSource
+McMaster.AspNetCore.LetsEncrypt.ICertificateSource.GetCertificatesAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<System.Security.Cryptography.X509Certificates.X509Certificate2>>

@@ -42,6 +42,46 @@ I recommend the following steps.
 
 And voila! The API should automatically provision and create an HTTPs certificate for TMP.ngrok.io.
 
+## Testing Azure KeyVault
+
+In order to test KeyVault storage/retrieval, follow these steps:
+
+1. Follow the ngrok steps above.
+
+1. Create a key vault instance in Azure (see [docs](https://docs.microsoft.com/en-us/azure/key-vault/quick-create-portal) for details)
+
+1. Add an account you have credentials for to the access policies for Certificates with the `Get` and `Import` permissions.
+
+1. Update `ConfigureServices` method to set up Azure KeyVault access:
+
+```csharp
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddLetsEncrypt()
+        .AddAzureKeyVaultCertificateSource(o =>
+        {
+            o.AzureKeyVaultEndpoint = "https://[url].vault.azure.net/";
+        })
+        .PersistCertificatesToAzureKeyVault();
+}
+```
+
+1. `dotnet run` your application. `Azure.Identity` will attempt to use default credentials to log into the configured KeyVault. If there are issues with using default credentials, consult the [documentation](https://azuresdkdocs.blob.core.windows.net/$web/dotnet/Azure.Identity/1.1.1/api/index.html) for details. This can be set with the following:
+
+```csharp
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddLetsEncrypt()
+        .AddAzureKeyVaultCertificateSource(o =>
+        {
+            o.Credentials = new SomeCredentials();
+            o.AzureKeyVaultEndpoint = "https://[url].vault.azure.net/";
+        })
+        .PersistCertificatesToAzureKeyVault();
+}
+```
+
+The certificate should now be persisted to KeyVault and will be retrieved at startup.
 
 ## Trusting dev certs from Let's Encrypt
 

@@ -6,10 +6,18 @@ using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace McMaster.AspNetCore.LetsEncrypt.Internal
+namespace McMaster.AspNetCore.LetsEncrypt
 {
-    internal interface ICertificateSource
+    /// <summary>
+    /// Defines a source for certificates.
+    /// </summary>
+    public interface ICertificateSource
     {
+        /// <summary>
+        /// Gets available certificates from the source.
+        /// </summary>
+        /// <param name="cancellationToken">A cancellation token.</param>
+        /// <returns>A collection of certificates</returns>
         Task<IEnumerable<X509Certificate2>> GetCertificatesAsync(CancellationToken cancellationToken);
     }
 }
