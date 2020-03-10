@@ -44,8 +44,8 @@ This only works with Kestrel, which is the default server configuration for ASP.
   </PropertyGroup>
 
   <PropertyGroup>
-    <VersionPrefix>0.3.0</VersionPrefix>
-    <VersionSuffix>rc</VersionSuffix>
+    <VersionPrefix>0.4.0</VersionPrefix>
+    <VersionSuffix>beta</VersionSuffix>
     <IncludePreReleaseLabelInPackageVersion Condition="'$(IsStableBuild)' != 'true'">true</IncludePreReleaseLabelInPackageVersion>
     <BuildNumber Condition=" '$(BuildNumber)' == '' ">$([MSBuild]::ValueOrDefault($(BUILD_NUMBER), 0))</BuildNumber>
     <VersionSuffix>$(VersionSuffix).$(BuildNumber)</VersionSuffix>
