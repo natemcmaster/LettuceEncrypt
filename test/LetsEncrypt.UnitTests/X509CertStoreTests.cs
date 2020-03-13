@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
+using McMaster.AspNetCore.LetsEncrypt;
 using McMaster.AspNetCore.LetsEncrypt.Internal;
 using McMaster.Extensions.Xunit;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using Moq;
+using Microsoft.Extensions.Options;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -13,19 +13,32 @@ namespace LetsEncrypt.UnitTests
 {
     using static TestUtils;
 
-    public class X509CertStoreTests
+    public class X509CertStoreTests : IDisposable
     {
         private readonly ITestOutputHelper _output;
+        private readonly LetsEncryptOptions _options;
+        private readonly X509CertStore _certStore;
 
         public X509CertStoreTests(ITestOutputHelper output)
         {
             _output = output;
+            _options = new LetsEncryptOptions();
+            _certStore = new X509CertStore(Options.Create(_options), NullLogger<X509CertStore>.Instance)
+            {
+                AllowInvalidCerts = true
+            };
+        }
+
+        public void Dispose()
+        {
+            _certStore.Dispose();
         }
 
         [Fact]
-        public void ItFindsCertByCommonName()
+        public async Task ItFindsCertByCommonNameAsync()
         {
             var commonName = "x509store.read.letsencrypt.test.natemcmaster.com";
+            _options.DomainNames = new[] { commonName };
             using var x509store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
             x509store.Open(OpenFlags.ReadWrite);
             var testCert = CreateTestCert(commonName);
@@ -35,11 +48,8 @@ namespace LetsEncrypt.UnitTests
 
             try
             {
-                using var certStore = new X509CertStore(NullLogger<X509CertStore>.Instance)
-                {
-                    AllowInvalidCerts = true
-                };
-                var foundCert = certStore.GetCertificate(commonName);
+                var certs = await _certStore.GetCertificatesAsync(default);
+                var foundCert = Assert.Single(certs);
                 Assert.NotNull(foundCert);
                 Assert.Equal(testCert, foundCert);
             }
@@ -61,11 +71,7 @@ namespace LetsEncrypt.UnitTests
 
             try
             {
-                using var certStore = new X509CertStore(NullLogger<X509CertStore>.Instance)
-                {
-                    AllowInvalidCerts = true
-                };
-                await certStore.SaveAsync(testCert, default);
+                await _certStore.SaveAsync(testCert, default);
 
                 var certificates = x509store.Certificates.Find(
                     X509FindType.FindByThumbprint,
@@ -86,15 +92,12 @@ namespace LetsEncrypt.UnitTests
         }
 
         [Fact]
-        public void ItReturnsNullWhenCantFindCert()
+        public async Task ItReturnsEmptyWhenCantFindCertAsync()
         {
             var commonName = "notfound.letsencrypt.test.natemcmaster.com";
-            using var certStore = new X509CertStore(Mock.Of<ILogger<X509CertStore>>())
-            {
-                AllowInvalidCerts = true
-            };
-            var foundCert = certStore.GetCertificate(commonName);
-            Assert.Null(foundCert);
+            _options.DomainNames = new[] { commonName };
+            var certs = await _certStore.GetCertificatesAsync(default);
+            Assert.Empty(certs);
         }
 
         [Fact]
@@ -111,11 +114,7 @@ namespace LetsEncrypt.UnitTests
             x509store.Add(testCert0);
             try
             {
-                using var certStore = new X509CertStore(Mock.Of<ILogger<X509CertStore>>())
-                {
-                    AllowInvalidCerts = true
-                };
-                var foundCert = certStore.GetCertificate(commonName);
+                var foundCert = _certStore.GetCertificate(commonName);
                 Assert.NotNull(foundCert);
                 Assert.Equal(testCert2, foundCert);
             }

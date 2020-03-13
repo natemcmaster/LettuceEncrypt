@@ -25,12 +25,9 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
 
         public virtual void Add(X509Certificate2 certificate)
         {
-            var commonName = certificate.GetNameInfo(X509NameType.SimpleName, false);
-            AddWithDomainName(commonName, certificate);
-
-            foreach (var subjectAltName in X509CertificateHelpers.GetDnsFromExtensions(certificate))
+            foreach (var dnsName in X509CertificateHelpers.GetAllDnsNames(certificate))
             {
-                AddWithDomainName(subjectAltName, certificate);
+                AddWithDomainName(dnsName, certificate);
             }
         }
 

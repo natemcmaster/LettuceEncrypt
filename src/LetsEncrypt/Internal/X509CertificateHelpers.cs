@@ -14,6 +14,20 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
 {
     internal static class X509CertificateHelpers
     {
+        public static IEnumerable<string> GetAllDnsNames(X509Certificate2 certificate)
+        {
+            yield return GetCommonName(certificate);
+            foreach (var subjectAltName in GetDnsFromExtensions(certificate))
+            {
+                yield return subjectAltName;
+            }
+        }
+
+        public static string GetCommonName(X509Certificate2 certificate)
+        {
+            return certificate.GetNameInfo(X509NameType.SimpleName, false);
+        }
+
         public static string[] GetDnsFromExtensions(X509Certificate2 cert)
         {
             foreach (var ext in cert.Extensions)

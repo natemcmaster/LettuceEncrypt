@@ -31,7 +31,9 @@ namespace LetsEncrypt.UnitTests
                 csr.CertificateExtensions.Add(sanBuilder.Build());
             }
 
-            return csr.CreateSelfSigned(DateTimeOffset.Now.AddMinutes(-1), expires.Value);
+            var cert = csr.CreateSelfSigned(DateTimeOffset.Now.AddMinutes(-1), expires.Value);
+            // https://github.com/dotnet/runtime/issues/29144
+            return new X509Certificate2(cert.Export(X509ContentType.Pfx), "", X509KeyStorageFlags.PersistKeySet | X509KeyStorageFlags.Exportable);
         }
     }
 }
