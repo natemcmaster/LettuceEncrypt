@@ -99,31 +99,5 @@ namespace LetsEncrypt.UnitTests
             var certs = await _certStore.GetCertificatesAsync(default);
             Assert.Empty(certs);
         }
-
-        [Fact]
-        public void ItFindsCertTheCertWithLongestLifespan()
-        {
-            var commonName = "x509store-ttl.letsencrypt.test.natemcmaster.com";
-            using var x509store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
-            x509store.Open(OpenFlags.ReadWrite);
-            var testCert0 = CreateTestCert(commonName, DateTimeOffset.Now.AddMinutes(2));
-            var testCert1 = CreateTestCert(commonName, DateTimeOffset.Now.AddHours(1));
-            var testCert2 = CreateTestCert(commonName, DateTimeOffset.Now.AddHours(2));
-            x509store.Add(testCert2);
-            x509store.Add(testCert1);
-            x509store.Add(testCert0);
-            try
-            {
-                var foundCert = _certStore.GetCertificate(commonName);
-                Assert.NotNull(foundCert);
-                Assert.Equal(testCert2, foundCert);
-            }
-            finally
-            {
-                x509store.Remove(testCert0);
-                x509store.Remove(testCert1);
-                x509store.Remove(testCert2);
-            }
-        }
     }
 }

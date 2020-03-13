@@ -27,7 +27,6 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
     {
         private readonly CertificateSelector _selector;
         private readonly IHttpChallengeResponseStore _challengeStore;
-        private readonly ICertificateStore _certificateStore;
         private readonly IOptions<LetsEncryptOptions> _options;
         private readonly ILogger<AcmeCertificateLoader> _logger;
 
@@ -40,7 +39,6 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
         public AcmeCertificateLoader(
             CertificateSelector selector,
             IHttpChallengeResponseStore challengeStore,
-            ICertificateStore certificateStore,
             IOptions<LetsEncryptOptions> options,
             ILogger<AcmeCertificateLoader> logger,
             IHostEnvironment hostEnvironment,
@@ -50,7 +48,6 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
         {
             _selector = selector;
             _challengeStore = challengeStore;
-            _certificateStore = certificateStore;
             _options = options;
             _logger = logger;
             _hostEnvironment = hostEnvironment;
@@ -118,10 +115,44 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
         {
             cancellationToken.ThrowIfCancellationRequested();
 
+            var domainNames = _options.Value.DomainNames;
+            var hasCertForAllDomains = domainNames.All(_selector.HasCertForDomain);
+            if (hasCertForAllDomains)
+            {
+                _logger.LogDebug("Certificate for {domainNames} already found.", domainNames);
+                return;
+            }
+
             var factory = new CertificateFactory(_options, _challengeStore, _logger, _hostEnvironment);
 
-            var cert = await GetOrCreateCertificate(factory, cancellationToken);
+            if (!_hasRegistered)
+            {
+                _hasRegistered = true;
+                await factory.RegisterUserAsync(cancellationToken);
+            }
 
+            try
+            {
+                _logger.LogInformation("Creating certificate for {hostname} using ACME server {acmeServer}",
+                    domainNames,
+                    factory.AcmeServer);
+
+
+                var cert = await factory.CreateCertificateAsync(cancellationToken);
+
+                _logger.LogInformation("Created certificate {subjectName} ({thumbprint})", cert.Subject, cert.Thumbprint);
+
+                await SaveCertificateAsync(cert, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(0, ex, "Failed to automatically create a certificate for {hostname}", domainNames);
+                throw;
+            }
+        }
+
+        private async Task SaveCertificateAsync(X509Certificate2 cert, CancellationToken cancellationToken)
+        {
             _selector.Add(cert);
 
             var saveTasks = new List<Task>
@@ -135,40 +166,6 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             }
 
             await Task.WhenAll(saveTasks);
-        }
-
-        private async Task<X509Certificate2> GetOrCreateCertificate(CertificateFactory factory, CancellationToken cancellationToken)
-        {
-            var domainName = _options.Value.DomainNames[0];
-            var cert = _certificateStore.GetCertificate(domainName);
-            if (cert != null)
-            {
-                _logger.LogDebug("Certificate for {hostname} already found.", domainName);
-                return cert;
-            }
-
-            if (!_hasRegistered)
-            {
-                _hasRegistered = true;
-                await factory.RegisterUserAsync(cancellationToken);
-            }
-
-            try
-            {
-                _logger.LogInformation("Creating certificate for {hostname} using ACME server {acmeServer}",
-                    domainName,
-                    factory.AcmeServer);
-
-                cert = await factory.CreateCertificateAsync(cancellationToken);
-
-                _logger.LogInformation("Created certificate {subjectName} ({thumbprint})", cert.Subject, cert.Thumbprint);
-                return cert;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(0, ex, "Failed to automatically create a certificate for {hostname}", domainName);
-                throw;
-            }
         }
     }
 }

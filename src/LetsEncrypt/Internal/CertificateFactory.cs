@@ -56,7 +56,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
 
             _logger.LogInformation("Creating certificate registration for {email}", options.EmailAddress);
             _account = await _context.NewAccount(options.EmailAddress, termsOfServiceAgreed: true);
-            _logger.LogAcmeAction("NewRegistration", _account);
+            _logger.LogAcmeAction("NewRegistration");
 
         }
 
@@ -177,7 +177,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
 
                 authorization = await authorizationContext.Resource();
 
-                _logger.LogAcmeAction("GetAuthorization", authorization);
+                _logger.LogAcmeAction("GetAuthorization");
 
                 switch (authorization.Status)
                 {
@@ -234,7 +234,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             var acmeCert = await order.Generate(csrInfo, privateKey);
 
 
-            _logger.LogAcmeAction("NewCertificate", acmeCert);
+            _logger.LogAcmeAction("NewCertificate");
 
             var pfxBuilder = acmeCert.ToPfx(privateKey);
             var pfx = pfxBuilder.Build("Let's Encrypt - " + _options.Value.DomainNames, string.Empty);

@@ -47,6 +47,8 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
                 });
         }
 
+        public bool HasCertForDomain(string domainName) => _certs.ContainsKey(domainName);
+
         public X509Certificate2? Select(ConnectionContext features, string? domainName)
         {
             if (domainName == null || !_certs.TryGetValue(domainName, out var retVal))

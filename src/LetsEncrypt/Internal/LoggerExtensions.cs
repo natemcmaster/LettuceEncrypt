@@ -7,7 +7,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
 {
     internal static class LoggerExtensions
     {
-        public static void LogAcmeAction(this ILogger logger, string actionName, object result)
+        public static void LogAcmeAction(this ILogger logger, string actionName)
         {
             if (!logger.IsEnabled(LogLevel.Trace))
             {

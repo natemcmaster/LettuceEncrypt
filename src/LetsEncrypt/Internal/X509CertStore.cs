@@ -12,7 +12,7 @@ using Microsoft.Extensions.Options;
 
 namespace McMaster.AspNetCore.LetsEncrypt.Internal
 {
-    internal class X509CertStore : ICertificateStore, ICertificateSource, ICertificateRepository, IDisposable
+    internal class X509CertStore : ICertificateSource, ICertificateRepository, IDisposable
     {
         private readonly X509Store _store;
         private readonly IOptions<LetsEncryptOptions> _options;
@@ -54,38 +54,6 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             }
 
             return Task.FromResult(result.AsEnumerable());
-        }
-
-        public X509Certificate2? GetCertificate(string domainName)
-        {
-            var certs = _store.Certificates.Find(
-                X509FindType.FindBySubjectDistinguishedName,
-                "CN=" + domainName,
-                validOnly: !AllowInvalidCerts);
-
-            if (certs == null || certs.Count == 0)
-            {
-                return null;
-            }
-
-            if (_logger.IsEnabled(LogLevel.Trace))
-            {
-                foreach (var cert in certs)
-                {
-                    _logger.LogTrace("Found certificate {subject}", cert.SubjectName.Name);
-                }
-            }
-
-            X509Certificate2? certWithMostTtl = null;
-            foreach (var cert in certs)
-            {
-                if (certWithMostTtl == null || cert.NotAfter > certWithMostTtl.NotAfter)
-                {
-                    certWithMostTtl = cert;
-                }
-            }
-
-            return certWithMostTtl;
         }
 
         public Task SaveAsync(X509Certificate2 certificate, CancellationToken cancellationToken)
