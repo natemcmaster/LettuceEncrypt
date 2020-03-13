@@ -34,7 +34,8 @@ namespace LetsEncrypt.UnitTests
             _certStore.Dispose();
         }
 
-        [Fact]
+        [SkippableFact]
+        [SkipOnAzurePipelinesWindows(SkipReason = "On Windows in Azure Pipelines, adding certs to store doesn't work for unclear reasons.")]
         public async Task ItFindsCertByCommonNameAsync()
         {
             var commonName = "x509store.read.letsencrypt.test.natemcmaster.com";
@@ -61,7 +62,7 @@ namespace LetsEncrypt.UnitTests
         }
 
         [SkippableFact]
-        [SkipOnOS(OS.Windows)] // Flaky on Windows for unclear reasons.
+        [SkipOnAzurePipelinesWindows(SkipReason = "On Windows in Azure Pipelines, adding certs to store doesn't work for unclear reasons.")]
         public async Task ItSavesCertificates()
         {
             var commonName = "x509store.save.letsencrypt.test.natemcmaster.com";
