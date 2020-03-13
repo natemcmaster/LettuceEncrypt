@@ -3,6 +3,7 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace McMaster.AspNetCore.LetsEncrypt
@@ -35,7 +36,29 @@ namespace McMaster.AspNetCore.LetsEncrypt
                 throw new ArgumentNullException(nameof(directory));
             }
 
-            builder.Services.AddSingleton<ICertificateRepository>(new FileSystemCertificateRepository(directory, pfxPassword));
+            var otherFileSystemRepoServices = builder
+                .Services
+                .Where(d => d.ServiceType == typeof(ICertificateRepository)
+                && d.ImplementationInstance != null
+                && d.ImplementationInstance.GetType() == typeof(FileSystemCertificateRepository));
+
+            foreach (var serviceDescriptor in otherFileSystemRepoServices)
+            {
+                var otherRepo = (FileSystemCertificateRepository)serviceDescriptor.ImplementationInstance;
+                if (otherRepo.RootDir.Equals(directory))
+                {
+                    if (otherRepo.PfxPassword != pfxPassword)
+                    {
+                        throw new ArgumentException($"Another file system repo has been configured for {directory}, but with a different password.");
+                    }
+                    return builder;
+                }
+            }
+
+            var implementationInstance = new FileSystemCertificateRepository(directory, pfxPassword);
+            builder.Services
+                .AddSingleton<ICertificateRepository>(implementationInstance)
+                .AddSingleton<ICertificateSource>(implementationInstance);
             return builder;
         }
     }
