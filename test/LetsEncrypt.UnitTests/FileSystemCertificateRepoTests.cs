@@ -6,7 +6,13 @@ using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using McMaster.AspNetCore.LetsEncrypt;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Hosting.Internal;
 using Xunit;
+
+#if NETCOREAPP2_1
+using IHostEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
+#endif
 
 namespace LetsEncrypt.UnitTests
 {
@@ -29,7 +35,7 @@ namespace LetsEncrypt.UnitTests
         }
 
         [Fact]
-        public async Task ItCreatesCertOnDiskAsync()
+        public async Task ItCreatesDirectory()
         {
             var dir = new DirectoryInfo(Path.Combine(AppContext.BaseDirectory, Path.GetRandomFileName()));
             Assert.False(dir.Exists, "Directory should not exist yet created");
@@ -45,11 +51,30 @@ namespace LetsEncrypt.UnitTests
             Assert.True(File.Exists(expectedFile), "Cert exists");
         }
 
+        [Theory]
+        [InlineData(null)]
+        [InlineData("testpassword")]
+        public async Task ItRoundTripsCert(string? password)
+        {
+            var dir = new DirectoryInfo(Path.Combine(AppContext.BaseDirectory, Path.GetRandomFileName()));
+
+            var repo = new FileSystemCertificateRepository(dir, password);
+            var writeCert = CreateTestCert("localhost");
+
+            await repo.SaveAsync(writeCert, default);
+
+            var certs = await repo.GetCertificatesAsync(default);
+            var readCert = Assert.Single(certs);
+            Assert.NotSame(writeCert, readCert);
+            Assert.Equal(writeCert, readCert);
+        }
+
         [Fact]
         public void DIConfiguresRepo()
         {
             var dir = new DirectoryInfo(Path.Combine(AppContext.BaseDirectory, Path.GetRandomFileName()));
             var services = new ServiceCollection()
+                .AddSingleton<IHostEnvironment, HostingEnvironment>()
                 .AddLogging()
                 .AddLetsEncrypt()
                 .PersistDataToDirectory(dir, "testpassword")
@@ -59,6 +84,59 @@ namespace LetsEncrypt.UnitTests
             Assert.Single(
                 services.GetServices<ICertificateRepository>()
                 .OfType<FileSystemCertificateRepository>());
+        }
+
+        [Fact]
+        public void MultipleCallsToDIWithSameInfoDoesNotDuplicate()
+        {
+            var dir = new DirectoryInfo(Path.Combine(AppContext.BaseDirectory, Path.GetRandomFileName()));
+
+            var provider = new ServiceCollection()
+                .AddSingleton<IHostEnvironment, HostingEnvironment>()
+                .AddLogging()
+                .AddLetsEncrypt()
+                .PersistDataToDirectory(dir, "")
+                .PersistDataToDirectory(dir, "")
+                .Services
+                .BuildServiceProvider(validateScopes: true);
+
+
+            Assert.Single(provider.GetServices<ICertificateRepository>().OfType<FileSystemCertificateRepository>());
+            Assert.Single(provider.GetServices<ICertificateSource>().OfType<FileSystemCertificateRepository>());
+        }
+
+        [Fact]
+        public void MultipleCallsToDIWithDirerentDirectory()
+        {
+            var dir1 = new DirectoryInfo(Path.Combine(AppContext.BaseDirectory, Path.GetRandomFileName()));
+            var dir2 = new DirectoryInfo(Path.Combine(AppContext.BaseDirectory, Path.GetRandomFileName()));
+
+            var provider = new ServiceCollection()
+                .AddSingleton<IHostEnvironment, HostingEnvironment>()
+                .AddLogging()
+                .AddLetsEncrypt()
+                .PersistDataToDirectory(dir1, "")
+                .PersistDataToDirectory(dir2, "")
+                .Services
+                .BuildServiceProvider(validateScopes: true);
+
+
+            Assert.Equal(2, provider.GetServices<ICertificateRepository>().OfType<FileSystemCertificateRepository>().Count());
+            Assert.Equal(2, provider.GetServices<ICertificateSource>().OfType<FileSystemCertificateRepository>().Count());
+        }
+
+        [Fact]
+        public void ThrowsIfMultipleCallsDIWithDifferentPassword()
+        {
+            var dir = new DirectoryInfo(Path.Combine(AppContext.BaseDirectory, Path.GetRandomFileName()));
+
+            var provider = new ServiceCollection()
+                .AddSingleton<IHostEnvironment, HostingEnvironment>()
+                .AddLogging()
+                .AddLetsEncrypt()
+                .PersistDataToDirectory(dir, "one");
+
+            Assert.Throws<ArgumentException>(() => provider.PersistDataToDirectory(dir, "two"));
         }
     }
 }
