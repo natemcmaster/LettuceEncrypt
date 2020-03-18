@@ -1,16 +1,16 @@
 ﻿// Copyright (c) Nate McMaster.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
-using Azure;
-using Azure.Identity;
-using Azure.Security.KeyVault.Certificates;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
+using Azure;
+using Azure.Identity;
+using Azure.Security.KeyVault.Certificates;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace McMaster.AspNetCore.LetsEncrypt
 {
@@ -136,6 +136,11 @@ namespace McMaster.AspNetCore.LetsEncrypt
             }
 
             var value = options.Value;
+
+            if (string.IsNullOrEmpty(value.AzureKeyVaultEndpoint))
+            {
+                throw new ArgumentException("Missing required option: AzureKeyVaultEndpoint");
+            }
 
             var vaultUri = new Uri(value.AzureKeyVaultEndpoint);
             var credentials = value.Credentials ?? new DefaultAzureCredential();

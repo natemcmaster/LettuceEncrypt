@@ -1,4 +1,7 @@
-﻿using Azure.Security.KeyVault.Certificates;
+﻿using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Azure.Security.KeyVault.Certificates;
 using McMaster.AspNetCore.LetsEncrypt;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -6,9 +9,6 @@ using Microsoft.Extensions.Hosting.Internal;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Xunit;
 
 #if NETCOREAPP2_1
@@ -19,67 +19,45 @@ namespace LetsEncrypt.Azure.UnitTests
 {
     public class AzureKeyVaultTests
     {
-        [Fact]
-        public void CertificateSourceRegistered()
+        private static void DefaultConfigure(AzureKeyVaultCertificateRepositoryOptions options)
         {
-            var services = new ServiceCollection();
-
-            var provider = services
-                .AddSingleton<IHostEnvironment, HostingEnvironment>()
-                .AddLogging()
-                .AddLetsEncrypt()
-                .AddAzureKeyVaultCertificateSource(options =>
-                {
-                    options.AzureKeyVaultEndpoint = "http://something";
-                })
-                .Services.BuildServiceProvider();
-
-
-            Assert.Empty(provider.GetServices<ICertificateRepository>().OfType<AzureKeyVaultCertificateRepository>());
-            Assert.Single(provider.GetServices<ICertificateSource>().OfType<AzureKeyVaultCertificateRepository>());
-        }
-
-        [Fact]
-        public void CertificateRepositoryRegistered()
-        {
-            var services = new ServiceCollection();
-
-            var provider = services
-                .AddSingleton<IHostEnvironment, HostingEnvironment>()
-                .AddLogging()
-                .AddLetsEncrypt()
-                .PersistCertificatesToAzureKeyVault(options =>
-                {
-                    options.AzureKeyVaultEndpoint = "http://something";
-                })
-                .Services.BuildServiceProvider();
-
-
-            Assert.Single(provider.GetServices<ICertificateRepository>().OfType<AzureKeyVaultCertificateRepository>());
-            Assert.Empty(provider.GetServices<ICertificateSource>().OfType<AzureKeyVaultCertificateRepository>());
+            options.AzureKeyVaultEndpoint = "http://something";
         }
 
         [Fact]
         public void SourceAndRepositorySameInstance()
         {
-            var services = new ServiceCollection();
-
-            var provider = services
+            var provider = new ServiceCollection()
                 .AddSingleton<IHostEnvironment, HostingEnvironment>()
                 .AddLogging()
                 .AddLetsEncrypt()
-                .AddAzureKeyVaultCertificateSource(options =>
-                {
-                    options.AzureKeyVaultEndpoint = "http://something";
-                })
-                .PersistCertificatesToAzureKeyVault()
-                .Services.BuildServiceProvider();
+                .PersistCertificatesToAzureKeyVault(DefaultConfigure)
+                .Services
+                .BuildServiceProvider(validateScopes: true);
 
 
-            var repository = Assert.Single(provider.GetServices<ICertificateRepository>().OfType<AzureKeyVaultCertificateRepository>());
-            var source = Assert.Single(provider.GetServices<ICertificateSource>().OfType<AzureKeyVaultCertificateRepository>());
+            var repository = provider.GetServices<ICertificateRepository>().OfType<AzureKeyVaultCertificateRepository>().First();
+            var source = provider.GetServices<ICertificateSource>().OfType<AzureKeyVaultCertificateRepository>().First();
 
             Assert.Same(source, repository);
+        }
+
+        [Fact]
+        public void MultipleCallsToPersistCertificatesToAzureKeyVaultDoesNotDuplicateServices()
+        {
+            var provider = new ServiceCollection()
+                .AddSingleton<IHostEnvironment, HostingEnvironment>()
+                .AddLogging()
+                .AddLetsEncrypt()
+                .PersistCertificatesToAzureKeyVault(DefaultConfigure)
+                .PersistCertificatesToAzureKeyVault(DefaultConfigure)
+                .PersistCertificatesToAzureKeyVault(DefaultConfigure)
+                .Services
+                .BuildServiceProvider(validateScopes: true);
+
+
+            Assert.Single(provider.GetServices<ICertificateRepository>().OfType<AzureKeyVaultCertificateRepository>());
+            Assert.Single(provider.GetServices<ICertificateSource>().OfType<AzureKeyVaultCertificateRepository>());
         }
 
         [Fact]
