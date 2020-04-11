@@ -70,6 +70,11 @@ A few required options should be set, typically via the appsettings.json file.
 
 ## Additional options
 
+Certificates are stored to the machine's X.509 store by default. Certificates can be stored in additional
+locations by using extension methods after calling `AddLetsEncrypt()` in the `Startup` class.
+
+Multiple storage locations can be configured.
+
 ### Save generated certificates and account information to a directory
 
 ```c#
@@ -82,6 +87,23 @@ public void ConfigureServices(IServiceCollection services)
         .PersistDataToDirectory(new DirectoryInfo("C:/data/LetsEncrypt/"), "Password123");
 }
 ```
+
+### Save generated certificates to Azure Key Vault
+
+Install [McMaster.AspNetCore.LetsEncrypt.Azure](https://nuget.org/packages/McMaster.AspNetCore.LetsEncrypt.Azure).
+
+```c#
+public void ConfigureServices(IServiceCollection services)
+{
+    services
+        .AddLetsEncrypt()
+        .PersistCertificatesToAzureKeyVault(o =>
+        {
+            o.AzureKeyVaultEndpoint = "https://[url].vault.azure.net/";
+        });
+}
+```
+
 
 ## Testing in development
 

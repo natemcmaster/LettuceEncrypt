@@ -1,7 +1,7 @@
 <Project>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-*" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
 
     <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="2.9.4" PrivateAssets="All" />
     <AdditionalFiles Include="PublicAPI.Shipped.txt" />

@@ -1,17 +1,7 @@
 <Project>
   <PropertyGroup>
-    <Description>Provides API for configuring ASP.NET Core to use Let's Encrypt.org to automaticaly generate HTTPS certificates.</Description>
-    <PackageDescription>$(Description)
-
-Let's Encrypt is a free, automated, and open Certificate Authority. When this package is installed and enabled, your web server will
-use the Let's Encrypt certificate authority and automatically generate an HTTPS certificate when the server starts up.
-It then configures Kestrel to use this certificate for all HTTPS traffic.
-
-This only works with Kestrel, which is the default server configuration for ASP.NET Core projects. Other servers, such as IIS and nginx, are not supported.
-    </PackageDescription>
     <PackageTags>lets-encrypt;aspnetcore;https;certificates</PackageTags>
     <Authors>Nate McMaster</Authors>
-    <Product>McMaster.AspNetCore.LetsEncrypt</Product>
     <Copyright>Copyright © Nate McMaster</Copyright>
     <NeutralLanguage>en-US</NeutralLanguage>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
@@ -45,18 +35,13 @@ This only works with Kestrel, which is the default server configuration for ASP.
 
   <PropertyGroup>
     <VersionPrefix>0.4.0</VersionPrefix>
-    <VersionSuffix>beta</VersionSuffix>
+    <VersionSuffix>rc</VersionSuffix>
     <IncludePreReleaseLabelInPackageVersion Condition="'$(IsStableBuild)' != 'true'">true</IncludePreReleaseLabelInPackageVersion>
     <BuildNumber Condition=" '$(BuildNumber)' == '' ">$([MSBuild]::ValueOrDefault($(BUILD_NUMBER), 0))</BuildNumber>
     <VersionSuffix>$(VersionSuffix).$(BuildNumber)</VersionSuffix>
     <SourceRevisionId Condition="'$(SourceRevisionId)' == ''">$(BUILD_SOURCEVERSION)</SourceRevisionId>
     <PackageVersion>$(VersionPrefix)</PackageVersion>
     <PackageVersion Condition="'$(IncludePreReleaseLabelInPackageVersion)' == 'true'">$(PackageVersion)-$(VersionSuffix)</PackageVersion>
-    <InformationalVersion Condition="'$(SourceRevisionId)' != ''">$(PackageVersion)+$(SourceRevisionId)</InformationalVersion>
-    <PackageDescription Condition="'$(SourceRevisionId)' != ''">$(PackageDescription)
-
-This package was build from source code at $(RepositoryUrl)/tree/$(SourceRevisionId)
-    </PackageDescription>
   </PropertyGroup>
 
   <Import Project="$(MSBuildProjectDirectory)/releasenotes.props"

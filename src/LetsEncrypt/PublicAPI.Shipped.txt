@@ -1,6 +1,8 @@
 McMaster.AspNetCore.LetsEncrypt.FileSystemStorageExtensions
 McMaster.AspNetCore.LetsEncrypt.ICertificateRepository
 McMaster.AspNetCore.LetsEncrypt.ICertificateRepository.SaveAsync(System.Security.Cryptography.X509Certificates.X509Certificate2 certificate, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task
+McMaster.AspNetCore.LetsEncrypt.ICertificateSource
+McMaster.AspNetCore.LetsEncrypt.ICertificateSource.GetCertificatesAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<System.Security.Cryptography.X509Certificates.X509Certificate2>>
 McMaster.AspNetCore.LetsEncrypt.ILetsEncryptServiceBuilder
 McMaster.AspNetCore.LetsEncrypt.ILetsEncryptServiceBuilder.Services.get -> Microsoft.Extensions.DependencyInjection.IServiceCollection
 McMaster.AspNetCore.LetsEncrypt.KeyAlgorithm

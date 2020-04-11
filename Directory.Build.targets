@@ -4,4 +4,11 @@
     <Message Importance="High" Text="##vso[build.updatebuildnumber]$(PackageVersion)" />
   </Target>
 
+  <PropertyGroup>
+    <PackageDescription Condition=" '$(SourceRevisionId)' != '' and '$(RepositoryUrl)' != '' ">$(PackageDescription)
+
+This package was build from source code at $(RepositoryUrl)/tree/$(SourceRevisionId)
+    </PackageDescription>
+  </PropertyGroup>
+
 </Project>

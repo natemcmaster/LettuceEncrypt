@@ -1,0 +1,9 @@
+<Project>
+  <PropertyGroup>
+    <PackageReleaseNotes Condition="'$(VersionPrefix)' == '0.4.0'">
+Initial release. See https://github.com/natemcmaster/LetsEncrypt/#Usage for instructions.
+    </PackageReleaseNotes>
+
+    <PackageReleaseNotes>$(PackageReleaseNotes.Trim())</PackageReleaseNotes>
+  </PropertyGroup>
+</Project>

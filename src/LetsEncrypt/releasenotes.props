@@ -1,5 +1,15 @@
 <Project>
   <PropertyGroup>
+    <PackageReleaseNotes Condition="'$(VersionPrefix)' == '0.4.0'">
+Features:
+
+* @twsouthwick: add API for persisting HTTPS certificates in Azure Key Vault. See https://nuget.org/packages/McMaster.AspNetCore.LetsEncrypt.Azure
+* Add `ICertificateSource` for extending how certificates are discovered on startup.
+
+Fixes:
+* Load certs from directory when PersistDataWithDirectory is used. See https://github.com/natemcmaster/LetsEncrypt/issues/59
+* Avoid duplicate registration of services in DI.
+    </PackageReleaseNotes>
     <PackageReleaseNotes Condition="'$(VersionPrefix)' == '0.3.0'">
 Features:
 

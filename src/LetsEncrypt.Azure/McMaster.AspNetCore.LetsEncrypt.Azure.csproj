@@ -6,6 +6,11 @@
     <Nullable>enable</Nullable>
     <IsPackable>true</IsPackable>
     <PackageIcon>images/le-logo-standard.png</PackageIcon>
+    <Description>Provides API for configuring ASP.NET Core to use Let's Encrypt.org to automaticaly generate HTTPS certificates and store them in Azure Key Vault.</Description>
+    <PackageDescription>$(Description)
+
+See https://nuget.org/packages/McMaster.AspNetCore.LetsEncrypt for more details.
+    </PackageDescription>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.0' ">
