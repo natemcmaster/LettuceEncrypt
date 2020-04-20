@@ -1,7 +1,6 @@
-﻿using System;
+using System;
 using Certes.Acme;
 using McMaster.AspNetCore.LetsEncrypt;
-using McMaster.AspNetCore.LetsEncrypt.Internal;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Hosting.Internal;
 using Xunit;
@@ -13,7 +12,7 @@ using Environments = Microsoft.Extensions.Hosting.EnvironmentName;
 
 namespace LetsEncrypt.UnitTests
 {
-    public class CertificateFactoryTests
+    public class LetsEncryptOptionsTests
     {
         public static TheoryData<string, Uri> EnvironmentToDefaultAcmeServer()
         {
@@ -38,7 +37,7 @@ namespace LetsEncrypt.UnitTests
 
             Assert.Equal(
                 acmeServer,
-                CertificateFactory.GetAcmeServer(new LetsEncryptOptions(), env));
+                new LetsEncryptOptions().GetAcmeServer(env));
         }
 
 
@@ -59,7 +58,7 @@ namespace LetsEncrypt.UnitTests
 
             Assert.Equal(
                 WellKnownServers.LetsEncryptStagingV2,
-                CertificateFactory.GetAcmeServer(useStaging, env));
+                useStaging.GetAcmeServer(env));
 
             var useProduction = new LetsEncryptOptions
             {
@@ -68,7 +67,7 @@ namespace LetsEncrypt.UnitTests
 
             Assert.Equal(
                 WellKnownServers.LetsEncryptV2,
-                CertificateFactory.GetAcmeServer(useProduction, env));
+                useProduction.GetAcmeServer(env));
         }
     }
 }

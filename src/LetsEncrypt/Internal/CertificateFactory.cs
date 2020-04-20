@@ -1,4 +1,4 @@
-﻿// Copyright (c) Nate McMaster.
+// Copyright (c) Nate McMaster.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
@@ -37,7 +37,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             _options = options;
             _challengeStore = challengeStore;
             _logger = logger;
-            AcmeServer = GetAcmeServer(_options.Value, env);
+            AcmeServer = _options.Value.GetAcmeServer(env);
             _context = new AcmeContext(AcmeServer);
         }
 
@@ -73,20 +73,6 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
 
             cancellationToken.ThrowIfCancellationRequested();
             return await CompleteCertificateRequestAsync(order, cancellationToken);
-        }
-
-        /// <summary>
-        /// The uri to the server that implements the ACME protocol for certificate generation.
-        /// </summary>
-        internal static Uri GetAcmeServer(LetsEncryptOptions options, IHostEnvironment env)
-        {
-            var useStaging = options.UseStagingServerExplicitlySet
-                ? options.UseStagingServer
-                : env.IsDevelopment();
-
-            return useStaging
-                ? WellKnownServers.LetsEncryptStagingV2
-                : WellKnownServers.LetsEncryptV2;
         }
 
         private IEnumerable<Task> BeginValidateAllAuthorizations(IEnumerable<IAuthorizationContext> authorizations, CancellationToken cancellationToken)
