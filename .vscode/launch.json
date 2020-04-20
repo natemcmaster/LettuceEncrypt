@@ -26,7 +26,8 @@
         }
       },
       "env": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Staging",
+        "ASPNETCORE_URLS": "http://localhost:5001;https://+:5002"
       },
       "sourceFileMap": {
         "/Views": "${workspaceFolder}/Views"
