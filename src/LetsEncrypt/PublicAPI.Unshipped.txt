@@ -1,0 +1,11 @@
+McMaster.AspNetCore.LetsEncrypt.Accounts.AccountModel
+McMaster.AspNetCore.LetsEncrypt.Accounts.AccountModel.AccountModel() -> void
+McMaster.AspNetCore.LetsEncrypt.Accounts.AccountModel.Id.get -> int
+McMaster.AspNetCore.LetsEncrypt.Accounts.AccountModel.Id.set -> void
+McMaster.AspNetCore.LetsEncrypt.Accounts.AccountModel.EmailAddresses.get -> string[]
+McMaster.AspNetCore.LetsEncrypt.Accounts.AccountModel.EmailAddresses.set -> void
+McMaster.AspNetCore.LetsEncrypt.Accounts.AccountModel.PrivateKey.get -> byte[]
+McMaster.AspNetCore.LetsEncrypt.Accounts.AccountModel.PrivateKey.set -> void
+McMaster.AspNetCore.LetsEncrypt.Accounts.IAccountStore
+McMaster.AspNetCore.LetsEncrypt.Accounts.IAccountStore.SaveAccountAsync(McMaster.AspNetCore.LetsEncrypt.Accounts.AccountModel account, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task
+McMaster.AspNetCore.LetsEncrypt.Accounts.IAccountStore.GetAccountAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<McMaster.AspNetCore.LetsEncrypt.Accounts.AccountModel>

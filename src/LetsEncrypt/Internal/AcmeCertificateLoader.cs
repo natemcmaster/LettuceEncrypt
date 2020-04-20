@@ -7,6 +7,7 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
+using McMaster.AspNetCore.LetsEncrypt.Accounts;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
@@ -27,8 +28,9 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
     {
         private readonly CertificateSelector _selector;
         private readonly IHttpChallengeResponseStore _challengeStore;
+        private readonly IAccountStore? _accountStore;
         private readonly IOptions<LetsEncryptOptions> _options;
-        private readonly ILogger<AcmeCertificateLoader> _logger;
+        private readonly ILogger _logger;
 
         private readonly IHostEnvironment _hostEnvironment;
         private readonly IServer _server;
@@ -44,10 +46,12 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             IHostEnvironment hostEnvironment,
             IServer server,
             IConfiguration config,
-            IEnumerable<ICertificateRepository> certificateRepositories)
+            IEnumerable<ICertificateRepository> certificateRepositories,
+            IAccountStore? accountStore = default)
         {
             _selector = selector;
             _challengeStore = challengeStore;
+            _accountStore = accountStore;
             _options = options;
             _logger = logger;
             _hostEnvironment = hostEnvironment;
@@ -123,12 +127,14 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
                 return;
             }
 
-            var factory = new CertificateFactory(_options, _challengeStore, _logger, _hostEnvironment);
+            var factory = new CertificateFactory(_options, _challengeStore, _accountStore, _logger, _hostEnvironment);
 
             if (!_hasRegistered)
             {
                 _hasRegistered = true;
-                await factory.RegisterUserAsync(cancellationToken);
+
+                var account = await factory.GetOrCreateAccountAsync(cancellationToken);
+                _logger.LogInformation("Using Let's Encrypt account {accountId}", account.Id);
             }
 
             try

@@ -4,7 +4,16 @@
 using System;
 using System.IO;
 using System.Linq;
+using McMaster.AspNetCore.LetsEncrypt.Accounts;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+
+#if NETSTANDARD2_0
+using IHostEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
+#endif
 
 namespace McMaster.AspNetCore.LetsEncrypt
 {
@@ -16,6 +25,7 @@ namespace McMaster.AspNetCore.LetsEncrypt
         /// <summary>
         /// Save Let's Encrypt data to a directory.
         /// Certificates are stored in the .pfx (PKCS #12) format in a subdirectory of <paramref name="directory"/>.
+        /// Account key information is stored in a JSON format in a different subdirectory of <paramref name="directory"/>.
         /// </summary>
         /// <param name="builder"></param>
         /// <param name="directory">The root directory for storing information. Information may be stored in subdirectories.</param>
@@ -59,6 +69,12 @@ namespace McMaster.AspNetCore.LetsEncrypt
             builder.Services
                 .AddSingleton<ICertificateRepository>(implementationInstance)
                 .AddSingleton<ICertificateSource>(implementationInstance);
+
+            builder.Services.TryAddSingleton<IAccountStore>(services => new FileSystemAccountStore(directory,
+                    services.GetRequiredService<ILogger<FileSystemAccountStore>>(),
+                    services.GetRequiredService<IOptions<LetsEncryptOptions>>(),
+                    services.GetRequiredService<IHostEnvironment>()));
+
             return builder;
         }
     }
