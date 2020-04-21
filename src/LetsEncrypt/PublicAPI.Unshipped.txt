@@ -9,3 +9,5 @@ McMaster.AspNetCore.LetsEncrypt.Accounts.AccountModel.PrivateKey.set -> void
 McMaster.AspNetCore.LetsEncrypt.Accounts.IAccountStore
 McMaster.AspNetCore.LetsEncrypt.Accounts.IAccountStore.SaveAccountAsync(McMaster.AspNetCore.LetsEncrypt.Accounts.AccountModel account, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task
 McMaster.AspNetCore.LetsEncrypt.Accounts.IAccountStore.GetAccountAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<McMaster.AspNetCore.LetsEncrypt.Accounts.AccountModel>
+McMaster.AspNetCore.LetsEncrypt.Diagnostics.CertificateInspector
+McMaster.AspNetCore.LetsEncrypt.Diagnostics.CertificateInspector.TryGetCertByDomainName(string domainName, out System.Security.Cryptography.X509Certificates.X509Certificate2 certificate) -> bool

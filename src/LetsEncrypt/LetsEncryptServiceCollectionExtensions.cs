@@ -3,6 +3,7 @@
 
 using System;
 using McMaster.AspNetCore.LetsEncrypt;
+using McMaster.AspNetCore.LetsEncrypt.Diagnostics;
 using McMaster.AspNetCore.LetsEncrypt.Internal;
 using McMaster.AspNetCore.LetsEncrypt.Internal.IO;
 using Microsoft.AspNetCore.Hosting;
@@ -42,7 +43,9 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             services.AddTransient<IConfigureOptions<KestrelServerOptions>, KestrelOptionsSetup>();
 
-            services.AddSingleton<CertificateSelector>()
+            services
+                .AddSingleton<CertificateInspector>(s => new CertificateInspector(s.GetRequiredService<CertificateSelector>()))
+                .AddSingleton<CertificateSelector>()
                 .AddSingleton<IConsole>(PhysicalConsole.Singleton)
                 .AddSingleton<TermsOfServiceChecker>()
                 .AddSingleton<IHostedService, StartupCertificateLoader>()

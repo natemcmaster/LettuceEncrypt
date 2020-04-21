@@ -59,6 +59,9 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             return retVal;
         }
 
+        public bool TryGetCert(string domainName, out X509Certificate2? cert)
+            => _certs.TryGetValue(domainName, out cert);
+
         public void Reset(string domainName)
         {
             _certs.TryRemove(domainName, out var _);

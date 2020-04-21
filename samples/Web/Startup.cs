@@ -11,6 +11,7 @@ namespace Web
     {
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddRazorPages();
             services.AddLetsEncrypt();
         }
 
@@ -21,17 +22,13 @@ namespace Web
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseHttpsRedirection();
-
-            app.UseRouting();
-
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapGet("/", async context =>
+            app
+                .UseHttpsRedirection()
+                .UseRouting()
+                .UseEndpoints(endpoints =>
                 {
-                    await context.Response.WriteAsync("Hello World!");
+                    endpoints.MapRazorPages();
                 });
-            });
         }
     }
 }

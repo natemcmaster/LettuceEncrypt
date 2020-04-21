@@ -1,0 +1,28 @@
+﻿@page
+@model IndexModel
+@using System.Security.Cryptography
+@using System.Security.Cryptography.X509Certificates
+@{
+    ViewData["Title"] = "Cert Details";
+}
+
+@if (Model.Cert == null)
+{
+    <p>This connection does NOT have a HTTPS certificate for @Model.DomainName</p>
+}
+else
+{
+    <h2>HTTPS Cert Details</h2>
+    <dl>
+        <dt>Common Name:</dt>
+        <dd>@Model.Cert.GetNameInfo(X509NameType.SimpleName, false)</dd>
+        <dt>Issuer:</dt>
+        <dd>@Model.Cert.Issuer</dd>
+        <dt>Valid from:</dt>
+        <dd>@Model.Cert.NotBefore</dd>
+        <dt>Expires:</dt>
+        <dd>@Model.Cert.NotAfter</dd>
+        <dt>Cert Hash:</dt>
+        <dd>@Model.Cert.GetCertHashString(HashAlgorithmName.SHA256)</dd>
+    </dl>
+}
