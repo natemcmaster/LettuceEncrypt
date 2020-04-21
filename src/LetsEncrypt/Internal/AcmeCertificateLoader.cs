@@ -35,6 +35,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
         private readonly IHostEnvironment _hostEnvironment;
         private readonly IServer _server;
         private readonly IConfiguration _config;
+        private readonly TermsOfServiceChecker _tosChecker;
         private readonly IEnumerable<ICertificateRepository> _certificateRepositories;
         private volatile bool _hasRegistered;
 
@@ -46,6 +47,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             IHostEnvironment hostEnvironment,
             IServer server,
             IConfiguration config,
+            TermsOfServiceChecker tosChecker,
             IEnumerable<ICertificateRepository> certificateRepositories,
             IAccountStore? accountStore = default)
         {
@@ -57,6 +59,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             _hostEnvironment = hostEnvironment;
             _server = server;
             _config = config;
+            _tosChecker = tosChecker;
             _certificateRepositories = certificateRepositories;
         }
 
@@ -127,7 +130,13 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
                 return;
             }
 
-            var factory = new CertificateFactory(_options, _challengeStore, _accountStore, _logger, _hostEnvironment);
+            var factory = new CertificateFactory(
+                _tosChecker,
+                _options,
+                _challengeStore,
+                _accountStore,
+                _logger,
+                _hostEnvironment);
 
             if (!_hasRegistered)
             {

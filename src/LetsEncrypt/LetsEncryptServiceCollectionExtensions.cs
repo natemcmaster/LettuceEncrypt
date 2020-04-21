@@ -4,6 +4,7 @@
 using System;
 using McMaster.AspNetCore.LetsEncrypt;
 using McMaster.AspNetCore.LetsEncrypt.Internal;
+using McMaster.AspNetCore.LetsEncrypt.Internal.IO;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
@@ -42,6 +43,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IConfigureOptions<KestrelServerOptions>, KestrelOptionsSetup>();
 
             services.AddSingleton<CertificateSelector>()
+                .AddSingleton<IConsole>(PhysicalConsole.Singleton)
+                .AddSingleton<TermsOfServiceChecker>()
                 .AddSingleton<IHostedService, StartupCertificateLoader>()
                 .AddSingleton<ICertificateSource, DeveloperCertLoader>()
                 .AddSingleton<IHostedService, AcmeCertificateLoader>()

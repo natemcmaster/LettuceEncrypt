@@ -24,6 +24,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
 {
     internal class CertificateFactory
     {
+        private readonly TermsOfServiceChecker _tosChecker;
         private readonly IOptions<LetsEncryptOptions> _options;
         private readonly IHttpChallengeResponseStore _challengeStore;
         private readonly IAccountStore _accountRepository;
@@ -32,12 +33,14 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
         private IAccountContext? _accountContext;
 
         public CertificateFactory(
+            TermsOfServiceChecker tosChecker,
             IOptions<LetsEncryptOptions> options,
             IHttpChallengeResponseStore challengeStore,
             IAccountStore? accountRepository,
             ILogger logger,
             IHostEnvironment env)
         {
+            _tosChecker = tosChecker;
             _options = options;
             _challengeStore = challengeStore;
             _logger = logger;
@@ -73,7 +76,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
 
             var tosUri = await _context.TermsOfService();
 
-            EnsureAgreementToTermsOfServices(tosUri);
+            _tosChecker.EnsureTermsAreAccepted(tosUri);
 
             var options = _options.Value;
             _logger.LogInformation("Creating new Let's Encrypt account for {email}", options.EmailAddress);
@@ -128,7 +131,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             if (existingAccount.TermsOfServiceAgreed != true)
             {
                 var tosUri = await _context.TermsOfService();
-                EnsureAgreementToTermsOfServices(tosUri);
+                _tosChecker.EnsureTermsAreAccepted(tosUri);
                 await _accountContext.Update(agreeTermsOfService: true);
             }
 
@@ -186,47 +189,6 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             {
                 yield return ValidateDomainOwnershipAsync(authorization, cancellationToken);
             }
-        }
-
-        private void EnsureAgreementToTermsOfServices(Uri tosUri)
-        {
-            if (_options.Value.AcceptTermsOfService)
-            {
-                _logger.LogDebug("Terms of service has been accepted");
-                return;
-            }
-
-            if (!Console.IsInputRedirected)
-            {
-                Console.BackgroundColor = ConsoleColor.DarkBlue;
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.WriteLine("By proceeding, you must agree with Let's Encrypt terms of services.");
-                Console.WriteLine(tosUri);
-                Console.Write("Do you accept? [Y/n] ");
-                Console.ResetColor();
-                try
-                {
-                    Console.CursorVisible = true;
-                }
-                catch { }
-
-                var result = Console.ReadLine().Trim();
-
-                try
-                {
-                    Console.CursorVisible = false;
-                }
-                catch { }
-
-                if (string.IsNullOrEmpty(result)
-                    || string.Equals("y", result, StringComparison.OrdinalIgnoreCase))
-                {
-                    return;
-                }
-            }
-
-            _logger.LogError($"You must accept the terms of service to continue.");
-            throw new InvalidOperationException("Could not automatically accept the terms of service");
         }
 
         private async Task ValidateDomainOwnershipAsync(IAuthorizationContext authorizationContext, CancellationToken cancellationToken)
