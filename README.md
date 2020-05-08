@@ -21,7 +21,13 @@ HTTPS made easy.
 This project provides API for ASP.NET Core projects to use Let's Encrypt.
 
 When enabled, your web server will use the Let's Encrypt certificate authority
-and **automatically** generate an HTTPS certificate when the server starts up. It then configures Kestrel to use this certificate for all HTTPs traffic.
+and **automatically** generate an HTTPS certificate when the server starts up. It then configures Kestrel to use this certificate for all HTTPs traffic. See [usage instructions below](#usage) to get started.
+
+Created and developed by [@natemcmaster](https://github.com/natemcmaster) with :heart: from Seattle :coffee:
+
+Special thanks to my sponsors!
+
+* [@bordenit](https://github.com/bordenit)
 
 ## Will this work for me?
 
