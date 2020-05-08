@@ -24,7 +24,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
     /// <summary>
     /// Loads certificates for all configured hostnames
     /// </summary>
-    internal class AcmeCertificateLoader : IHostedService
+    internal class AcmeCertificateLoader : BackgroundService
     {
         private readonly CertificateSelector _selector;
         private readonly IHttpChallengeResponseStore _challengeStore;
@@ -37,7 +37,8 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
         private readonly IConfiguration _config;
         private readonly TermsOfServiceChecker _tosChecker;
         private readonly IEnumerable<ICertificateRepository> _certificateRepositories;
-        private volatile bool _hasRegistered;
+
+        private const string ErrorMessage = "Failed to create certificate";
 
         public AcmeCertificateLoader(
             CertificateSelector selector,
@@ -63,23 +64,20 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             _certificateRepositories = certificateRepositories;
         }
 
-        public Task StopAsync(CancellationToken cancellationToken)
-            => Task.CompletedTask;
-
-        public Task StartAsync(CancellationToken cancellationToken)
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             if (!(_server is KestrelServer))
             {
                 var serverType = _server.GetType().FullName;
                 _logger.LogWarning("LetsEncrypt can only be used with Kestrel and is not supported on {serverType} servers. Skipping certificate provisioning.", serverType);
-                return Task.CompletedTask;
+                return;
             }
 
             if (_config.GetValue<bool>("UseIISIntegration"))
             {
                 _logger.LogWarning("LetsEncrypt does not work with apps hosting in IIS. IIS does not allow for dynamic HTTPS certificate binding, " +
                     "so if you want to use Let's Encrypt, you'll need to use a different tool to do so.");
-                return Task.CompletedTask;
+                return;
             }
 
             // load certificates in the background
@@ -87,16 +85,14 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             if (!LetsEncryptDomainNamesWereConfigured())
             {
                 _logger.LogInformation("No domain names were configured for Let's Encrypt");
-                return Task.CompletedTask;
+                return;
             }
 
-            Task.Factory.StartNew(async () =>
+            await Task.Run(async () =>
             {
-                const string ErrorMessage = "Failed to create certificate";
-
                 try
                 {
-                    await LoadCerts(cancellationToken);
+                    await LoadCerts(stoppingToken);
                 }
                 catch (AggregateException ex) when (ex.InnerException != null)
                 {
@@ -106,9 +102,9 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
                 {
                     _logger.LogError(0, ex, ErrorMessage);
                 }
-            });
 
-            return Task.CompletedTask;
+                await MonitorRenewal(stoppingToken);
+            });
         }
 
         private bool LetsEncryptDomainNamesWereConfigured()
@@ -130,6 +126,11 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
                 return;
             }
 
+            await CreateCertificateAsync(domainNames, cancellationToken);
+        }
+
+        private async Task CreateCertificateAsync(string[] domainNames, CancellationToken cancellationToken)
+        {
             var factory = new CertificateFactory(
                 _tosChecker,
                 _options,
@@ -138,20 +139,14 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
                 _logger,
                 _hostEnvironment);
 
-            if (!_hasRegistered)
-            {
-                _hasRegistered = true;
-
-                var account = await factory.GetOrCreateAccountAsync(cancellationToken);
-                _logger.LogInformation("Using Let's Encrypt account {accountId}", account.Id);
-            }
+            var account = await factory.GetOrCreateAccountAsync(cancellationToken);
+            _logger.LogInformation("Using Let's Encrypt account {accountId}", account.Id);
 
             try
             {
                 _logger.LogInformation("Creating certificate for {hostname} using ACME server {acmeServer}",
                     domainNames,
                     factory.AcmeServer);
-
 
                 var cert = await factory.CreateCertificateAsync(cancellationToken);
 
@@ -181,6 +176,49 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             }
 
             await Task.WhenAll(saveTasks);
+        }
+
+        private async Task MonitorRenewal(CancellationToken cancellationToken)
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                var checkPeriod = _options.Value.RenewalCheckPeriod;
+                var daysInAdvance = _options.Value.RenewDaysInAdvance;
+                if (!checkPeriod.HasValue || !daysInAdvance.HasValue)
+                {
+                    _logger.LogInformation("Automatic Let's Encrypt certificate renewal is not configured. Stopping {service}",
+                        nameof(AcmeCertificateLoader));
+                    return;
+                }
+
+                try
+                {
+                    var domainNames = _options.Value.DomainNames;
+                    _logger.LogDebug("Checking certificates' renewals for {hostname}",
+                        domainNames);
+
+                    foreach (var domainName in domainNames)
+                    {
+                        if (!_selector.TryGet(domainName, out var cert)
+                            || cert == null
+                            || cert.NotAfter <= DateTime.Now + daysInAdvance.Value)
+                        {
+                            await CreateCertificateAsync(domainNames, cancellationToken);
+                            break;
+                        }
+                    }
+                }
+                catch (AggregateException ex) when (ex.InnerException != null)
+                {
+                    _logger.LogError(0, ex.InnerException, ErrorMessage);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(0, ex, ErrorMessage);
+                }
+
+                await Task.Delay(checkPeriod.Value, cancellationToken);
+            }
         }
     }
 }
