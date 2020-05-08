@@ -1,0 +1,6 @@
+--- 
+- name: Log into Docker
+  docker_login:
+    username: "{{ hostvars['localhost'].dockerHubUsername }}"
+    password: "{{ hostvars['localhost'].dockerHubPassword  }}"
+    registry_url: "https://index.docker.io/v2/"

@@ -1,0 +1,13 @@
+---
+- name: Check Page Content
+  hosts: localhost
+  connection: local
+  tasks:
+    - include: setfacts.yml
+    - name: Check if web page loads and contains commit
+      uri: 
+        url: "https://{{hostvars[item].domain}}"
+        return_content: true
+      register: response
+      failed_when: "hostvars['localhost'].commitSHA not in response.content"
+      with_items: "{{ groups['containers'] }}"

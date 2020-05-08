@@ -1,7 +1,7 @@
 Integration Testing
 ===================
 
-This project doesn't yet have automated tests for integration, so here is how to manually test.
+This project has automated tests for integration, but you can test it manually if you choose.
 
 ## Testing in development using ngrok
 
@@ -106,3 +106,7 @@ To trust a test certificate, on macOS
 4. Refresh your browser.
 
 ![green](https://i.imgur.com/tyTaJwV.png)
+
+## CI/CD With Docker
+Automated tests run on each pull request to build all .csproj files in this repository using GitHub Actions and Ansible scripts to deploy a container to a public facing Docker host. Following deployment, the page on the deployed container is checked for a matching GITHUB_SHA value that matches the commit that triggered the container build.
+

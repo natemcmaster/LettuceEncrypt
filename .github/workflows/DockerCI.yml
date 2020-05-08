@@ -1,0 +1,42 @@
+name: DockerCI
+
+on: 
+
+  pull_request:
+    branches: 
+      - master
+
+jobs:
+
+  LetsEncrypt:
+    runs-on: ubuntu-latest
+    env:
+      digitalOceanIP: ${{secrets.digitalOceanIP}}
+      dockerHubUsername: ${{secrets.dockerHubUsername}}
+      dockerHubPassword: ${{secrets.dockerHubPassword}}
+      dockerHubContainerName: ${{secrets.dockerHubContainerName}}    
+      commitSHA: ${{github.event.pull_request.head.sha}}
+      digitalOceanPrivateKey: ${{secrets.digitalOceanPrivateKey}}  
+      domain: ${{secrets.domain}}  
+      ansible_python_interpreter: "/usr/bin/python3"
+      ASPNETCORE_ENVIRONMENT: "Production"
+      ASPNETCORE_URLS: "http://+;https://+"
+      ASPNETCORE_HTTPS_PORT: "443"
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Set Ansible Script Permissions
+      run: chmod -R a+x ./test/Integration/scripts/
+   
+    - name: Build and Push to Docker Hub
+      run: ansible-playbook test/Integration/scripts/dockerPushToDockerHub.yml
+
+    - name: Prepare For Deployment
+      run: ansible-playbook test/Integration/scripts/createvars.yml
+        
+    - name: Deploy Public Facing Containers
+      run: ansible-playbook -i inventory test/Integration/scripts/dockerDeployFromDockerHub.yml
+          
+    - name: Check Home Page of Containers
+      run: ansible-playbook -i inventory test/Integration/scripts/checkpages.yml

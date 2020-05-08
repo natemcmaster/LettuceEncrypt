@@ -1,0 +1,4 @@
+---
+- name: Log out of DockerHub
+  docker_login:
+    state: absent

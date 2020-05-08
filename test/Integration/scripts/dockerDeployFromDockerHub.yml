@@ -1,0 +1,30 @@
+---
+- hosts: localhost
+  tasks:
+    - include: setfacts.yml
+      
+- hosts: all
+  tasks:
+    - include: installDependencies.yml
+
+    - include: dockerHubLogin.yml
+
+    - name: Start Ubuntu Containers
+      docker_container: 
+          name: "{{ hostvars['localhost']['dockerHubContainerName'] }}"
+          image: "{{ hostvars['localhost']['dockerHubUsername']}}/{{ hostvars['localhost']['dockerHubContainerName'] }}:{{hostvars[inventory_hostname].ansible_distribution_version}}"
+          pull: yes
+          state: started
+          network_mode: bridge
+          published_ports:
+            - "80:80"
+            - "443:443"
+          volumes:
+            - "~/x509stores/:/root/.dotnet/corefx/cryptography/x509stores/"
+          env:
+            ASPNETCORE_ENVIRONMENT: "{{ hostvars['localhost']['ASPNETCORE_ENVIRONMENT']}}"
+            ASPNETCORE_URLS: "http://+;https://+"
+            ASPNETCORE_HTTPS_PORT: "443"
+            commitSHA: "{{ hostvars['localhost']['commitSHA'] }}"
+
+    - include: dockerHubLogout.yml

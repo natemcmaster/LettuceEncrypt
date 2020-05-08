@@ -1,0 +1,20 @@
+---
+- name: Install Dependencies
+  block:
+    - name: Install Python3
+      become: yes
+      yum:
+        name: 
+          - python-apt
+          - python3
+        state: present
+
+    - name: Install PIP
+      yum:
+        name: python3-pip
+        state: present
+
+    - name: Install Docker Python Module
+      pip:
+        name: docker
+  become: true

@@ -1,0 +1,8 @@
+---
+- hosts: localhost
+  connection: local
+  tasks:
+    - name: Delete Private Key
+      file:
+        path: "{{ansible_env.GITHUB_WORKSPACE}}/key.txt"
+        state: absent
