@@ -90,7 +90,6 @@ namespace McMaster.AspNetCore.LetsEncrypt
         public TimeSpan? RenewalCheckPeriod { get; set; } = TimeSpan.FromDays(1);
 
         /// <summary>
-        /// The uri to the server that implements the ACME protocol for certificate generation.
         /// Asymetric encryption algorithm: RS256, ES256, ES384, ES512
         /// </summary>
         public KeyAlgorithm KeyAlgorithm { get; set; } = KeyAlgorithm.ES256;
