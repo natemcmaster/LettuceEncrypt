@@ -8,6 +8,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
 using McMaster.AspNetCore.LetsEncrypt.Accounts;
+using McMaster.AspNetCore.LetsEncrypt.Internal.IO;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
@@ -37,6 +38,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
         private readonly IConfiguration _config;
         private readonly TermsOfServiceChecker _tosChecker;
         private readonly IEnumerable<ICertificateRepository> _certificateRepositories;
+        private readonly IClock _clock;
 
         private const string ErrorMessage = "Failed to create certificate";
 
@@ -50,6 +52,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             IConfiguration config,
             TermsOfServiceChecker tosChecker,
             IEnumerable<ICertificateRepository> certificateRepositories,
+            IClock clock,
             IAccountStore? accountStore = default)
         {
             _selector = selector;
@@ -62,6 +65,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             _config = config;
             _tosChecker = tosChecker;
             _certificateRepositories = certificateRepositories;
+            _clock = clock;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -201,7 +205,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
                     {
                         if (!_selector.TryGet(domainName, out var cert)
                             || cert == null
-                            || cert.NotAfter <= DateTime.Now + daysInAdvance.Value)
+                            || cert.NotAfter <= _clock.Now.DateTime + daysInAdvance.Value)
                         {
                             await CreateCertificateAsync(domainNames, cancellationToken);
                             break;
