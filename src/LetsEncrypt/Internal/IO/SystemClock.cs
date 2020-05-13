@@ -2,7 +2,7 @@
 
 namespace McMaster.AspNetCore.LetsEncrypt.Internal.IO
 {
-    internal class SystemClock: IClock
+    internal class SystemClock : IClock
     {
         public DateTimeOffset Now => DateTimeOffset.Now;
     }
