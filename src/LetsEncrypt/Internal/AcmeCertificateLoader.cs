@@ -199,6 +199,8 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
                     return;
                 }
 
+                await Task.Delay(checkPeriod.Value, cancellationToken);
+
                 try
                 {
                     var domainNames = _options.Value.DomainNames;
@@ -224,8 +226,6 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
                 {
                     _logger.LogError(0, ex, ErrorMessage);
                 }
-
-                await Task.Delay(checkPeriod.Value, cancellationToken);
             }
         }
     }
