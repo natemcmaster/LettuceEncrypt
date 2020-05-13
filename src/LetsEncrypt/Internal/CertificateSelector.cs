@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Options;
@@ -13,6 +14,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
     internal class CertificateSelector
     {
         private readonly ConcurrentDictionary<string, X509Certificate2> _certs = new ConcurrentDictionary<string, X509Certificate2>(StringComparer.OrdinalIgnoreCase);
+        private readonly ConcurrentDictionary<string, X509Certificate2> _challengeCerts = new ConcurrentDictionary<string, X509Certificate2>(StringComparer.OrdinalIgnoreCase);
 
         private readonly IOptions<LetsEncryptOptions> _options;
 
@@ -27,13 +29,26 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
         {
             foreach (var dnsName in X509CertificateHelpers.GetAllDnsNames(certificate))
             {
-                AddWithDomainName(dnsName, certificate);
+                AddWithDomainName(_certs, dnsName, certificate);
             }
         }
 
-        private void AddWithDomainName(string domainName, X509Certificate2 certificate)
+        public void AddChallengeCert(X509Certificate2 certificate)
         {
-            _certs.AddOrUpdate(
+            foreach (var dnsName in X509CertificateHelpers.GetAllDnsNames(certificate))
+            {
+                AddWithDomainName(_challengeCerts, dnsName, certificate);
+            }
+        }
+
+        public void ClearChallengeCert(string domainName)
+        {
+            _challengeCerts.TryRemove(domainName, out _);
+        }
+
+        private static void AddWithDomainName(ConcurrentDictionary<string, X509Certificate2> certs, string domainName, X509Certificate2 certificate)
+        {
+            certs.AddOrUpdate(
                 domainName,
                 certificate,
                 (_, currentCert) =>
@@ -49,8 +64,27 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
 
         public bool HasCertForDomain(string domainName) => _certs.ContainsKey(domainName);
 
-        public X509Certificate2? Select(ConnectionContext features, string? domainName)
+        public X509Certificate2? Select(ConnectionContext context, string? domainName)
         {
+#if NETCOREAPP3_0
+            if (_challengeCerts.Count > 0)
+            {
+                var sslStream = context.Features.Get<SslStream>();
+
+                if (sslStream != null
+                    && domainName != null
+                    && sslStream.NegotiatedApplicationProtocol == TlsAlpnChallengeResponder.AcmeTlsProtocol
+                    && _challengeCerts.TryGetValue(domainName, out var challengeCert))
+                {
+                    // Responds with a self-signed certificate to as a part of the TLS/ALPN challenge verification
+                    return challengeCert;
+                }
+            }
+#elif NETSTANDARD2_0
+#else
+#error Update TFMs
+#endif
+
             if (domainName == null || !_certs.TryGetValue(domainName, out var retVal))
             {
                 return _options.Value.FallbackCertificate;

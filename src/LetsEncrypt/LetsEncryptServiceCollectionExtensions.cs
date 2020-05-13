@@ -54,6 +54,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddSingleton<ICertificateSource>(x => x.GetRequiredService<X509CertStore>())
                 .AddSingleton<ICertificateRepository>(x => x.GetRequiredService<X509CertStore>())
                 .AddSingleton<HttpChallengeResponseMiddleware>()
+                .AddSingleton<TlsAlpnChallengeResponder>()
                 .AddSingleton<IStartupFilter, HttpChallengeStartupFilter>();
 
             services.AddSingleton<IConfigureOptions<LetsEncryptOptions>>(services =>
