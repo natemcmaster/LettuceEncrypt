@@ -41,6 +41,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
         private readonly IEnumerable<ICertificateRepository> _certificateRepositories;
         private readonly IClock _clock;
         private readonly IHostApplicationLifetime _applicationLifetime;
+        private readonly TlsAlpnChallengeResponder _tlsAlpnChallengeResponder;
         private const string ErrorMessage = "Failed to create certificate";
 
         public AcmeCertificateLoader(
@@ -55,6 +56,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             IEnumerable<ICertificateRepository> certificateRepositories,
             IClock clock,
             IHostApplicationLifetime applicationLifetime,
+            TlsAlpnChallengeResponder tlsAlpnChallengeResponder,
             IAccountStore? accountStore = default)
         {
             _selector = selector;
@@ -69,6 +71,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             _certificateRepositories = certificateRepositories;
             _clock = clock;
             _applicationLifetime = applicationLifetime;
+            _tlsAlpnChallengeResponder = tlsAlpnChallengeResponder;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -145,7 +148,8 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
                 _accountStore,
                 _logger,
                 _hostEnvironment,
-                _applicationLifetime);
+                _applicationLifetime,
+                _tlsAlpnChallengeResponder);
 
             var account = await factory.GetOrCreateAccountAsync(cancellationToken);
             _logger.LogInformation("Using Let's Encrypt account {accountId}", account.Id);

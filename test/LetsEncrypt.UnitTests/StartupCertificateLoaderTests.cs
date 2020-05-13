@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using McMaster.AspNetCore.LetsEncrypt;
 using McMaster.AspNetCore.LetsEncrypt.Internal;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
@@ -18,7 +19,10 @@ namespace LetsEncrypt.UnitTests
             var testCert = new X509Certificate2();
             IEnumerable<X509Certificate2> certs = new[] { testCert };
 
-            var selector = new Mock<CertificateSelector>(Options.Create(new LetsEncryptOptions()));
+            var selector = new Mock<CertificateSelector>(
+                Options.Create(new LetsEncryptOptions()),
+                NullLogger<CertificateSelector>.Instance);
+
             selector
                 .Setup(s => s.Add(testCert))
                 .Verifiable();

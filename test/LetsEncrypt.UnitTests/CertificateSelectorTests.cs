@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using McMaster.AspNetCore.LetsEncrypt;
 using McMaster.AspNetCore.LetsEncrypt.Internal;
 using Microsoft.AspNetCore.Connections;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
@@ -19,7 +20,9 @@ namespace LetsEncrypt.UnitTests
             const string CommonName = "selector.letsencrypt.natemcmaster.com";
 
             var testCert = CreateTestCert(CommonName);
-            var selector = new CertificateSelector(Options.Create(new LetsEncryptOptions()));
+            var selector = new CertificateSelector(
+                Options.Create(new LetsEncryptOptions()),
+                NullLogger<CertificateSelector>.Instance);
 
             selector.Add(testCert);
 
@@ -37,7 +40,9 @@ namespace LetsEncrypt.UnitTests
                 "san3.letsencrypt.natemcmaster.com",
             };
             var testCert = CreateTestCert(domainNames);
-            var selector = new CertificateSelector(Options.Create(new LetsEncryptOptions()));
+            var selector = new CertificateSelector(
+                Options.Create(new LetsEncryptOptions()),
+                NullLogger<CertificateSelector>.Instance);
 
             selector.Add(testCert);
 
@@ -54,7 +59,9 @@ namespace LetsEncrypt.UnitTests
             var fiveDays = CreateTestCert(CommonName, DateTimeOffset.Now.AddDays(5));
             var tenDays = CreateTestCert(CommonName, DateTimeOffset.Now.AddDays(10));
 
-            var selector = new CertificateSelector(Options.Create(new LetsEncryptOptions()));
+            var selector = new CertificateSelector(
+                Options.Create(new LetsEncryptOptions()),
+                NullLogger<CertificateSelector>.Instance);
 
             selector.Add(fiveDays);
             selector.Add(tenDays);

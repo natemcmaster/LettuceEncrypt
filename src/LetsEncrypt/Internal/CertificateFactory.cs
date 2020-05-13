@@ -30,6 +30,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
         private readonly IHttpChallengeResponseStore _challengeStore;
         private readonly IAccountStore _accountRepository;
         private readonly ILogger _logger;
+        private readonly TlsAlpnChallengeResponder _tlsAlpnChallengeResponder;
         private TaskCompletionSource<object?> _appStarted;
         private AcmeContext? _context;
         private IAccountContext? _accountContext;
@@ -41,12 +42,14 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             IAccountStore? accountRepository,
             ILogger logger,
             IHostEnvironment env,
-            IHostApplicationLifetime appLifetime)
+            IHostApplicationLifetime appLifetime,
+            TlsAlpnChallengeResponder tlsAlpnChallengeResponder)
         {
             _tosChecker = tosChecker;
             _options = options;
             _challengeStore = challengeStore;
             _logger = logger;
+            _tlsAlpnChallengeResponder = tlsAlpnChallengeResponder;
 
             _appStarted = new TaskCompletionSource<object?>();
             appLifetime.ApplicationStarted.Register(() => _appStarted.TrySetResult(null));
@@ -224,40 +227,56 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
 
             cancellationToken.ThrowIfCancellationRequested();
 
+            if (_tlsAlpnChallengeResponder.IsEnabled)
+            {
+                await PrepareTlsAlpnChallengeResponseAsync(authorizationContext, domainName, cancellationToken);
+            }
+
             await PrepareHttpChallengeResponseAsync(authorizationContext, domainName, cancellationToken);
 
             var retries = 60;
             var delay = TimeSpan.FromSeconds(2);
 
-            while (retries > 0)
+            try
             {
-                retries--;
-
-                cancellationToken.ThrowIfCancellationRequested();
-
-                authorization = await authorizationContext.Resource();
-
-                _logger.LogAcmeAction("GetAuthorization");
-
-                switch (authorization.Status)
+                while (retries > 0)
                 {
-                    case AuthorizationStatus.Valid:
-                        return;
-                    case AuthorizationStatus.Pending:
-                        await Task.Delay(delay);
-                        continue;
-                    case AuthorizationStatus.Invalid:
-                        throw InvalidAuthorizationError(authorization);
-                    case AuthorizationStatus.Revoked:
-                        throw new InvalidOperationException($"The authorization to verify domainName '{domainName}' has been revoked.");
-                    case AuthorizationStatus.Expired:
-                        throw new InvalidOperationException($"The authorization to verify domainName '{domainName}' has expired.");
-                    default:
-                        throw new ArgumentOutOfRangeException("Unexpected response from server while validating domain ownership.");
+                    retries--;
+
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    authorization = await authorizationContext.Resource();
+
+                    _logger.LogAcmeAction("GetAuthorization");
+
+                    switch (authorization.Status)
+                    {
+                        case AuthorizationStatus.Valid:
+                            return;
+                        case AuthorizationStatus.Pending:
+                            await Task.Delay(delay);
+                            continue;
+                        case AuthorizationStatus.Invalid:
+                            throw InvalidAuthorizationError(authorization);
+                        case AuthorizationStatus.Revoked:
+                            throw new InvalidOperationException($"The authorization to verify domainName '{domainName}' has been revoked.");
+                        case AuthorizationStatus.Expired:
+                            throw new InvalidOperationException($"The authorization to verify domainName '{domainName}' has expired.");
+                        default:
+                            throw new ArgumentOutOfRangeException("Unexpected response from server while validating domain ownership.");
+                    }
+                }
+
+                throw new TimeoutException("Timed out waiting for domain ownership validation.");
+            }
+            finally
+            {
+                if (_tlsAlpnChallengeResponder.IsEnabled)
+                {
+                    // cleanup after authorization is done to skip unnecessary cert lookup on all incoming SSL connections
+                    _tlsAlpnChallengeResponder.DiscardChallenge(domainName);
                 }
             }
-
-            throw new TimeoutException("Timed out waiting for domain ownership validation.");
         }
 
         private async Task PrepareHttpChallengeResponseAsync(
@@ -276,11 +295,29 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             var keyAuth = httpChallenge.KeyAuthz;
             _challengeStore.AddChallengeResponse(httpChallenge.Token, keyAuth);
 
-            // ensure the server has started before requesting validation of HTTP challenge
             _logger.LogTrace("Waiting for server to start accepting HTTP requests");
             await _appStarted.Task;
 
+            _logger.LogTrace("Requesting server to validate HTTP challenge");
             await httpChallenge.Validate();
+        }
+
+        private async Task PrepareTlsAlpnChallengeResponseAsync(
+            IAuthorizationContext authorizationContext,
+            string domainName,
+            CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var tlsAlpnChallenge = await authorizationContext.TlsAlpn();
+
+            _tlsAlpnChallengeResponder.PrepareChallengeCert(domainName, tlsAlpnChallenge.KeyAuthz);
+
+            _logger.LogTrace("Waiting for server to start accepting HTTP requests");
+            await _appStarted.Task;
+
+            _logger.LogTrace("Requesting server to validate TLS/ALPN challenge");
+            await tlsAlpnChallenge.Validate();
         }
 
         private Exception InvalidAuthorizationError(Authorization authorization)

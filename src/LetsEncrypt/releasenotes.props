@@ -5,6 +5,7 @@ Features:
 
 * @mbican: Automatically renew certificates 30 days before expiration (PR #73)
 * @natemcmaster: persist account information between server restarts (PR #67)
+* @natemcmaster: (.NET Core 3+) support HTTPS-only config by implementing TLS/ALPN challenge validation (RFC 8737)
 
 Fixes:
 
