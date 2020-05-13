@@ -4,9 +4,9 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.Connections;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace McMaster.AspNetCore.LetsEncrypt.Internal
@@ -17,10 +17,12 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
         private readonly ConcurrentDictionary<string, X509Certificate2> _challengeCerts = new ConcurrentDictionary<string, X509Certificate2>(StringComparer.OrdinalIgnoreCase);
 
         private readonly IOptions<LetsEncryptOptions> _options;
+        private readonly ILogger<CertificateSelector> _logger;
 
-        public CertificateSelector(IOptions<LetsEncryptOptions> options)
+        public CertificateSelector(IOptions<LetsEncryptOptions> options, ILogger<CertificateSelector> logger)
         {
             _options = options ?? throw new ArgumentNullException(nameof(options));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public ICollection<string> SupportedDomains => _certs.Keys;
@@ -69,14 +71,14 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
 #if NETCOREAPP3_0
             if (_challengeCerts.Count > 0)
             {
-                var sslStream = context.Features.Get<SslStream>();
+                // var sslStream = context.Features.Get<SslStream>();
+                // sslStream.NegotiatedApplicationProtocol hasn't been set yet, so we have to assume that
+                // if ALPN challenge certs are configured, we must respond with those.
 
-                if (sslStream != null
-                    && domainName != null
-                    && sslStream.NegotiatedApplicationProtocol == TlsAlpnChallengeResponder.AcmeTlsProtocol
-                    && _challengeCerts.TryGetValue(domainName, out var challengeCert))
+                if (domainName != null && _challengeCerts.TryGetValue(domainName, out var challengeCert))
                 {
-                    // Responds with a self-signed certificate to as a part of the TLS/ALPN challenge verification
+                    _logger.LogTrace("Using ALPN challenge cert for {domainName}", domainName);
+
                     return challengeCert;
                 }
             }

@@ -295,10 +295,10 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             var keyAuth = httpChallenge.KeyAuthz;
             _challengeStore.AddChallengeResponse(httpChallenge.Token, keyAuth);
 
-            // ensure the server has started before requesting validation of HTTP challenge
             _logger.LogTrace("Waiting for server to start accepting HTTP requests");
             await _appStarted.Task;
 
+            _logger.LogTrace("Requesting server to validate HTTP challenge");
             await httpChallenge.Validate();
         }
 
@@ -313,8 +313,10 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
 
             _tlsAlpnChallengeResponder.PrepareChallengeCert(domainName, tlsAlpnChallenge.KeyAuthz);
 
+            _logger.LogTrace("Waiting for server to start accepting HTTP requests");
             await _appStarted.Task;
 
+            _logger.LogTrace("Requesting server to validate TLS/ALPN challenge");
             await tlsAlpnChallenge.Validate();
         }
 
