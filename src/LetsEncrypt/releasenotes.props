@@ -5,6 +5,10 @@ Features:
 
 * @mbican: Automatically renew certificates 30 days before expiration (PR #73)
 * @natemcmaster: persist account information between server restarts (PR #67)
+
+Fixes:
+
+* @natemcmaster: fix bug in responding to HTTP challenges (PR #74)
     </PackageReleaseNotes>
     <PackageReleaseNotes Condition="'$(VersionPrefix)' == '0.4.0'">
 Features:
