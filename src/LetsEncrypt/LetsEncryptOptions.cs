@@ -80,6 +80,16 @@ namespace McMaster.AspNetCore.LetsEncrypt
         public X509Certificate2? FallbackCertificate { get; set; }
 
         /// <summary>
+        /// How long before certificate expiration will be renewal attempted
+        /// </summary>
+        public TimeSpan? RenewDaysInAdvance { get; set; } = TimeSpan.FromDays(30);
+
+        /// <summary>
+        /// How often will be certificates checked for renewal
+        /// </summary>
+        public TimeSpan? RenewalCheckPeriod { get; set; } = TimeSpan.FromDays(1);
+
+        /// <summary>
         /// Asymetric encryption algorithm: RS256, ES256, ES384, ES512
         /// </summary>
         public KeyAlgorithm KeyAlgorithm { get; set; } = KeyAlgorithm.ES256;
