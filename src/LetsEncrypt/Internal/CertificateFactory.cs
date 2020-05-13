@@ -18,6 +18,7 @@ using Microsoft.Extensions.Options;
 
 #if NETSTANDARD2_0
 using IHostEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
+using IHostApplicationLifetime = Microsoft.Extensions.Hosting.IApplicationLifetime;
 #endif
 
 namespace McMaster.AspNetCore.LetsEncrypt.Internal
@@ -29,6 +30,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
         private readonly IHttpChallengeResponseStore _challengeStore;
         private readonly IAccountStore _accountRepository;
         private readonly ILogger _logger;
+        private TaskCompletionSource<object?> _appStarted;
         private AcmeContext? _context;
         private IAccountContext? _accountContext;
 
@@ -38,12 +40,21 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             IHttpChallengeResponseStore challengeStore,
             IAccountStore? accountRepository,
             ILogger logger,
-            IHostEnvironment env)
+            IHostEnvironment env,
+            IHostApplicationLifetime appLifetime)
         {
             _tosChecker = tosChecker;
             _options = options;
             _challengeStore = challengeStore;
             _logger = logger;
+
+            _appStarted = new TaskCompletionSource<object?>();
+            appLifetime.ApplicationStarted.Register(() => _appStarted.TrySetResult(null));
+            if (appLifetime.ApplicationStarted.IsCancellationRequested)
+            {
+                _appStarted.TrySetResult(null);
+            }
+
             _accountRepository = accountRepository ?? new FileSystemAccountStore(logger, options, env);
             AcmeServer = _options.Value.GetAcmeServer(env);
         }
@@ -153,6 +164,11 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
                 foreach (var order in orders)
                 {
                     var orderDetails = await order.Resource();
+                    if (orderDetails.Status != OrderStatus.Pending)
+                    {
+                        continue;
+                    }
+
                     var orderDomains = orderDetails
                         .Identifiers
                         .Where(i => i.Type == IdentifierType.Dns)
@@ -208,23 +224,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
 
             cancellationToken.ThrowIfCancellationRequested();
 
-            var httpChallenge = await authorizationContext.Http();
-
-            cancellationToken.ThrowIfCancellationRequested();
-
-            if (httpChallenge == null)
-            {
-                throw new InvalidOperationException($"Did not receive challenge information for challenge type {ChallengeTypes.Http01}");
-            }
-
-            var keyAuth = httpChallenge.KeyAuthz;
-            _challengeStore.AddChallengeResponse(httpChallenge.Token, keyAuth);
-
-            cancellationToken.ThrowIfCancellationRequested();
-
-            _logger.LogDebug("Requesting completion of challenge to prove ownership of domain {domainName}", domainName);
-
-            var challenge = await httpChallenge.Validate();
+            await PrepareHttpChallengeResponseAsync(authorizationContext, domainName, cancellationToken);
 
             var retries = 60;
             var delay = TimeSpan.FromSeconds(2);
@@ -258,6 +258,29 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             }
 
             throw new TimeoutException("Timed out waiting for domain ownership validation.");
+        }
+
+        private async Task PrepareHttpChallengeResponseAsync(
+            IAuthorizationContext authorizationContext,
+            string domainName,
+            CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var httpChallenge = await authorizationContext.Http();
+            if (httpChallenge == null)
+            {
+                throw new InvalidOperationException($"Did not receive challenge information for challenge type {ChallengeTypes.Http01}");
+            }
+
+            var keyAuth = httpChallenge.KeyAuthz;
+            _challengeStore.AddChallengeResponse(httpChallenge.Token, keyAuth);
+
+            // ensure the server has started before requesting validation of HTTP challenge
+            _logger.LogTrace("Waiting for server to start accepting HTTP requests");
+            await _appStarted.Task;
+
+            await httpChallenge.Validate();
         }
 
         private Exception InvalidAuthorizationError(Authorization authorization)

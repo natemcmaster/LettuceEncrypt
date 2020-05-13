@@ -18,6 +18,7 @@ using Microsoft.Extensions.Options;
 
 #if NETSTANDARD2_0
 using IHostEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
+using IHostApplicationLifetime = Microsoft.Extensions.Hosting.IApplicationLifetime;
 #endif
 
 namespace McMaster.AspNetCore.LetsEncrypt.Internal
@@ -39,7 +40,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
         private readonly TermsOfServiceChecker _tosChecker;
         private readonly IEnumerable<ICertificateRepository> _certificateRepositories;
         private readonly IClock _clock;
-
+        private readonly IHostApplicationLifetime _applicationLifetime;
         private const string ErrorMessage = "Failed to create certificate";
 
         public AcmeCertificateLoader(
@@ -53,6 +54,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             TermsOfServiceChecker tosChecker,
             IEnumerable<ICertificateRepository> certificateRepositories,
             IClock clock,
+            IHostApplicationLifetime applicationLifetime,
             IAccountStore? accountStore = default)
         {
             _selector = selector;
@@ -66,6 +68,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             _tosChecker = tosChecker;
             _certificateRepositories = certificateRepositories;
             _clock = clock;
+            _applicationLifetime = applicationLifetime;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -141,7 +144,8 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
                 _challengeStore,
                 _accountStore,
                 _logger,
-                _hostEnvironment);
+                _hostEnvironment,
+                _applicationLifetime);
 
             var account = await factory.GetOrCreateAccountAsync(cancellationToken);
             _logger.LogInformation("Using Let's Encrypt account {accountId}", account.Id);
