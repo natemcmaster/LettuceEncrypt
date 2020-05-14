@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Azure;
 using Azure.Identity;
 using Azure.Security.KeyVault.Certificates;
+using Azure.Security.KeyVault.Secrets;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -18,14 +19,17 @@ namespace McMaster.AspNetCore.LetsEncrypt
     {
         private readonly IOptions<LetsEncryptOptions> _encryptOptions;
         private readonly ILogger<AzureKeyVaultCertificateRepository> _logger;
-        private readonly CertificateClient _client;
+        private readonly CertificateClient _certificateClient;
+        private readonly SecretClient _secretClient;
 
         public AzureKeyVaultCertificateRepository(
-            CertificateClient client,
+            CertificateClient certificateClient,
+            SecretClient secretClient,
             IOptions<LetsEncryptOptions> encryptOptions,
             ILogger<AzureKeyVaultCertificateRepository> logger)
         {
-            _client = client ?? throw new ArgumentNullException(nameof(client));
+            _certificateClient = certificateClient ?? throw new ArgumentNullException(nameof(certificateClient));
+            _secretClient = secretClient ?? throw new ArgumentNullException(nameof(secretClient));
             _encryptOptions = encryptOptions ?? throw new ArgumentNullException(nameof(encryptOptions));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -34,7 +38,7 @@ namespace McMaster.AspNetCore.LetsEncrypt
             IOptions<LetsEncryptOptions> encryptOptions,
             IOptions<AzureKeyVaultCertificateRepositoryOptions> options,
             ILogger<AzureKeyVaultCertificateRepository> logger)
-            : this(CreateClient(options), encryptOptions, logger)
+            : this(CreateCertificateClient(options), CreateSecretClient(options), encryptOptions, logger)
         {
         }
 
@@ -62,9 +66,10 @@ namespace McMaster.AspNetCore.LetsEncrypt
             try
             {
                 var normalizedName = NormalizeHostName(domain);
-                var certificate = await _client.GetCertificateAsync(normalizedName, token);
 
-                return new X509Certificate2(certificate.Value.Cer);
+                var certificate = await _secretClient.GetSecretAsync(normalizedName, null, token);
+
+                return new X509Certificate2(Convert.FromBase64String(certificate.Value.Value));
             }
             catch (RequestFailedException ex) when (ex.Status == 404)
             {
@@ -100,7 +105,7 @@ namespace McMaster.AspNetCore.LetsEncrypt
 
             try
             {
-                await _client.ImportCertificateAsync(options, cancellationToken);
+                await _certificateClient.ImportCertificateAsync(options, cancellationToken);
 
                 _logger.LogInformation("Imported certificate into Azure KeyVault for {Domain}", domainName);
             }
@@ -128,7 +133,7 @@ namespace McMaster.AspNetCore.LetsEncrypt
         /// </summary>
         internal static string NormalizeHostName(string hostName) => hostName.Replace(".", "-");
 
-        private static CertificateClient CreateClient(IOptions<AzureKeyVaultCertificateRepositoryOptions> options)
+        private static CertificateClient CreateCertificateClient(IOptions<AzureKeyVaultCertificateRepositoryOptions> options)
         {
             if (options is null)
             {
@@ -146,6 +151,25 @@ namespace McMaster.AspNetCore.LetsEncrypt
             var credentials = value.Credentials ?? new DefaultAzureCredential();
 
             return new CertificateClient(vaultUri, credentials);
+        }
+        private static SecretClient CreateSecretClient(IOptions<AzureKeyVaultCertificateRepositoryOptions> options)
+        {
+            if (options is null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
+            var value = options.Value;
+
+            if (string.IsNullOrEmpty(value.AzureKeyVaultEndpoint))
+            {
+                throw new ArgumentException("Missing required option: AzureKeyVaultEndpoint");
+            }
+
+            var vaultUri = new Uri(value.AzureKeyVaultEndpoint);
+            var credentials = value.Credentials ?? new DefaultAzureCredential();
+
+            return new SecretClient(vaultUri, credentials);
         }
     }
 }

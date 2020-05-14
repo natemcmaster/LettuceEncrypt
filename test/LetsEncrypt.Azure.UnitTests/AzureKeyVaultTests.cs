@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Azure.Security.KeyVault.Certificates;
+using Azure.Security.KeyVault.Secrets;
 using McMaster.AspNetCore.LetsEncrypt;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -66,7 +67,8 @@ namespace LetsEncrypt.Azure.UnitTests
             const string Domain1 = "https://github.com";
             const string Domain2 = "https://azure.com";
 
-            var client = new Mock<CertificateClient>();
+            var certclient = new Mock<CertificateClient>();
+            var secretclient = new Mock<SecretClient>();
             var logger = new Mock<ILogger<AzureKeyVaultCertificateRepository>>();
             var options = new Mock<IOptions<LetsEncryptOptions>>();
 
@@ -75,14 +77,17 @@ namespace LetsEncrypt.Azure.UnitTests
                 DomainNames = new[] { Domain1, Domain2 }
             });
 
-            var repository = new AzureKeyVaultCertificateRepository(client.Object, options.Object, logger.Object);
+            var repository = new AzureKeyVaultCertificateRepository(certclient.Object, secretclient.Object, options.Object, logger.Object);
 
             var certificates = await repository.GetCertificatesAsync(CancellationToken.None);
 
             Assert.Empty(certificates);
 
-            client.Verify(t => t.GetCertificateAsync(AzureKeyVaultCertificateRepository.NormalizeHostName(Domain1), CancellationToken.None));
-            client.Verify(t => t.GetCertificateAsync(AzureKeyVaultCertificateRepository.NormalizeHostName(Domain2), CancellationToken.None));
+            certclient.Verify(t => t.GetCertificateAsync(AzureKeyVaultCertificateRepository.NormalizeHostName(Domain1), CancellationToken.None));
+            certclient.Verify(t => t.GetCertificateAsync(AzureKeyVaultCertificateRepository.NormalizeHostName(Domain2), CancellationToken.None));
+
+            secretclient.Verify(t => t.GetSecretAsync(AzureKeyVaultCertificateRepository.NormalizeHostName(Domain1), null, CancellationToken.None));
+            secretclient.Verify(t => t.GetSecretAsync(AzureKeyVaultCertificateRepository.NormalizeHostName(Domain2), null, CancellationToken.None));
         }
     }
 }
