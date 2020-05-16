@@ -48,8 +48,10 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             _challengeCerts.TryRemove(domainName, out _);
         }
 
-        private static void AddWithDomainName(ConcurrentDictionary<string, X509Certificate2> certs, string domainName, X509Certificate2 certificate)
+        private void AddWithDomainName(ConcurrentDictionary<string, X509Certificate2> certs, string domainName, X509Certificate2 certificate)
         {
+            PreloadIntermediateCertificates(certificate);
+
             certs.AddOrUpdate(
                 domainName,
                 certificate,
@@ -103,6 +105,26 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
         public bool TryGet(string domainName, out X509Certificate2? certificate)
         {
             return _certs.TryGetValue(domainName, out certificate);
+        }
+
+        private void PreloadIntermediateCertificates(X509Certificate2 certificate)
+        {
+            using var chain = new X509Chain
+            {
+                ChainPolicy =
+                {
+                    RevocationMode = X509RevocationMode.NoCheck
+                }
+            };
+
+            if (chain.Build(certificate))
+            {
+                _logger.LogTrace("Successfully built certificate chain");
+            }
+            else
+            {
+                _logger.LogWarning("Was not able to build certificate chain. This can cause an outage of your app.");
+            }
         }
     }
 }
