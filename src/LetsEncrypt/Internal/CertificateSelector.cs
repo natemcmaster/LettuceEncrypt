@@ -79,7 +79,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
                 {
                     _logger.LogTrace("Using ALPN challenge cert for {domainName}", domainName);
 
-                    return challengeCert;
+                    return PreloadIntermediateCertificates(challengeCert);
                 }
             }
 #elif NETSTANDARD2_0
@@ -89,7 +89,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
 
             if (domainName == null || !_certs.TryGetValue(domainName, out var retVal))
             {
-                return _options.Value.FallbackCertificate;
+                return PreloadIntermediateCertificates(_options.Value.FallbackCertificate);
             }
 
             return retVal;
@@ -103,6 +103,33 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
         public bool TryGet(string domainName, out X509Certificate2? certificate)
         {
             return _certs.TryGetValue(domainName, out certificate);
+        }
+
+        private X509Certificate2? PreloadIntermediateCertificates(X509Certificate2? certificate)
+        {
+            if (certificate == null)
+            {
+                return null;
+            }
+
+            using var chain = new X509Chain
+            {
+                ChainPolicy =
+                {
+                    RevocationMode = X509RevocationMode.NoCheck
+                }
+            };
+
+            if (chain.Build(certificate))
+            {
+                _logger.LogTrace("Successfully built certificate chain");
+            }
+            else
+            {
+                _logger.LogWarning("Was not able to build certificate chain. This can cause an outage of your app.");
+            }
+
+            return certificate;
         }
     }
 }
