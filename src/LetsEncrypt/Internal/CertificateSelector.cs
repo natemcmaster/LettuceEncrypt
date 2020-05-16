@@ -48,8 +48,10 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             _challengeCerts.TryRemove(domainName, out _);
         }
 
-        private static void AddWithDomainName(ConcurrentDictionary<string, X509Certificate2> certs, string domainName, X509Certificate2 certificate)
+        private void AddWithDomainName(ConcurrentDictionary<string, X509Certificate2> certs, string domainName, X509Certificate2 certificate)
         {
+            PreloadIntermediateCertificates(certificate);
+
             certs.AddOrUpdate(
                 domainName,
                 certificate,
@@ -79,7 +81,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
                 {
                     _logger.LogTrace("Using ALPN challenge cert for {domainName}", domainName);
 
-                    return PreloadIntermediateCertificates(challengeCert);
+                    return challengeCert;
                 }
             }
 #elif NETSTANDARD2_0
@@ -89,7 +91,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
 
             if (domainName == null || !_certs.TryGetValue(domainName, out var retVal))
             {
-                return PreloadIntermediateCertificates(_options.Value.FallbackCertificate);
+                return _options.Value.FallbackCertificate;
             }
 
             return retVal;
@@ -105,13 +107,8 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             return _certs.TryGetValue(domainName, out certificate);
         }
 
-        private X509Certificate2? PreloadIntermediateCertificates(X509Certificate2? certificate)
+        private void PreloadIntermediateCertificates(X509Certificate2 certificate)
         {
-            if (certificate == null)
-            {
-                return null;
-            }
-
             using var chain = new X509Chain
             {
                 ChainPolicy =
@@ -128,8 +125,6 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
             {
                 _logger.LogWarning("Was not able to build certificate chain. This can cause an outage of your app.");
             }
-
-            return certificate;
         }
     }
 }
