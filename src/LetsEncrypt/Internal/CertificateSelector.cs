@@ -109,6 +109,7 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
 
         private void PreloadIntermediateCertificates(X509Certificate2 certificate)
         {
+            // workaround for https://github.com/dotnet/aspnetcore/issues/21183
             using var chain = new X509Chain
             {
                 ChainPolicy =
