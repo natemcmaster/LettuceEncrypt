@@ -1,3 +1,14 @@
+McMaster.AspNetCore.LetsEncrypt.Accounts.AccountModel
+McMaster.AspNetCore.LetsEncrypt.Accounts.AccountModel.AccountModel() -> void
+McMaster.AspNetCore.LetsEncrypt.Accounts.AccountModel.EmailAddresses.get -> string[]
+McMaster.AspNetCore.LetsEncrypt.Accounts.AccountModel.EmailAddresses.set -> void
+McMaster.AspNetCore.LetsEncrypt.Accounts.AccountModel.Id.get -> int
+McMaster.AspNetCore.LetsEncrypt.Accounts.AccountModel.Id.set -> void
+McMaster.AspNetCore.LetsEncrypt.Accounts.AccountModel.PrivateKey.get -> byte[]
+McMaster.AspNetCore.LetsEncrypt.Accounts.AccountModel.PrivateKey.set -> void
+McMaster.AspNetCore.LetsEncrypt.Accounts.IAccountStore
+McMaster.AspNetCore.LetsEncrypt.Accounts.IAccountStore.GetAccountAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<McMaster.AspNetCore.LetsEncrypt.Accounts.AccountModel>
+McMaster.AspNetCore.LetsEncrypt.Accounts.IAccountStore.SaveAccountAsync(McMaster.AspNetCore.LetsEncrypt.Accounts.AccountModel account, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task
 McMaster.AspNetCore.LetsEncrypt.FileSystemStorageExtensions
 McMaster.AspNetCore.LetsEncrypt.ICertificateRepository
 McMaster.AspNetCore.LetsEncrypt.ICertificateRepository.SaveAsync(System.Security.Cryptography.X509Certificates.X509Certificate2 certificate, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task
@@ -22,6 +33,10 @@ McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.FallbackCertificate.set -> vo
 McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.KeyAlgorithm.get -> McMaster.AspNetCore.LetsEncrypt.KeyAlgorithm
 McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.KeyAlgorithm.set -> void
 McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.LetsEncryptOptions() -> void
+McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.RenewalCheckPeriod.get -> System.TimeSpan?
+McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.RenewalCheckPeriod.set -> void
+McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.RenewDaysInAdvance.get -> System.TimeSpan?
+McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.RenewDaysInAdvance.set -> void
 McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.UseStagingServer.get -> bool
 McMaster.AspNetCore.LetsEncrypt.LetsEncryptOptions.UseStagingServer.set -> void
 Microsoft.Extensions.DependencyInjection.LetsEncryptServiceCollectionExtensions
