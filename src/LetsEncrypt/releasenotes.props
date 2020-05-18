@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup>
-    <PackageReleaseNotes Condition="'$(VersionPrefix)' == '0.5.0'">
+    <PackageReleaseNotes Condition="$(VersionPrefix.StartsWith('0.5.'))">
 Features:
 
 * @mbican: Automatically renew certificates 30 days before expiration (PR #73)
@@ -9,8 +9,14 @@ Features:
 
 Fixes:
 
+0.5.0
+
 * @natemcmaster: fix bug in responding to HTTP challenges (PR #74)
 * @dv00d00: workaround dotnet/aspnetcore#21183 by preloading intermediate CA certificates (PR #81)
+
+0.5.1
+
+* @natemcmaster: ensure failure in one cert repository doesn't prevent saving the cert to others (PR #82)
     </PackageReleaseNotes>
     <PackageReleaseNotes Condition="'$(VersionPrefix)' == '0.4.0'">
 Features:

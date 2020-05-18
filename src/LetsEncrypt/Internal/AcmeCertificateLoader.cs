@@ -182,12 +182,27 @@ namespace McMaster.AspNetCore.LetsEncrypt.Internal
                 Task.Delay(TimeSpan.FromMinutes(5), cancellationToken)
             };
 
+            var errors = new List<Exception>();
             foreach (var repo in _certificateRepositories)
             {
-                saveTasks.Add(repo.SaveAsync(cert, cancellationToken));
+                try
+                {
+                    saveTasks.Add(repo.SaveAsync(cert, cancellationToken));
+                }
+                catch (Exception ex)
+                {
+                    // synchronous saves may fail immediatedly
+                    errors.Add(ex);
+                    continue;
+                }
             }
 
             await Task.WhenAll(saveTasks);
+
+            if (errors.Count > 0)
+            {
+                throw new AggregateException("Failed to save cert to repositories", errors);
+            }
         }
 
         private async Task MonitorRenewal(CancellationToken cancellationToken)
