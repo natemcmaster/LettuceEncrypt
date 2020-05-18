@@ -48,7 +48,7 @@ namespace McMaster.AspNetCore.LetsEncrypt
 
             foreach (var domain in _encryptOptions.Value.DomainNames)
             {
-                var cert = await GetCertificateAsync(domain, cancellationToken);
+                var cert = await GetCertificateWithPrivateKeyAsync(domain, cancellationToken);
 
                 if (cert != null)
                 {
@@ -60,6 +60,33 @@ namespace McMaster.AspNetCore.LetsEncrypt
         }
 
         private async Task<X509Certificate2?> GetCertificateAsync(string domain, CancellationToken token)
+        {
+            _logger.LogInformation("Searching for certificate in KeyVault for {Domain}", domain);
+
+            try
+            {
+                var normalizedName = NormalizeHostName(domain);
+
+                var certificate = await _certificateClient.GetCertificateAsync(normalizedName, token);
+
+                return new X509Certificate2(certificate.Value.Cer);
+            }
+            catch (RequestFailedException ex) when (ex.Status == 404)
+            {
+                _logger.LogWarning("Could not find certificate for {Domain} in Azure KeyVault", domain);
+            }
+            catch (CredentialUnavailableException ex)
+            {
+                _logger.LogError(ex, "Could not retrieve credentials for Azure Key Vault");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error attempting to retrieve certificate for {Domain} from Azure KeyVault. Verify settings and try again.", domain);
+            }
+
+            return null;
+        }
+        private async Task<X509Certificate2?> GetCertificateWithPrivateKeyAsync(string domain, CancellationToken token)
         {
             _logger.LogInformation("Searching for certificate in KeyVault for {Domain}", domain);
 
@@ -99,7 +126,16 @@ namespace McMaster.AspNetCore.LetsEncrypt
                 return;
             }
 
-            var exported = certificate.Export(X509ContentType.Pfx);
+            byte[] exported;
+            try
+            {
+                exported = certificate.Export(X509ContentType.Pfx);
+            }
+            catch(Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to export {Domain} certificate", domainName);
+                return;
+            }
 
             var options = new ImportCertificateOptions(NormalizeHostName(domainName), exported);
 
