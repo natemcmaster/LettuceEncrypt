@@ -42,7 +42,6 @@ namespace LetsEncrypt.Azure.UnitTests
             var request = new CertificateRequest(distinguishedName, rsa, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
 
             var certificate = request.CreateSelfSigned(new DateTimeOffset(DateTime.UtcNow.AddDays(-1)), new DateTimeOffset(DateTime.UtcNow.AddDays(1)));
-            certificate.FriendlyName = CN;
             var exportedCertficiate = new X509Certificate2(certificate.Export(X509ContentType.Pfx, "p@ssw0rd"), "p@ssw0rd", X509KeyStorageFlags.Exportable);
             return exportedCertficiate;
         }
