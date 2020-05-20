@@ -17,6 +17,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\LetsEncrypt.Azure\McMaster.AspNetCore.LetsEncrypt.Azure.csproj" />
     <ProjectReference Include="..\..\src\LetsEncrypt\McMaster.AspNetCore.LetsEncrypt.csproj" />
+    <ProjectReference Include="..\LetsEncrypt.UnitTests\LetsEncrypt.UnitTests.csproj" />
   </ItemGroup>
 
 </Project>
