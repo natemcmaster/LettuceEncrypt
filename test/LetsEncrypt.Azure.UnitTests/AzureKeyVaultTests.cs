@@ -96,9 +96,7 @@ namespace LetsEncrypt.Azure.UnitTests
             var certclient = new Mock<CertificateClient>();
             var secretclient = new Mock<SecretClient>();
             var logger = new Mock<ILogger<AzureKeyVaultCertificateRepository>>();
-            var options = new Mock<IOptions<LetsEncryptOptions>>();
-
-            options.Setup(o => o.Value).Returns(new LetsEncryptOptions
+            var options = Options.Create(new LetsEncryptOptions
             {
                 DomainNames = new[] { Domain1, Domain2 }
             });
@@ -142,4 +140,3 @@ namespace LetsEncrypt.Azure.UnitTests
         }
     }
 }
-
