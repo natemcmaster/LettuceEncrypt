@@ -5,8 +5,6 @@ param(
     $Configuration = $null,
     [switch]
     $ci,
-    [switch]
-    $sign,
     [Parameter(ValueFromRemainingArguments = $true)]
     [string[]]$MSBuildArgs
 )
@@ -37,11 +35,6 @@ if ($ci) {
 $isPr = $env:APPVEYOR_PULL_REQUEST_HEAD_COMMIT -or ($env:BUILD_REASON -eq 'PullRequest')
 if (-not (Test-Path variable:\IsCoreCLR)) {
     $IsWindows = $true
-}
-
-$CodeSign = $sign -or ($ci -and -not $isPr -and $IsWindows)
-if ($CodeSign) {
-    $MSBuildArgs += '-p:CodeSign=true'
 }
 
 $artifacts = "$PSScriptRoot/artifacts/"
