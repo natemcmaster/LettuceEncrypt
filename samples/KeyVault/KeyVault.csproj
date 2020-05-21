@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\LetsEncrypt.Azure\McMaster.AspNetCore.LetsEncrypt.Azure.csproj" />
-    <ProjectReference Include="..\..\src\LetsEncrypt\McMaster.AspNetCore.LetsEncrypt.csproj" />
+    <ProjectReference Include="..\..\src\LettuceEncrypt.Azure\LettuceEncrypt.Azure.csproj" />
+    <ProjectReference Include="..\..\src\LettuceEncrypt\LettuceEncrypt.csproj" />
   </ItemGroup>
 </Project>
