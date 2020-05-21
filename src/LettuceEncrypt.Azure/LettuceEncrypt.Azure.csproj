@@ -5,7 +5,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Nullable>enable</Nullable>
     <IsPackable>true</IsPackable>
-    <Description>Provides API for configuring ASP.NET Core to automaticaly generate HTTPS certificates and store them in Azure Key Vault.</Description>
+    <Description>Provides API for configuring ASP.NET Core to automatically generate HTTPS certificates and store them in Azure Key Vault.</Description>
     <PackageDescription>$(Description)
 
 See https://nuget.org/packages/LettuceEncrypt for more details.

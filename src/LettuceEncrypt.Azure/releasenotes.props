@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup>
     <PackageReleaseNotes Condition="'$(VersionPrefix)' == '1.0.0'">
-First release! This is 100% the same as LettuceEncrypt 0.5.0, but has been rebranded with a new name.
+First release! This is basically the same as McMaster.AspNetCore.LetsEncrypt.Azure 0.5.0, but has been renamed.
 
 See https://github.com/natemcmaster/LettuceEncrypt/#Usage for instructions.
     </PackageReleaseNotes>

@@ -13,7 +13,7 @@ namespace LettuceEncrypt.Internal
         {
             return app =>
             {
-                app.UseLettuceEncryptDomainVerification();
+                app.UseHttpChallengeResponseMiddleware();
                 next(app);
             };
         }

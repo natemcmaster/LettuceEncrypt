@@ -15,7 +15,7 @@ namespace Microsoft.AspNetCore.Builder
         /// </summary>
         /// <param name="app">The application builder</param>
         /// <returns>The application builder</returns>
-        public static IApplicationBuilder UseLettuceEncryptDomainVerification(this IApplicationBuilder app)
+        public static IApplicationBuilder UseHttpChallengeResponseMiddleware(this IApplicationBuilder app)
         {
             app.Map("/.well-known/acme-challenge", mapped =>
             {

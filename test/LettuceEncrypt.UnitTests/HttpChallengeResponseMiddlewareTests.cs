@@ -27,7 +27,7 @@ namespace LettuceEncrypt.UnitTests
                 .BuildServiceProvider(validateScopes: true);
 
             var appBuilder = new ApplicationBuilder(services);
-            appBuilder.UseLettuceEncryptDomainVerification();
+            appBuilder.UseHttpChallengeResponseMiddleware();
 
             var app = appBuilder.Build();
 
@@ -80,7 +80,7 @@ namespace LettuceEncrypt.UnitTests
             var services = servicesCollection.BuildServiceProvider(validateScopes: true);
 
             var appBuilder = new ApplicationBuilder(services);
-            appBuilder.UseLettuceEncryptDomainVerification();
+            appBuilder.UseHttpChallengeResponseMiddleware();
 
             var app = appBuilder.Build();
 

@@ -31,7 +31,7 @@ That depends on [which kind of web server you are using](#web-server-scenarios).
 
 Not sure? [Read "Web Server Scenarios" below for more details.](#web-server-scenarios)
 
-Using :cloud: Azure App Services (aka WebApps)? This library isn't for you, but you can still get free HTTPS certificates. See ["Securing An Azure App Service with Let's Encrypt"](https://www.hanselman.com/blog/SecuringAnAzureAppServiceWebsiteUnderSSLInMinutesWithLettuceEncrypt.aspx) by Scott Hanselman for more details.
+Using :cloud: Azure App Services (aka WebApps)? This library isn't for you, but you can still get free HTTPS certificates. See ["Securing An Azure App Service with Let's Encrypt"](https://www.hanselman.com/blog/SecuringAnAzureAppServiceWebsiteUnderSSLInMinutesWithLetsEncrypt.aspx) by Scott Hanselman for more details.
 
 ## Usage
 
