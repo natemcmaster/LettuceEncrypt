@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;netcoreapp3.0</TargetFrameworks>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Nullable>enable</Nullable>
+    <IsPackable>true</IsPackable>
+    <Description>Provides API for configuring ASP.NET Core to automaticaly generate HTTPS certificates and store them in Azure Key Vault.</Description>
+    <PackageDescription>$(Description)
+
+See https://nuget.org/packages/LettuceEncrypt for more details.
+    </PackageDescription>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.0' ">
+    <DefineConstants>$(DefineConstants);FEATURE_VALIDATE_DATA_ANNOTATIONS</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Azure.Identity" Version="1.1.1" />
+    <PackageReference Include="Azure.Security.KeyVault.Certificates" Version="4.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LettuceEncrypt\LettuceEncrypt.csproj" />
+  </ItemGroup>
+
+</Project>

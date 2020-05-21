@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netcoreapp3.0;netstandard2.0</TargetFrameworks>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Nullable>enable</Nullable>
+    <IsPackable>true</IsPackable>
+    <Description>Provides API for configuring ASP.NET Core to automaticaly generate HTTPS certificates.</Description>
+    <PackageDescription>$(Description)
+
+This configures your server to use the ACME protocol to connect with a certificate authority (CA),
+such as Let's Encrypt (https://letsencrypt.org), to verify ownership of your domain name
+and generate a HTTPS certificate. This happens automatically when the server starts up, and will
+renew the certificate automatically when the expiration date is near.
+
+This only works with Kestrel, which is the default server configuration for ASP.NET Core projects. Other servers, such as IIS and nginx, are not supported.
+    </PackageDescription>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="$(PackageIcon)" Pack="true" PackagePath="images/" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Certes" Version="2.3.3" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.0'">
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel.Core" Version="2.1.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.1.0" />
+    <PackageReference Include="System.Text.Json" Version="4.7.1" />
+  </ItemGroup>
+
+</Project>

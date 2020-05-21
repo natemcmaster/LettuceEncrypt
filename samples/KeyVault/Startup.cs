@@ -10,7 +10,7 @@ namespace Web
     {
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddLetsEncrypt()
+            services.AddLettuceEncrypt()
                 .PersistCertificatesToAzureKeyVault(o =>
                 {
                     o.AzureKeyVaultEndpoint = "https://[url].vault.azure.net/";
