@@ -1,9 +1,0 @@
-<Project>
-  <Import Project="..\Directory.Build.props" />
-
-  <PropertyGroup>
-    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)StrongName.snk</AssemblyOriginatorKeyFile>
-    <SignAssembly>true</SignAssembly>
-  </PropertyGroup>
-
-</Project>
