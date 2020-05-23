@@ -1,19 +1,20 @@
-﻿// Copyright (c) Nate McMaster.
+// Copyright (c) Nate McMaster.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
-
-using Azure.Core;
-using Azure.Identity;
 
 #if FEATURE_VALIDATE_DATA_ANNOTATIONS
 using System.ComponentModel.DataAnnotations;
 #endif
 
-namespace LettuceEncrypt
+using Azure.Core;
+using Azure.Identity;
+using LettuceEncrypt.Accounts;
+
+namespace LettuceEncrypt.Azure
 {
     /// <summary>
     /// Options to connect to an Azure KeyVault
     /// </summary>
-    public class AzureKeyVaultCertificateRepositoryOptions
+    public class AzureKeyVaultLettuceEncryptOptions
     {
         /// <summary>
         /// Gets or sets the Url for the KeyVault instance.

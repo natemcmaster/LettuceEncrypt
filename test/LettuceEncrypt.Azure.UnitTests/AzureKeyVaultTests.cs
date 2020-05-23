@@ -21,7 +21,7 @@ namespace LettuceEncrypt.Azure.UnitTests
 {
     public class AzureKeyVaultTests
     {
-        private static void DefaultConfigure(AzureKeyVaultCertificateRepositoryOptions options)
+        private static void DefaultConfigure(AzureKeyVaultLettuceEncryptOptions options)
         {
             options.AzureKeyVaultEndpoint = "http://something";
         }

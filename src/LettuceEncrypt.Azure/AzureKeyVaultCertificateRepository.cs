@@ -13,7 +13,7 @@ using Azure.Security.KeyVault.Secrets;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace LettuceEncrypt
+namespace LettuceEncrypt.Azure
 {
     internal class AzureKeyVaultCertificateRepository : ICertificateRepository, ICertificateSource
     {
@@ -36,7 +36,7 @@ namespace LettuceEncrypt
 
         public AzureKeyVaultCertificateRepository(
             IOptions<LettuceEncryptOptions> encryptOptions,
-            IOptions<AzureKeyVaultCertificateRepositoryOptions> options,
+            IOptions<AzureKeyVaultLettuceEncryptOptions> options,
             ILogger<AzureKeyVaultCertificateRepository> logger)
             : this(CreateCertificateClient(options), CreateSecretClient(options), encryptOptions, logger)
         {
@@ -100,7 +100,7 @@ namespace LettuceEncrypt
             }
             catch (RequestFailedException ex) when (ex.Status == 404)
             {
-                _logger.LogWarning("Could not find certificate for {Domain} in Azure KeyVault", domain);
+                _logger.LogInformation("Could not find certificate for {Domain} in Azure KeyVault", domain);
             }
             catch (CredentialUnavailableException ex)
             {
@@ -169,7 +169,7 @@ namespace LettuceEncrypt
         /// </summary>
         internal static string NormalizeHostName(string hostName) => hostName.Replace(".", "-");
 
-        private static CertificateClient CreateCertificateClient(IOptions<AzureKeyVaultCertificateRepositoryOptions> options)
+        private static CertificateClient CreateCertificateClient(IOptions<AzureKeyVaultLettuceEncryptOptions> options)
         {
             if (options is null)
             {
@@ -188,7 +188,7 @@ namespace LettuceEncrypt
 
             return new CertificateClient(vaultUri, credentials);
         }
-        private static SecretClient CreateSecretClient(IOptions<AzureKeyVaultCertificateRepositoryOptions> options)
+        private static SecretClient CreateSecretClient(IOptions<AzureKeyVaultLettuceEncryptOptions> options)
         {
             if (options is null)
             {

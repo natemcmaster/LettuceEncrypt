@@ -1,16 +1,19 @@
-﻿// Copyright (c) Nate McMaster.
+// Copyright (c) Nate McMaster.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
 using LettuceEncrypt;
+using LettuceEncrypt.Accounts;
+using LettuceEncrypt.Azure;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
+// ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
-    /// Extensions to enable Azure KeyVault connections with LettuceEncrypt.
+    /// Extensions to integrate Azure with LettuceEncrypt.
     /// </summary>
-    public static class AzureKeyVaultExtensions
+    public static class AzureLettuceEncryptExtensions
     {
         /// <summary>
         /// Persists certificates to configured key vault.
@@ -27,14 +30,14 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="configure">Configuration for KeyVault connections.</param>
         /// <returns>The original LettuceEncrypt service builder.</returns>
         public static ILettuceEncryptServiceBuilder PersistCertificatesToAzureKeyVault(this ILettuceEncryptServiceBuilder builder,
-            Action<AzureKeyVaultCertificateRepositoryOptions> configure)
+            Action<AzureKeyVaultLettuceEncryptOptions> configure)
         {
             builder.Services.TryAddSingleton<AzureKeyVaultCertificateRepository>();
             builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<ICertificateRepository, AzureKeyVaultCertificateRepository>(x => x.GetRequiredService<AzureKeyVaultCertificateRepository>()));
             builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<ICertificateSource, AzureKeyVaultCertificateRepository>(x => x.GetRequiredService<AzureKeyVaultCertificateRepository>()));
 
             var options = builder.Services
-                .AddOptions<AzureKeyVaultCertificateRepositoryOptions>()
+                .AddOptions<AzureKeyVaultLettuceEncryptOptions>()
                 .Configure(configure);
 
 #if FEATURE_VALIDATE_DATA_ANNOTATIONS
