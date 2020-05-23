@@ -10,12 +10,14 @@
 [Let's Encrypt]: https://letsencrypt.org/
 
 LettuceEncrypt 🥬 provides API for ASP.NET Core projects to integrate with a certificate authority (CA), such as
-[Let's Encrypt], for free, automatic HTTPS (SSL/TLS) certificate generation using the [ACME] protocol.
+[Let's Encrypt], for free, automatic HTTPS (SSL/TLS) certificates using the [ACME] protocol.
 
-When enabled, your web server will **automatically** generate an HTTPS certificate during start up. It then configures Kestrel to use this certificate for all HTTPS traffic. See [usage instructions below](#usage) to get started.
+When enabled, your web server will **automatically** generate an HTTPS certificate during start up.
+It then configures Kestrel to use this certificate for all HTTPS traffic.
+See [usage instructions below](#usage) to get started.
 
 Created and developed by [@natemcmaster](https://github.com/natemcmaster) with ❤️from Seattle ☕️.
-This project was formerly known as "LetsEncrypt", but has been renamed for
+This project was formerly known as "McMaster.AspNetCore.LetsEncrypt", but has been renamed for
 trademark reasons. This project is **not an official
 offering** from Let's Encrypt® or ISRG™.
 
@@ -27,11 +29,15 @@ This project is 100% organic and best served cold with ranch and carrots.
 
 ## Will this work for me?
 
-That depends on [which kind of web server you are using](#web-server-scenarios). This library only works with [Kestrel](https://docs.microsoft.com/aspnet/core/fundamentals/servers/kestrel), which is the default server configuration for ASP.NET Core projects. Other servers, such as IIS and HTTP.sys, are not supported. Furthermore, this only works when Kestrel is the edge server.
+That depends on [which kind of web server you are using](#web-server-scenarios). This library only works with
+[Kestrel](https://docs.microsoft.com/aspnet/core/fundamentals/servers/kestrel), which is the default server
+configuration for ASP.NET Core projects. Other servers, such as IIS and HTTP.sys, are not supported.
+Furthermore, this only works when Kestrel is the edge server.
 
 Not sure? [Read "Web Server Scenarios" below for more details.](#web-server-scenarios)
 
-Using :cloud: Azure App Services (aka WebApps)? This library isn't for you, but you can still get free HTTPS certificates. See ["Securing An Azure App Service with Let's Encrypt"](https://www.hanselman.com/blog/SecuringAnAzureAppServiceWebsiteUnderSSLInMinutesWithLetsEncrypt.aspx) by Scott Hanselman for more details.
+Using :cloud: Azure App Services (aka WebApps)? This library isn't for you, but you can still get free HTTPS certificates.
+See ["Securing An Azure App Service with Let's Encrypt"](https://www.hanselman.com/blog/SecuringAnAzureAppServiceWebsiteUnderSSLInMinutesWithLetsEncrypt.aspx) by Scott Hanselman for more details.
 
 ## Usage
 
@@ -79,8 +85,12 @@ Multiple storage locations can be configured.
 
 ### Save generated certificates and account information to a directory
 
+This will save and load certificate files (PFX format) using the specified directory.
+It will also save your certificate authority account key into the same directory.
+
 ```c#
 using LettuceEncrypt;
+using Microsoft.Extensions.DependencyInjection;
 
 public void ConfigureServices(IServiceCollection services)
 {
@@ -93,9 +103,12 @@ public void ConfigureServices(IServiceCollection services)
 ### Save generated certificates to Azure Key Vault
 
 Install [LettuceEncrypt.Azure](https://nuget.org/packages/LettuceEncrypt.Azure).
+This will save and load certificate files using an Azure Key Vault.
+
 
 ```c#
 using LettuceEncrypt;
+using Microsoft.Extensions.DependencyInjection;
 
 public void ConfigureServices(IServiceCollection services)
 {
@@ -108,6 +121,76 @@ public void ConfigureServices(IServiceCollection services)
 }
 ```
 
+### Customizing how the certs are saved and loaded
+
+Create a class that implements `ICertificateRepository` to customize how to save your certificates.
+
+Create a class that implements `ICertificateSource` to customize where pre-existing certificates are
+found when the server starts.
+
+```c#
+using LettuceEncrypt;
+using Microsoft.Extensions.DependencyInjection;
+
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddLettuceEncrypt();
+    services.AddSingleton<ICertificateRepository, MyCertRepo>();
+    services.AddSingleton<ICertificateSource, MyCertSource>();
+}
+
+class MyCertRepo : ICertificateRepository
+{
+    public async Task SaveAsync(X509Certificate2 certificate, CancellationToken cancellationToken)
+    {
+        byte[] certData = certificate.Export(X509ContentType.Pfx, "optionallySetPfxPassword");
+        // save this data somehow
+    }
+}
+
+class MyCertSource : ICertificateSource
+{
+    public async Task<IEnumerable<X509Certificate2>> GetCertificatesAsync(CancellationToken cancellationToken);
+    {
+        // find and return certificate objects. Return an empty enumerable if none are found
+    }
+}
+```
+
+### Customizing saving your account key
+
+Your interactions with the certificate authority are encrypted with a private
+key which is generated automatically on first-use. To ensure you can renew certificates
+later using the same account, this account key is saved to disk by default.
+You can customize where this account information is shared by adding your own implementation
+of `IAccountStore`.
+
+```c#
+using LettuceEncrypt;
+using LettuceEncrypt.Accounts;
+
+
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddLettuceEncrypt();
+    services.AddSingleton<IAccountStore, MyAccountStore>();
+}
+
+
+class MyAccountStore: IAccountStore
+{
+    public Task SaveAccountAsync(AccountModel account, CancellationToken cancellationToken)
+    {
+        // save the account object somewhere
+    }
+
+    // add #nullable enable if using c#, or remove the question mark for older versions of C#
+    public Task<AccountModel?> GetAccountAsync(CancellationToken cancellationToken)
+    {
+        // return null if there is no account and one will be created for you
+    }
+}
+```
 
 ## Testing in development
 

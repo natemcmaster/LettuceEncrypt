@@ -6,3 +6,5 @@ bin/
 artifacts/
 *.user
 TestResults/
+.idea/
+*.iml
