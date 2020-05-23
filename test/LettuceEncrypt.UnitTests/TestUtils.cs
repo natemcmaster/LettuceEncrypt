@@ -5,7 +5,7 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace LettuceEncrypt.UnitTests
 {
-    internal class TestUtils
+    public class TestUtils
     {
         public static X509Certificate2 CreateTestCert(string commonName, DateTimeOffset? expires = null)
             => CreateTestCert(new[] { commonName }, expires);

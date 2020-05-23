@@ -17,6 +17,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\LettuceEncrypt.Azure\LettuceEncrypt.Azure.csproj" />
     <ProjectReference Include="..\..\src\LettuceEncrypt\LettuceEncrypt.csproj" />
+    <ProjectReference Include="..\LettuceEncrypt.UnitTests\LettuceEncrypt.UnitTests.csproj" />
   </ItemGroup>
 
 </Project>
