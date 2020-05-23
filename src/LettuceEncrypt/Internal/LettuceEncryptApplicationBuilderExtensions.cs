@@ -3,6 +3,7 @@
 
 using LettuceEncrypt.Internal;
 
+// ReSharper disable once CheckNamespace
 namespace Microsoft.AspNetCore.Builder
 {
     /// <summary>

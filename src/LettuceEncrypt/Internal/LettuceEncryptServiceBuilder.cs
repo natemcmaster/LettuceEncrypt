@@ -4,7 +4,7 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace LettuceEncrypt
+namespace LettuceEncrypt.Internal
 {
     internal class LettuceEncryptServiceBuilder : ILettuceEncryptServiceBuilder
     {
@@ -13,8 +13,6 @@ namespace LettuceEncrypt
             Services = services ?? throw new ArgumentNullException(nameof(services));
         }
 
-
-        /// <inheritdoc />
         public IServiceCollection Services { get; }
     }
 }

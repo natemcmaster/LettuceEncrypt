@@ -17,13 +17,13 @@ namespace LettuceEncrypt.Accounts
         /// <param name="account">All information in this model should round trip with <see cref="GetAccountAsync" />.</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public Task SaveAccountAsync(AccountModel account, CancellationToken cancellationToken);
+        Task SaveAccountAsync(AccountModel account, CancellationToken cancellationToken);
 
         /// <summary>
         /// Fetch account information.
         /// </summary>
         /// <param name="cancellationToken"></param>
         /// <returns>Should return null if no account could be found.</returns>
-        public Task<AccountModel?> GetAccountAsync(CancellationToken cancellationToken);
+        Task<AccountModel?> GetAccountAsync(CancellationToken cancellationToken);
     }
 }

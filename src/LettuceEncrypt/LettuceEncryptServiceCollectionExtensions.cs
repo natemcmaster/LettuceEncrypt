@@ -15,6 +15,7 @@ using Microsoft.Extensions.Options;
 using IHostEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
 #endif
 
+// ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
