@@ -1,21 +1,22 @@
+#nullable enable
 LettuceEncrypt.Accounts.AccountModel
 LettuceEncrypt.Accounts.AccountModel.AccountModel() -> void
-LettuceEncrypt.Accounts.AccountModel.EmailAddresses.get -> string[]
+LettuceEncrypt.Accounts.AccountModel.EmailAddresses.get -> string![]!
 LettuceEncrypt.Accounts.AccountModel.EmailAddresses.set -> void
 LettuceEncrypt.Accounts.AccountModel.Id.get -> int
 LettuceEncrypt.Accounts.AccountModel.Id.set -> void
-LettuceEncrypt.Accounts.AccountModel.PrivateKey.get -> byte[]
+LettuceEncrypt.Accounts.AccountModel.PrivateKey.get -> byte[]!
 LettuceEncrypt.Accounts.AccountModel.PrivateKey.set -> void
 LettuceEncrypt.Accounts.IAccountStore
-LettuceEncrypt.Accounts.IAccountStore.GetAccountAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<LettuceEncrypt.Accounts.AccountModel>
-LettuceEncrypt.Accounts.IAccountStore.SaveAccountAsync(LettuceEncrypt.Accounts.AccountModel account, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task
+LettuceEncrypt.Accounts.IAccountStore.GetAccountAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<LettuceEncrypt.Accounts.AccountModel?>!
+LettuceEncrypt.Accounts.IAccountStore.SaveAccountAsync(LettuceEncrypt.Accounts.AccountModel! account, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task!
 LettuceEncrypt.FileSystemStorageExtensions
 LettuceEncrypt.ICertificateRepository
-LettuceEncrypt.ICertificateRepository.SaveAsync(System.Security.Cryptography.X509Certificates.X509Certificate2 certificate, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task
+LettuceEncrypt.ICertificateRepository.SaveAsync(System.Security.Cryptography.X509Certificates.X509Certificate2! certificate, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task!
 LettuceEncrypt.ICertificateSource
-LettuceEncrypt.ICertificateSource.GetCertificatesAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<System.Security.Cryptography.X509Certificates.X509Certificate2>>
+LettuceEncrypt.ICertificateSource.GetCertificatesAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<System.Security.Cryptography.X509Certificates.X509Certificate2!>!>!
 LettuceEncrypt.ILettuceEncryptServiceBuilder
-LettuceEncrypt.ILettuceEncryptServiceBuilder.Services.get -> Microsoft.Extensions.DependencyInjection.IServiceCollection
+LettuceEncrypt.ILettuceEncryptServiceBuilder.Services.get -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
 LettuceEncrypt.KeyAlgorithm
 LettuceEncrypt.KeyAlgorithm.RS256 = 0 -> LettuceEncrypt.KeyAlgorithm
 LettuceEncrypt.KeyAlgorithm.ES256 = 1 -> LettuceEncrypt.KeyAlgorithm
@@ -24,11 +25,11 @@ LettuceEncrypt.KeyAlgorithm.ES512 = 3 -> LettuceEncrypt.KeyAlgorithm
 LettuceEncrypt.LettuceEncryptOptions
 LettuceEncrypt.LettuceEncryptOptions.AcceptTermsOfService.get -> bool
 LettuceEncrypt.LettuceEncryptOptions.AcceptTermsOfService.set -> void
-LettuceEncrypt.LettuceEncryptOptions.DomainNames.get -> string[]
+LettuceEncrypt.LettuceEncryptOptions.DomainNames.get -> string![]!
 LettuceEncrypt.LettuceEncryptOptions.DomainNames.set -> void
-LettuceEncrypt.LettuceEncryptOptions.EmailAddress.get -> string
+LettuceEncrypt.LettuceEncryptOptions.EmailAddress.get -> string!
 LettuceEncrypt.LettuceEncryptOptions.EmailAddress.set -> void
-LettuceEncrypt.LettuceEncryptOptions.FallbackCertificate.get -> System.Security.Cryptography.X509Certificates.X509Certificate2
+LettuceEncrypt.LettuceEncryptOptions.FallbackCertificate.get -> System.Security.Cryptography.X509Certificates.X509Certificate2?
 LettuceEncrypt.LettuceEncryptOptions.FallbackCertificate.set -> void
 LettuceEncrypt.LettuceEncryptOptions.KeyAlgorithm.get -> LettuceEncrypt.KeyAlgorithm
 LettuceEncrypt.LettuceEncryptOptions.KeyAlgorithm.set -> void
@@ -40,6 +41,6 @@ LettuceEncrypt.LettuceEncryptOptions.RenewDaysInAdvance.set -> void
 LettuceEncrypt.LettuceEncryptOptions.UseStagingServer.get -> bool
 LettuceEncrypt.LettuceEncryptOptions.UseStagingServer.set -> void
 Microsoft.Extensions.DependencyInjection.LettuceEncryptServiceCollectionExtensions
-static LettuceEncrypt.FileSystemStorageExtensions.PersistDataToDirectory(this LettuceEncrypt.ILettuceEncryptServiceBuilder builder, System.IO.DirectoryInfo directory, string pfxPassword) -> LettuceEncrypt.ILettuceEncryptServiceBuilder
-static Microsoft.Extensions.DependencyInjection.LettuceEncryptServiceCollectionExtensions.AddLettuceEncrypt(this Microsoft.Extensions.DependencyInjection.IServiceCollection services) -> LettuceEncrypt.ILettuceEncryptServiceBuilder
-static Microsoft.Extensions.DependencyInjection.LettuceEncryptServiceCollectionExtensions.AddLettuceEncrypt(this Microsoft.Extensions.DependencyInjection.IServiceCollection services, System.Action<LettuceEncrypt.LettuceEncryptOptions> configure) -> LettuceEncrypt.ILettuceEncryptServiceBuilder
+static LettuceEncrypt.FileSystemStorageExtensions.PersistDataToDirectory(this LettuceEncrypt.ILettuceEncryptServiceBuilder! builder, System.IO.DirectoryInfo! directory, string? pfxPassword) -> LettuceEncrypt.ILettuceEncryptServiceBuilder!
+static Microsoft.Extensions.DependencyInjection.LettuceEncryptServiceCollectionExtensions.AddLettuceEncrypt(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services) -> LettuceEncrypt.ILettuceEncryptServiceBuilder!
+static Microsoft.Extensions.DependencyInjection.LettuceEncryptServiceCollectionExtensions.AddLettuceEncrypt(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, System.Action<LettuceEncrypt.LettuceEncryptOptions!>! configure) -> LettuceEncrypt.ILettuceEncryptServiceBuilder!
