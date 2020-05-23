@@ -1,4 +1,4 @@
-// Copyright (c) Nate McMaster.
+﻿// Copyright (c) Nate McMaster.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
@@ -33,6 +33,7 @@ namespace Microsoft.Extensions.DependencyInjection
             Action<AzureKeyVaultLettuceEncryptOptions> configure)
         {
             builder.Services.TryAddSingleton<AzureKeyVaultCertificateRepository>();
+            builder.Services.TryAddSingleton<IAccountStore, AzureKeyVaultAccountStore>();
             builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<ICertificateRepository, AzureKeyVaultCertificateRepository>(x => x.GetRequiredService<AzureKeyVaultCertificateRepository>()));
             builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<ICertificateSource, AzureKeyVaultCertificateRepository>(x => x.GetRequiredService<AzureKeyVaultCertificateRepository>()));
 

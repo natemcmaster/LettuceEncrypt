@@ -104,6 +104,7 @@ public void ConfigureServices(IServiceCollection services)
 
 Install [LettuceEncrypt.Azure](https://nuget.org/packages/LettuceEncrypt.Azure).
 This will save and load certificate files using an Azure Key Vault.
+It will also save your certificate authority account key as a secret in the same vault.
 
 
 ```c#

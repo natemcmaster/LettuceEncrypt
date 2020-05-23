@@ -4,6 +4,8 @@ LettuceEncrypt.Azure.AzureKeyVaultLettuceEncryptOptions.Credentials.get -> Azure
 LettuceEncrypt.Azure.AzureKeyVaultLettuceEncryptOptions.Credentials.set -> void
 LettuceEncrypt.Azure.AzureKeyVaultLettuceEncryptOptions.AzureKeyVaultEndpoint.get -> string
 LettuceEncrypt.Azure.AzureKeyVaultLettuceEncryptOptions.AzureKeyVaultEndpoint.set -> void
+LettuceEncrypt.Azure.AzureKeyVaultLettuceEncryptOptions.AccountKeySecretName.get -> string
+LettuceEncrypt.Azure.AzureKeyVaultLettuceEncryptOptions.AccountKeySecretName.set -> void
 Microsoft.Extensions.DependencyInjection.AzureLettuceEncryptExtensions
 static Microsoft.Extensions.DependencyInjection.AzureLettuceEncryptExtensions.PersistCertificatesToAzureKeyVault(this LettuceEncrypt.ILettuceEncryptServiceBuilder builder) -> LettuceEncrypt.ILettuceEncryptServiceBuilder
 static Microsoft.Extensions.DependencyInjection.AzureLettuceEncryptExtensions.PersistCertificatesToAzureKeyVault(this LettuceEncrypt.ILettuceEncryptServiceBuilder builder, System.Action<LettuceEncrypt.Azure.AzureKeyVaultLettuceEncryptOptions> configure) -> LettuceEncrypt.ILettuceEncryptServiceBuilder
