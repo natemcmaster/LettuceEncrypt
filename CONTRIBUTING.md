@@ -26,6 +26,6 @@ There are more ways to help that don't involve writing code.
 
 Open a GitHub issue if you'd like to help and don't know where to begin.
 
-[watchers]: https://github.com/natemcmaster/LetsEncrypt/watchers
-[closed-stale]: https://github.com/natemcmaster/LetsEncrypt/labels/closed-stale
-[help-wanted]: https://github.com/natemcmaster/LetsEncrypt/labels/help%20wanted
+[watchers]: https://github.com/natemcmaster/LettuceEncrypt/watchers
+[closed-stale]: https://github.com/natemcmaster/LettuceEncrypt/labels/closed-stale
+[help-wanted]: https://github.com/natemcmaster/LettuceEncrypt/labels/help%20wanted

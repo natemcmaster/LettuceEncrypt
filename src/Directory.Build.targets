@@ -9,6 +9,5 @@
   </ItemGroup>
 
   <Import Project="..\Directory.Build.targets" />
-  <Import Project="CodeSign.targets" />
 
 </Project>

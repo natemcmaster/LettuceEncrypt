@@ -6,8 +6,8 @@
     <NeutralLanguage>en-US</NeutralLanguage>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/natemcmaster/LetsEncrypt</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/natemcmaster/LetsEncrypt</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/natemcmaster/LettuceEncrypt</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/natemcmaster/LettuceEncrypt</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <DebugType>portable</DebugType>
@@ -18,10 +18,6 @@
     <LangVersion>8.0</LangVersion>
     <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)src\StrongName.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
-    <AzureKeyVaultUrl>https://nmcmaster.vault.azure.net</AzureKeyVaultUrl>
-    <AzureKeyVaultClientId>6a27a2da-bb78-4baa-bd2b-150fe89ea039</AzureKeyVaultClientId>
-    <AzureKeyVaultClientSecret>$(KEYVAULT_CLIENT_SECRET)</AzureKeyVaultClientSecret>
-    <CodeSignCertName>DigiCertCodeSign</CodeSignCertName>
     <NoWarn>$(NoWarn);NU5105</NoWarn>
     <WarningsNotAsErrors>$(WarningsNotAsErrors);CS1591</WarningsNotAsErrors>
     <IsPackableFalseWarningTask>false</IsPackableFalseWarningTask>
@@ -34,7 +30,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <VersionPrefix>0.5.0</VersionPrefix>
+    <VersionPrefix>1.0.0</VersionPrefix>
     <VersionSuffix>beta</VersionSuffix>
     <IncludePreReleaseLabelInPackageVersion Condition="'$(IsStableBuild)' != 'true'">true</IncludePreReleaseLabelInPackageVersion>
     <BuildNumber Condition=" '$(BuildNumber)' == '' ">$([MSBuild]::ValueOrDefault($(BUILD_NUMBER), 0))</BuildNumber>
