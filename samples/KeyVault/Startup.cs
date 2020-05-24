@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Azure.Identity;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,11 +11,9 @@ namespace Web
     {
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddLettuceEncrypt()
-                .PersistCertificatesToAzureKeyVault(o =>
-                {
-                    o.AzureKeyVaultEndpoint = "https://[url].vault.azure.net/";
-                });
+            services
+                .AddLettuceEncrypt()
+                .PersistCertificatesToAzureKeyVault();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

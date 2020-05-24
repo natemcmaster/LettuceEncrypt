@@ -106,7 +106,6 @@ Install [LettuceEncrypt.Azure](https://nuget.org/packages/LettuceEncrypt.Azure).
 This will save and load certificate files using an Azure Key Vault.
 It will also save your certificate authority account key as a secret in the same vault.
 
-
 ```c#
 using LettuceEncrypt;
 using Microsoft.Extensions.DependencyInjection;
@@ -115,10 +114,23 @@ public void ConfigureServices(IServiceCollection services)
 {
     services
         .AddLettuceEncrypt()
-        .PersistCertificatesToAzureKeyVault(o =>
-        {
-            o.AzureKeyVaultEndpoint = "https://[url].vault.azure.net/";
-        });
+        .PersistCertificatesToAzureKeyVault();
+}
+```
+
+```jsonc
+// appsettings.json
+{
+    "LettuceEncrypt": {
+        "AzureKeyVault": {
+            // Required - specify the name of your key vault
+            "AzureKeyVaultEndpoint": "https://myaccount.vault.azure.net/"
+
+            // Optional - specify the secret name used to store your account info (used for cert rewewals)
+            // If not specified, name defaults to "le-encrypt-${ACME server URL}"
+            "AccountKeySecretName": "my-lets-encrypt-account"
+        }
+    }
 }
 ```
 

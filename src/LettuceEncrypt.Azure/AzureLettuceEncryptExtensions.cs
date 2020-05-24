@@ -1,4 +1,4 @@
-// Copyright (c) Nate McMaster.
+﻿// Copyright (c) Nate McMaster.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
@@ -51,7 +51,14 @@ namespace Microsoft.Extensions.DependencyInjection
                 ServiceDescriptor.Singleton<ICertificateSource, AzureKeyVaultCertificateRepository>(x =>
                     x.GetRequiredService<AzureKeyVaultCertificateRepository>()));
 
-            var options = builder.Services
+            services.AddSingleton<IConfigureOptions<AzureKeyVaultLettuceEncryptOptions>>(s =>
+            {
+                var config = s.GetService<IConfiguration?>();
+                return new ConfigureOptions<AzureKeyVaultLettuceEncryptOptions>(o =>
+                    config?.Bind("LettuceEncrypt:AzureKeyVault", o));
+            });
+
+            var options = services
                 .AddOptions<AzureKeyVaultLettuceEncryptOptions>()
                 .Configure(configure);
 
