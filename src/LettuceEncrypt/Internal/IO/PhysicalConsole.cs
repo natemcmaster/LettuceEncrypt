@@ -8,12 +8,30 @@ namespace LettuceEncrypt.Internal.IO
     internal class PhysicalConsole : IConsole
     {
         public static PhysicalConsole Singleton { get; } = new PhysicalConsole();
-        private PhysicalConsole() { }
+
+        private PhysicalConsole()
+        {
+        }
 
         public bool IsInputRedirected => Console.IsInputRedirected;
-        public ConsoleColor BackgroundColor { get => Console.BackgroundColor; set => Console.BackgroundColor = value; }
-        public ConsoleColor ForegroundColor { get => Console.ForegroundColor; set => Console.ForegroundColor = value; }
-        public bool CursorVisible { get => Console.CursorVisible; set => Console.CursorVisible = value; }
+
+        public ConsoleColor BackgroundColor
+        {
+            get => Console.BackgroundColor;
+            set => Console.BackgroundColor = value;
+        }
+
+        public ConsoleColor ForegroundColor
+        {
+            get => Console.ForegroundColor;
+            set => Console.ForegroundColor = value;
+        }
+
+        public bool CursorVisible
+        {
+            get => Console.CursorVisible;
+            set => Console.CursorVisible = value;
+        }
 
         public void WriteLine(string line) => Console.WriteLine(line);
         public void Write(string line) => Console.Write(line);

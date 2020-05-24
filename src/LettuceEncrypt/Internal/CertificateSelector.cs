@@ -25,7 +25,7 @@ namespace LettuceEncrypt.Internal
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public ICollection<string> SupportedDomains => _certs.Keys;
+        public IEnumerable<string> SupportedDomains => _certs.Keys;
 
         public virtual void Add(X509Certificate2 certificate)
         {

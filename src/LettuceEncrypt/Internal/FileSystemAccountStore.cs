@@ -15,7 +15,7 @@ using Microsoft.Extensions.Options;
 using IHostEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
 #endif
 
-namespace LettuceEncrypt
+namespace LettuceEncrypt.Internal
 {
     internal class FileSystemAccountStore : IAccountStore
     {
@@ -69,15 +69,17 @@ namespace LettuceEncrypt
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             };
 
-            return await JsonSerializer.DeserializeAsync<AccountModel>(fileStream, deserializeOptions, cancellationToken);
+            return await JsonSerializer.DeserializeAsync<AccountModel>(fileStream, deserializeOptions,
+                cancellationToken);
         }
 
         public async Task SaveAccountAsync(AccountModel account, CancellationToken cancellationToken)
         {
             _accountDir.Create();
 
-            var jsonFile = new FileInfo($"{_accountDir.FullName}/{account.Id}.json");
+            var jsonFile = new FileInfo(Path.Combine(_accountDir.FullName, $"{account.Id}.json"));
             _logger.LogDebug("Saving account information to {path}", jsonFile.FullName);
+
             using var writeStream = jsonFile.OpenWrite();
             var serializerOptions = new JsonSerializerOptions
             {

@@ -35,15 +35,16 @@ namespace LettuceEncrypt.UnitTests
         }
 
         [SkippableFact]
-        [SkipOnAzurePipelinesWindows(SkipReason = "On Windows in Azure Pipelines, adding certs to store doesn't work for unclear reasons.")]
+        [SkipOnAzurePipelinesWindows(SkipReason =
+            "On Windows in Azure Pipelines, adding certs to store doesn't work for unclear reasons.")]
         public async Task ItFindsCertByCommonNameAsync()
         {
             var commonName = "x509store.read.test.natemcmaster.com";
-            _options.DomainNames = new[] { commonName };
-            using var x509store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
-            x509store.Open(OpenFlags.ReadWrite);
+            _options.DomainNames = new[] {commonName};
+            using var x509Store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
+            x509Store.Open(OpenFlags.ReadWrite);
             var testCert = CreateTestCert(commonName);
-            x509store.Add(testCert);
+            x509Store.Add(testCert);
 
             _output.WriteLine($"Adding cert {testCert.Thumbprint} to My/CurrentUser");
 
@@ -56,13 +57,13 @@ namespace LettuceEncrypt.UnitTests
             }
             finally
             {
-
-                x509store.Remove(testCert);
+                x509Store.Remove(testCert);
             }
         }
 
         [SkippableFact]
-        [SkipOnAzurePipelinesWindows(SkipReason = "On Windows in Azure Pipelines, adding certs to store doesn't work for unclear reasons.")]
+        [SkipOnAzurePipelinesWindows(SkipReason =
+            "On Windows in Azure Pipelines, adding certs to store doesn't work for unclear reasons.")]
         public async Task ItSavesCertificates()
         {
             var commonName = "x509store.save.test.natemcmaster.com";
@@ -96,7 +97,7 @@ namespace LettuceEncrypt.UnitTests
         public async Task ItReturnsEmptyWhenCantFindCertAsync()
         {
             var commonName = "notfound.test.natemcmaster.com";
-            _options.DomainNames = new[] { commonName };
+            _options.DomainNames = new[] {commonName};
             var certs = await _certStore.GetCertificatesAsync(default);
             Assert.Empty(certs);
         }

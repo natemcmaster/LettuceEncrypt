@@ -39,7 +39,6 @@ namespace LettuceEncrypt.Accounts
             }
         }
 
-        [JsonIgnore]
-        internal IKey? Key { get; private set; }
+        [JsonIgnore] internal IKey? Key { get; private set; }
     }
 }

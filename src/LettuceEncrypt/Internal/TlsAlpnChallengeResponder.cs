@@ -22,9 +22,9 @@ namespace LettuceEncrypt.Internal
     {
         // See RFC8737 section 6.1
         private static readonly Oid s_acmeExtensionOid = new Oid("1.3.6.1.5.5.7.1.31");
-        private const string PROTOCOL_NAME = "acme-tls/1";
+        private const string ProtocolName = "acme-tls/1";
 #if NETCOREAPP3_0
-        private static readonly SslApplicationProtocol s_acmeTlsProtocol = new SslApplicationProtocol(PROTOCOL_NAME);
+        private static readonly SslApplicationProtocol s_acmeTlsProtocol = new SslApplicationProtocol(ProtocolName);
 #endif
         private readonly IClock _clock;
         private readonly ILogger<TlsAlpnChallengeResponder> _logger;
@@ -42,7 +42,6 @@ namespace LettuceEncrypt.Internal
         }
 
 #if NETSTANDARD2_0
-
         // TLS ALPN not supported on .NET Standard. Requires .NET Core 3
         public bool IsEnabled => false;
 

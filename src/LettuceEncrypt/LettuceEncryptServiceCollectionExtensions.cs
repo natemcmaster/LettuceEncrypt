@@ -39,7 +39,8 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="services"></param>
         /// <param name="configure">A callback to configure options.</param>
         /// <returns></returns>
-        public static ILettuceEncryptServiceBuilder AddLettuceEncrypt(this IServiceCollection services, Action<LettuceEncryptOptions> configure)
+        public static ILettuceEncryptServiceBuilder AddLettuceEncrypt(this IServiceCollection services,
+            Action<LettuceEncryptOptions> configure)
         {
             services.AddTransient<IConfigureOptions<KestrelServerOptions>, KestrelOptionsSetup>();
 
@@ -58,9 +59,9 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddSingleton<TlsAlpnChallengeResponder>()
                 .AddSingleton<IStartupFilter, HttpChallengeStartupFilter>();
 
-            services.AddSingleton<IConfigureOptions<LettuceEncryptOptions>>(services =>
+            services.AddSingleton<IConfigureOptions<LettuceEncryptOptions>>(s =>
             {
-                var config = services.GetService<IConfiguration?>();
+                var config = s.GetService<IConfiguration?>();
                 return new ConfigureOptions<LettuceEncryptOptions>(options => config?.Bind("LettuceEncrypt", options));
             });
 

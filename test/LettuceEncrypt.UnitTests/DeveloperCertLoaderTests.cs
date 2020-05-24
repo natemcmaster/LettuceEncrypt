@@ -5,9 +5,9 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Xunit;
-
 #if NETCOREAPP2_1
 using IHostEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
+
 #endif
 
 
@@ -25,10 +25,7 @@ namespace LettuceEncrypt.UnitTests
 
             var certs = await loader.GetCertificatesAsync(default);
             Assert.NotEmpty(certs);
-            Assert.All(certs, c =>
-            {
-                Assert.Equal("localhost", c.GetNameInfo(X509NameType.SimpleName, false));
-            });
+            Assert.All(certs, c => { Assert.Equal("localhost", c.GetNameInfo(X509NameType.SimpleName, false)); });
         }
 
         [Fact]

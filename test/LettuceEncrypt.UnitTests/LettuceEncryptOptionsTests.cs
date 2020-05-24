@@ -4,10 +4,10 @@ using LettuceEncrypt;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Hosting.Internal;
 using Xunit;
-
 #if NETCOREAPP2_1
 using IHostEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
 using Environments = Microsoft.Extensions.Hosting.EnvironmentName;
+
 #endif
 
 namespace LettuceEncrypt.UnitTests
@@ -18,16 +18,15 @@ namespace LettuceEncrypt.UnitTests
         {
             return new TheoryData<string, Uri>
             {
-                { Environments.Development,  WellKnownServers.LetsEncryptStagingV2 },
-                { Environments.Staging,  WellKnownServers.LetsEncryptV2 },
-                { Environments.Production,  WellKnownServers.LetsEncryptV2 },
-                { null,  WellKnownServers.LetsEncryptV2 },
+                {Environments.Development, WellKnownServers.LetsEncryptStagingV2},
+                {Environments.Staging, WellKnownServers.LetsEncryptV2},
+                {Environments.Production, WellKnownServers.LetsEncryptV2},
+                {null, WellKnownServers.LetsEncryptV2},
             };
         }
 
         [Theory]
         [MemberData(nameof(EnvironmentToDefaultAcmeServer))]
-
         public void UsesDefaultAcmeServerBasedOnEnvironmentName(string environmentName, Uri acmeServer)
         {
             var env = new HostingEnvironment

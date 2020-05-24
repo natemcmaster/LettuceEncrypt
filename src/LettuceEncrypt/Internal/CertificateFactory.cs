@@ -31,7 +31,7 @@ namespace LettuceEncrypt.Internal
         private readonly IAccountStore _accountRepository;
         private readonly ILogger _logger;
         private readonly TlsAlpnChallengeResponder _tlsAlpnChallengeResponder;
-        private TaskCompletionSource<object?> _appStarted;
+        private readonly TaskCompletionSource<object?> _appStarted;
         private AcmeContext? _context;
         private IAccountContext? _accountContext;
 
@@ -254,7 +254,7 @@ namespace LettuceEncrypt.Internal
                         case AuthorizationStatus.Valid:
                             return;
                         case AuthorizationStatus.Pending:
-                            await Task.Delay(delay);
+                            await Task.Delay(delay, cancellationToken);
                             continue;
                         case AuthorizationStatus.Invalid:
                             throw InvalidAuthorizationError(authorization);
@@ -263,7 +263,7 @@ namespace LettuceEncrypt.Internal
                         case AuthorizationStatus.Expired:
                             throw new InvalidOperationException($"The authorization to verify domainName '{domainName}' has expired.");
                         default:
-                            throw new ArgumentOutOfRangeException("Unexpected response from server while validating domain ownership.");
+                            throw new ArgumentOutOfRangeException("authorization", "Unexpected response from server while validating domain ownership.");
                     }
                 }
 

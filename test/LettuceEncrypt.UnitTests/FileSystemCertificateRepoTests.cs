@@ -5,13 +5,14 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using LettuceEncrypt;
+using LettuceEncrypt.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Hosting.Internal;
 using Xunit;
-
 #if NETCOREAPP2_1
 using IHostEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
+
 #endif
 
 namespace LettuceEncrypt.UnitTests
@@ -83,7 +84,7 @@ namespace LettuceEncrypt.UnitTests
 
             Assert.Single(
                 services.GetServices<ICertificateRepository>()
-                .OfType<FileSystemCertificateRepository>());
+                    .OfType<FileSystemCertificateRepository>());
         }
 
         [Fact]
@@ -121,8 +122,10 @@ namespace LettuceEncrypt.UnitTests
                 .BuildServiceProvider(validateScopes: true);
 
 
-            Assert.Equal(2, provider.GetServices<ICertificateRepository>().OfType<FileSystemCertificateRepository>().Count());
-            Assert.Equal(2, provider.GetServices<ICertificateSource>().OfType<FileSystemCertificateRepository>().Count());
+            Assert.Equal(2,
+                provider.GetServices<ICertificateRepository>().OfType<FileSystemCertificateRepository>().Count());
+            Assert.Equal(2,
+                provider.GetServices<ICertificateSource>().OfType<FileSystemCertificateRepository>().Count());
         }
 
         [Fact]

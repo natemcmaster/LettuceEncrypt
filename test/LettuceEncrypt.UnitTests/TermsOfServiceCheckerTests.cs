@@ -31,7 +31,6 @@ namespace LettuceEncrypt.UnitTests
         [Theory]
         [InlineData("no")]
         [InlineData("N")]
-
         public void InvalidResponse(string response)
         {
             var console = new Mock<IConsole>();

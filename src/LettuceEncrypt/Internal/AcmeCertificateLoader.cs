@@ -79,13 +79,16 @@ namespace LettuceEncrypt.Internal
             if (!(_server is KestrelServer))
             {
                 var serverType = _server.GetType().FullName;
-                _logger.LogWarning("LettuceEncrypt can only be used with Kestrel and is not supported on {serverType} servers. Skipping certificate provisioning.", serverType);
+                _logger.LogWarning(
+                    "LettuceEncrypt can only be used with Kestrel and is not supported on {serverType} servers. Skipping certificate provisioning.",
+                    serverType);
                 return;
             }
 
             if (_config.GetValue<bool>("UseIISIntegration"))
             {
-                _logger.LogWarning("LettuceEncrypt does not work with apps hosting in IIS. IIS does not allow for dynamic HTTPS certificate binding." +
+                _logger.LogWarning(
+                    "LettuceEncrypt does not work with apps hosting in IIS. IIS does not allow for dynamic HTTPS certificate binding." +
                     "Skipping certificate provisioning.");
                 return;
             }
@@ -114,14 +117,13 @@ namespace LettuceEncrypt.Internal
                 }
 
                 await MonitorRenewal(stoppingToken);
-            });
+            }, stoppingToken);
         }
 
         private bool LettuceEncryptDomainNamesWereConfigured()
         {
             return _options.Value.DomainNames
-                .Where(w => !string.Equals("localhost", w, StringComparison.OrdinalIgnoreCase))
-                .Any();
+                .Any(w => !string.Equals("localhost", w, StringComparison.OrdinalIgnoreCase));
         }
 
         private async Task LoadCerts(CancellationToken cancellationToken)
@@ -162,7 +164,8 @@ namespace LettuceEncrypt.Internal
 
                 var cert = await factory.CreateCertificateAsync(cancellationToken);
 
-                _logger.LogInformation("Created certificate {subjectName} ({thumbprint})", cert.Subject, cert.Thumbprint);
+                _logger.LogInformation("Created certificate {subjectName} ({thumbprint})", cert.Subject,
+                    cert.Thumbprint);
 
                 await SaveCertificateAsync(cert, cancellationToken);
             }
@@ -191,9 +194,8 @@ namespace LettuceEncrypt.Internal
                 }
                 catch (Exception ex)
                 {
-                    // synchronous saves may fail immediatedly
+                    // synchronous saves may fail immediately
                     errors.Add(ex);
-                    continue;
                 }
             }
 
@@ -223,8 +225,11 @@ namespace LettuceEncrypt.Internal
                 try
                 {
                     var domainNames = _options.Value.DomainNames;
-                    _logger.LogDebug("Checking certificates' renewals for {hostname}",
-                        domainNames);
+                    if (_logger.IsEnabled(LogLevel.Debug))
+                    {
+                        _logger.LogDebug("Checking certificates' renewals for {hostname}",
+                            string.Join(", ", domainNames));
+                    }
 
                     foreach (var domainName in domainNames)
                     {

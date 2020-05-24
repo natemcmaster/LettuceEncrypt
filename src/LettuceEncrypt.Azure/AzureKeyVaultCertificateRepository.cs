@@ -81,11 +81,14 @@ namespace LettuceEncrypt.Azure
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unexpected error attempting to retrieve certificate for {Domain} from Azure KeyVault. Verify settings and try again.", domain);
+                _logger.LogError(ex,
+                    "Unexpected error attempting to retrieve certificate for {Domain} from Azure KeyVault. Verify settings and try again.",
+                    domain);
             }
 
             return null;
         }
+
         private async Task<X509Certificate2?> GetCertificateWithPrivateKeyAsync(string domain, CancellationToken token)
         {
             _logger.LogInformation("Searching for certificate in KeyVault for {Domain}", domain);
@@ -108,7 +111,9 @@ namespace LettuceEncrypt.Azure
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unexpected error attempting to retrieve certificate for {Domain} from Azure KeyVault. Verify settings and try again.", domain);
+                _logger.LogError(ex,
+                    "Unexpected error attempting to retrieve certificate for {Domain} from Azure KeyVault. Verify settings and try again.",
+                    domain);
             }
 
             return null;
@@ -122,7 +127,9 @@ namespace LettuceEncrypt.Azure
 
             if (!(await ShouldImportVersionAsync(domainName, certificate, cancellationToken)))
             {
-                _logger.LogInformation("Certificate for {Domain} is already up-to-date in Azure KeyVault. Skipping importing.", domainName);
+                _logger.LogInformation(
+                    "Certificate for {Domain} is already up-to-date in Azure KeyVault. Skipping importing.",
+                    domainName);
                 return;
             }
 
@@ -131,7 +138,7 @@ namespace LettuceEncrypt.Azure
             {
                 exported = certificate.Export(X509ContentType.Pfx);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogWarning(ex, "Failed to export {Domain} certificate", domainName);
                 return;
@@ -151,7 +158,8 @@ namespace LettuceEncrypt.Azure
             }
         }
 
-        private async ValueTask<bool> ShouldImportVersionAsync(string domainName, X509Certificate2 certificate, CancellationToken token)
+        private async ValueTask<bool> ShouldImportVersionAsync(string domainName, X509Certificate2 certificate,
+            CancellationToken token)
         {
             using var other = await GetCertificateAsync(domainName, token);
 
@@ -188,6 +196,7 @@ namespace LettuceEncrypt.Azure
 
             return new CertificateClient(vaultUri, credentials);
         }
+
         private static SecretClient CreateSecretClient(IOptions<AzureKeyVaultLettuceEncryptOptions> options)
         {
             if (options is null)

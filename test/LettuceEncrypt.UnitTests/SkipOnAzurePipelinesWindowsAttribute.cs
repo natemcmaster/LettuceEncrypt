@@ -8,7 +8,7 @@ namespace LettuceEncrypt.UnitTests
     internal class SkipOnAzurePipelinesWindowsAttribute : Attribute, ITestCondition
     {
         public bool IsMet => string.IsNullOrEmpty(Environment.GetEnvironmentVariable("TF_BUILD"))
-            || !RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+                             || !RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 
         public string SkipReason { get; set; }
     }

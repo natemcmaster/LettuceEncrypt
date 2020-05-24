@@ -49,10 +49,7 @@ namespace LettuceEncrypt.Tests
 
             var services = new ServiceCollection()
                 .AddSingleton<IConfiguration>(config)
-                .AddLettuceEncrypt(o =>
-                {
-                    o.EmailAddress = "code";
-                })
+                .AddLettuceEncrypt(o => { o.EmailAddress = "code"; })
                 .Services
                 .BuildServiceProvider(true);
 

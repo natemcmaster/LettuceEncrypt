@@ -7,9 +7,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Moq;
 using Xunit;
-
 #if NETCOREAPP2_1
 using ApplicationBuilder = Microsoft.AspNetCore.Builder.Internal.ApplicationBuilder;
+
 #endif
 
 namespace LettuceEncrypt.UnitTests
@@ -53,7 +53,7 @@ namespace LettuceEncrypt.UnitTests
 
             context.Response.Body.Seek(0, SeekOrigin.Begin);
             var reader = new StreamReader(context.Response.Body);
-            var streamText = reader.ReadToEnd();
+            var streamText = await reader.ReadToEndAsync();
 
             Assert.Equal(TokenValue, streamText);
             Assert.Equal("application/octet-stream", context.Response.ContentType);
@@ -61,7 +61,7 @@ namespace LettuceEncrypt.UnitTests
         }
 
         [Fact]
-        public async Task ItForwardsToNextMiddlwareForUnrecognizedChallenge()
+        public async Task ItForwardsToNextMiddlewareForUnrecognizedChallenge()
         {
             var servicesCollection = new ServiceCollection()
                 .AddLogging()

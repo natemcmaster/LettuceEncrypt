@@ -4,7 +4,6 @@
 #if FEATURE_VALIDATE_DATA_ANNOTATIONS
 using System.ComponentModel.DataAnnotations;
 #endif
-
 using Azure.Core;
 using Azure.Identity;
 using LettuceEncrypt.Accounts;
