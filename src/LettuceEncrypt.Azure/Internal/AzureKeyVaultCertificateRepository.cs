@@ -27,7 +27,8 @@ namespace LettuceEncrypt.Azure.Internal
             IOptions<LettuceEncryptOptions> encryptOptions,
             ILogger<AzureKeyVaultCertificateRepository> logger)
         {
-            _certificateClientFactory = certificateClientFactory ?? throw new ArgumentNullException(nameof(_certificateClientFactory));
+            _certificateClientFactory = certificateClientFactory ??
+                                        throw new ArgumentNullException(nameof(_certificateClientFactory));
             _secretClientFactory = secretClientFactory ?? throw new ArgumentNullException(nameof(secretClientFactory));
             _encryptOptions = encryptOptions ?? throw new ArgumentNullException(nameof(encryptOptions));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -50,13 +51,13 @@ namespace LettuceEncrypt.Azure.Internal
             return certs;
         }
 
-        private async Task<X509Certificate2?> GetCertificateAsync(string domain, CancellationToken token)
+        private async Task<X509Certificate2?> GetCertificateAsync(string domainName, CancellationToken token)
         {
-            _logger.LogInformation("Searching for certificate in KeyVault for {Domain}", domain);
+            _logger.LogInformation("Searching for certificate in KeyVault for {domainName}", domainName);
 
             try
             {
-                var normalizedName = NormalizeHostName(domain);
+                var normalizedName = NormalizeHostName(domainName);
                 var certificateClient = _certificateClientFactory.Create();
 
                 var certificate = await certificateClient.GetCertificateAsync(normalizedName, token);
@@ -65,7 +66,7 @@ namespace LettuceEncrypt.Azure.Internal
             }
             catch (RequestFailedException ex) when (ex.Status == 404)
             {
-                _logger.LogWarning("Could not find certificate for {Domain} in Azure KeyVault", domain);
+                _logger.LogWarning("Could not find certificate for {domainName} in Azure KeyVault", domainName);
             }
             catch (CredentialUnavailableException ex)
             {
@@ -74,29 +75,35 @@ namespace LettuceEncrypt.Azure.Internal
             catch (Exception ex)
             {
                 _logger.LogError(ex,
-                    "Unexpected error attempting to retrieve certificate for {Domain} from Azure KeyVault. Verify settings and try again.",
-                    domain);
+                    "Unexpected error attempting to retrieve certificate for {domainName} from Azure KeyVault. Verify settings and try again.",
+                    domainName);
             }
 
             return null;
         }
 
-        private async Task<X509Certificate2?> GetCertificateWithPrivateKeyAsync(string domain, CancellationToken token)
+        private async Task<X509Certificate2?> GetCertificateWithPrivateKeyAsync(string domainName, CancellationToken token)
         {
-            _logger.LogInformation("Searching for certificate in KeyVault for {Domain}", domain);
+            _logger.LogDebug("Searching for certificate in KeyVault for {domainName}", domainName);
 
             try
             {
-                var normalizedName = NormalizeHostName(domain);
+                var normalizedName = NormalizeHostName(domainName);
                 var secretClient = _secretClientFactory.Create();
 
                 var certificate = await secretClient.GetSecretAsync(normalizedName, null, token);
 
-                return new X509Certificate2(Convert.FromBase64String(certificate.Value.Value));
+                var cert = new X509Certificate2(Convert.FromBase64String(certificate.Value.Value));
+
+                _logger.LogInformation(
+                    "Found certificate for {domainName} from Azure Key Vault with thumbprint {thumbprint}",
+                    domainName, cert.Thumbprint);
+
+                return cert;
             }
             catch (RequestFailedException ex) when (ex.Status == 404)
             {
-                _logger.LogInformation("Could not find certificate for {Domain} in Azure KeyVault", domain);
+                _logger.LogInformation("Could not find certificate for {domainName} in Azure KeyVault", domainName);
             }
             catch (CredentialUnavailableException ex)
             {
@@ -105,8 +112,8 @@ namespace LettuceEncrypt.Azure.Internal
             catch (Exception ex)
             {
                 _logger.LogError(ex,
-                    "Unexpected error attempting to retrieve certificate for {Domain} from Azure KeyVault. Verify settings and try again.",
-                    domain);
+                    "Unexpected error attempting to retrieve certificate for {domainName} from Azure KeyVault. Verify settings and try again.",
+                    domainName);
             }
 
             return null;
@@ -116,12 +123,12 @@ namespace LettuceEncrypt.Azure.Internal
         {
             var domainName = certificate.GetNameInfo(X509NameType.DnsName, false);
 
-            _logger.LogInformation("Saving certificate for {Domain} in Azure KeyVault.", domainName);
+            _logger.LogInformation("Saving certificate for {domainName} in Azure KeyVault.", domainName);
 
             if (!(await ShouldImportVersionAsync(domainName, certificate, cancellationToken)))
             {
                 _logger.LogInformation(
-                    "Certificate for {Domain} is already up-to-date in Azure KeyVault. Skipping importing.",
+                    "Certificate for {domainName} is already up-to-date in Azure KeyVault. Skipping importing.",
                     domainName);
                 return;
             }
@@ -133,7 +140,7 @@ namespace LettuceEncrypt.Azure.Internal
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "Failed to export {Domain} certificate", domainName);
+                _logger.LogWarning(ex, "Failed to export {domainName} certificate", domainName);
                 return;
             }
 
@@ -145,11 +152,11 @@ namespace LettuceEncrypt.Azure.Internal
 
                 await certificateClient.ImportCertificateAsync(options, cancellationToken);
 
-                _logger.LogInformation("Imported certificate into Azure KeyVault for {Domain}", domainName);
+                _logger.LogInformation("Imported certificate into Azure KeyVault for {domainName}", domainName);
             }
             catch (RequestFailedException ex)
             {
-                _logger.LogWarning(ex, "Failed to save {Domain} certificate to Azure KeyVault", domainName);
+                _logger.LogWarning(ex, "Failed to save {domainName} certificate to Azure KeyVault", domainName);
             }
         }
 

@@ -43,17 +43,19 @@ namespace LettuceEncrypt.Azure.Internal
         public async Task SaveAccountAsync(AccountModel account, CancellationToken cancellationToken)
         {
             var secretName = GetSecretName();
-            _logger.LogDebug("Saving account information to Azure Key Vault as {secretName}", secretName);
+            _logger.LogTrace("Saving account information to Azure Key Vault as {secretName}", secretName);
             var secretValue = JsonSerializer.Serialize(account);
             try
             {
                 var secretClient = _secretClientFactory.Create();
 
                 await secretClient.SetSecretAsync(secretName, secretValue, cancellationToken);
+                _logger.LogInformation("Saved account information to Azure Key Vault as {secretName}", secretName);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to save account information to Azure Key Vault");
+                _logger.LogError(ex, "Failed to save account information to Azure Key Vault as {secretName}",
+                    secretName);
                 throw;
             }
         }
@@ -61,6 +63,9 @@ namespace LettuceEncrypt.Azure.Internal
         public async Task<AccountModel?> GetAccountAsync(CancellationToken cancellationToken)
         {
             var secretName = GetSecretName();
+
+            _logger.LogTrace("Searching account information to Azure Key Vault in secret {secretName}", secretName);
+
             try
             {
                 var secretClient = _secretClientFactory.Create();

@@ -46,23 +46,26 @@ namespace LettuceEncrypt.Internal
 
         public async Task<AccountModel?> GetAccountAsync(CancellationToken cancellationToken)
         {
-            _logger.LogDebug("Looking for account information in {path}", _accountDir.FullName);
+            _logger.LogTrace("Looking for account information in {path}", _accountDir.FullName);
 
             foreach (var jsonFile in _accountDir.GetFiles("*.json"))
             {
-                var item = await Deserialize(jsonFile, cancellationToken);
-                if (item != null)
+                _logger.LogTrace("Parsing {path} for account info",jsonFile);
+
+                var accountModel = await Deserialize(jsonFile, cancellationToken);
+                if (accountModel != null)
                 {
-                    return item;
+                    _logger.LogDebug("Loaded account information from {path}", _accountDir.FullName);
+                    return accountModel;
                 }
             }
 
+            _logger.LogDebug("Could not find account information in {path}", _accountDir.FullName);
             return default;
         }
 
         private async Task<AccountModel?> Deserialize(FileInfo jsonFile, CancellationToken cancellationToken)
         {
-            using var log = _logger.BeginScope("parsing {filename}", jsonFile.FullName);
             using var fileStream = jsonFile.OpenRead();
             var deserializeOptions = new JsonSerializerOptions
             {
@@ -78,7 +81,7 @@ namespace LettuceEncrypt.Internal
             _accountDir.Create();
 
             var jsonFile = new FileInfo(Path.Combine(_accountDir.FullName, $"{account.Id}.json"));
-            _logger.LogDebug("Saving account information to {path}", jsonFile.FullName);
+            _logger.LogTrace("Saving account information to {path}", jsonFile.FullName);
 
             using var writeStream = jsonFile.OpenWrite();
             var serializerOptions = new JsonSerializerOptions
@@ -86,6 +89,8 @@ namespace LettuceEncrypt.Internal
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             };
             await JsonSerializer.SerializeAsync(writeStream, account, serializerOptions, cancellationToken);
+
+            _logger.LogDebug("Saved account information to {path}", jsonFile.FullName);
         }
     }
 }

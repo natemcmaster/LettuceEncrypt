@@ -33,6 +33,8 @@ namespace LettuceEncrypt.Internal
 
         public virtual void Add(X509Certificate2 certificate)
         {
+            PreloadIntermediateCertificates(certificate);
+
             foreach (var dnsName in X509CertificateHelpers.GetAllDnsNames(certificate))
             {
                 AddWithDomainName(_certs, dnsName, certificate);
@@ -55,11 +57,6 @@ namespace LettuceEncrypt.Internal
         private void AddWithDomainName(ConcurrentDictionary<string, X509Certificate2> certs, string domainName,
             X509Certificate2 certificate)
         {
-            if (domainName != "localhost")
-            {
-                PreloadIntermediateCertificates(certificate);
-            }
-
             certs.AddOrUpdate(
                 domainName,
                 certificate,
@@ -131,20 +128,23 @@ namespace LettuceEncrypt.Internal
                 }
             };
 
+            var commonName = X509CertificateHelpers.GetCommonName(certificate);
             try
             {
                 if (chain.Build(certificate))
                 {
-                    _logger.LogTrace("Successfully built certificate chain");
+                    _logger.LogTrace("Successfully tested certificate chain for {commonName}", commonName);
                     return;
                 }
             }
             catch (CryptographicException ex)
             {
-                _logger.LogTrace(ex, "Failed to validate certificate chain");
+                _logger.LogDebug(ex, "Failed to validate certificate chain for {commonName}", commonName);
             }
 
-            _logger.LogWarning("Failed to validate certificate chain. This could cause an outage of your app.");
+            _logger.LogWarning(
+                "Failed to validate certificate for {commonName} ({thumbprint}). This could cause an outage of your app.",
+                commonName, certificate.Thumbprint);
         }
     }
 }
