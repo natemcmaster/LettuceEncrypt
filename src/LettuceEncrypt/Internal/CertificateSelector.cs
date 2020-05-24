@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
@@ -13,8 +14,11 @@ namespace LettuceEncrypt.Internal
 {
     internal class CertificateSelector
     {
-        private readonly ConcurrentDictionary<string, X509Certificate2> _certs = new ConcurrentDictionary<string, X509Certificate2>(StringComparer.OrdinalIgnoreCase);
-        private readonly ConcurrentDictionary<string, X509Certificate2> _challengeCerts = new ConcurrentDictionary<string, X509Certificate2>(StringComparer.OrdinalIgnoreCase);
+        private readonly ConcurrentDictionary<string, X509Certificate2> _certs =
+            new ConcurrentDictionary<string, X509Certificate2>(StringComparer.OrdinalIgnoreCase);
+
+        private readonly ConcurrentDictionary<string, X509Certificate2> _challengeCerts =
+            new ConcurrentDictionary<string, X509Certificate2>(StringComparer.OrdinalIgnoreCase);
 
         private readonly IOptions<LettuceEncryptOptions> _options;
         private readonly ILogger<CertificateSelector> _logger;
@@ -48,9 +52,13 @@ namespace LettuceEncrypt.Internal
             _challengeCerts.TryRemove(domainName, out _);
         }
 
-        private void AddWithDomainName(ConcurrentDictionary<string, X509Certificate2> certs, string domainName, X509Certificate2 certificate)
+        private void AddWithDomainName(ConcurrentDictionary<string, X509Certificate2> certs, string domainName,
+            X509Certificate2 certificate)
         {
-            PreloadIntermediateCertificates(certificate);
+            if (domainName != "localhost")
+            {
+                PreloadIntermediateCertificates(certificate);
+            }
 
             certs.AddOrUpdate(
                 domainName,
@@ -109,6 +117,11 @@ namespace LettuceEncrypt.Internal
 
         private void PreloadIntermediateCertificates(X509Certificate2 certificate)
         {
+            if (certificate.IsSelfSigned())
+            {
+                return;
+            }
+
             // workaround for https://github.com/dotnet/aspnetcore/issues/21183
             using var chain = new X509Chain
             {
@@ -118,14 +131,20 @@ namespace LettuceEncrypt.Internal
                 }
             };
 
-            if (chain.Build(certificate))
+            try
             {
-                _logger.LogTrace("Successfully built certificate chain");
+                if (chain.Build(certificate))
+                {
+                    _logger.LogTrace("Successfully built certificate chain");
+                    return;
+                }
             }
-            else
+            catch (CryptographicException ex)
             {
-                _logger.LogWarning("Was not able to build certificate chain. This can cause an outage of your app.");
+                _logger.LogTrace(ex, "Failed to validate certificate chain");
             }
+
+            _logger.LogWarning("Failed to validate certificate chain. This could cause an outage of your app.");
         }
     }
 }

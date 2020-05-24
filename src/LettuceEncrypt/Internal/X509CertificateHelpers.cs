@@ -8,12 +8,18 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 
 namespace LettuceEncrypt.Internal
 {
     internal static class X509CertificateHelpers
     {
+        public static bool IsSelfSigned(this X509Certificate2 cert)
+        {
+            return cert.SubjectName.RawData.SequenceEqual(cert.IssuerName.RawData);
+        }
+
         public static IEnumerable<string> GetAllDnsNames(X509Certificate2 certificate)
         {
             yield return GetCommonName(certificate);
