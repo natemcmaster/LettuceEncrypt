@@ -17,7 +17,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 #if NETSTANDARD2_0
-using IHostEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
 using IHostApplicationLifetime = Microsoft.Extensions.Hosting.IApplicationLifetime;
 #endif
 
@@ -34,7 +33,6 @@ namespace LettuceEncrypt.Internal
         private readonly IOptions<LettuceEncryptOptions> _options;
         private readonly ILogger _logger;
 
-        private readonly IHostEnvironment _hostEnvironment;
         private readonly IServer _server;
         private readonly IConfiguration _config;
         private readonly TermsOfServiceChecker _tosChecker;
@@ -42,6 +40,7 @@ namespace LettuceEncrypt.Internal
         private readonly IClock _clock;
         private readonly IHostApplicationLifetime _applicationLifetime;
         private readonly TlsAlpnChallengeResponder _tlsAlpnChallengeResponder;
+        private readonly ICertificateAuthorityProvider _certificateAuthority;
         private const string ErrorMessage = "Failed to create certificate";
 
         public AcmeCertificateLoader(
@@ -49,7 +48,6 @@ namespace LettuceEncrypt.Internal
             IHttpChallengeResponseStore challengeStore,
             IOptions<LettuceEncryptOptions> options,
             ILogger<AcmeCertificateLoader> logger,
-            IHostEnvironment hostEnvironment,
             IServer server,
             IConfiguration config,
             TermsOfServiceChecker tosChecker,
@@ -57,6 +55,7 @@ namespace LettuceEncrypt.Internal
             IClock clock,
             IHostApplicationLifetime applicationLifetime,
             TlsAlpnChallengeResponder tlsAlpnChallengeResponder,
+            ICertificateAuthorityProvider certificateAuthority,
             IAccountStore? accountStore = default)
         {
             _selector = selector;
@@ -64,7 +63,6 @@ namespace LettuceEncrypt.Internal
             _accountStore = accountStore;
             _options = options;
             _logger = logger;
-            _hostEnvironment = hostEnvironment;
             _server = server;
             _config = config;
             _tosChecker = tosChecker;
@@ -72,6 +70,7 @@ namespace LettuceEncrypt.Internal
             _clock = clock;
             _applicationLifetime = applicationLifetime;
             _tlsAlpnChallengeResponder = tlsAlpnChallengeResponder;
+            _certificateAuthority = certificateAuthority;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -149,22 +148,22 @@ namespace LettuceEncrypt.Internal
                 _challengeStore,
                 _accountStore,
                 _logger,
-                _hostEnvironment,
                 _applicationLifetime,
-                _tlsAlpnChallengeResponder);
+                _tlsAlpnChallengeResponder,
+                _certificateAuthority);
 
             var account = await factory.GetOrCreateAccountAsync(cancellationToken);
             _logger.LogInformation("Using account {accountId}", account.Id);
 
             try
             {
-                _logger.LogInformation("Creating certificate for {hostname} using ACME server {acmeServer}",
-                    domainNames,
-                    factory.AcmeServer);
+                _logger.LogInformation("Creating certificate for {hostname}",
+                    string.Join(",", domainNames));
 
                 var cert = await factory.CreateCertificateAsync(cancellationToken);
 
-                _logger.LogInformation("Created certificate {subjectName} ({thumbprint})", cert.Subject,
+                _logger.LogInformation("Created certificate {subjectName} ({thumbprint})",
+                    cert.Subject,
                     cert.Thumbprint);
 
                 await SaveCertificateAsync(cert, cancellationToken);

@@ -7,7 +7,6 @@ using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Certes;
-using LettuceEncrypt;
 using LettuceEncrypt.Accounts;
 using LettuceEncrypt.Internal;
 using Microsoft.Extensions.Hosting;
@@ -15,9 +14,9 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
+
 #if NETCOREAPP2_1
 using IHostEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
-
 #endif
 
 namespace LettuceEncrypt.UnitTests
@@ -105,10 +104,13 @@ namespace LettuceEncrypt.UnitTests
             {
                 UseStagingServer = true
             });
-            return new FileSystemAccountStore(_testDir,
+            var mockCertificateAuthority =
+                new LetsEncryptCertificateAuthorityProvider(Mock.Of<IHostEnvironment>(), options);
+
+            return new FileSystemAccountStore(
+                _testDir,
                 NullLogger<FileSystemAccountStore>.Instance,
-                options,
-                Mock.Of<IHostEnvironment>());
+                mockCertificateAuthority);
         }
     }
 }

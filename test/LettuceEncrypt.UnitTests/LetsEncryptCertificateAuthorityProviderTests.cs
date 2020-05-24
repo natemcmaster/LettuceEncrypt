@@ -1,18 +1,18 @@
 using System;
 using Certes.Acme;
-using LettuceEncrypt;
+using LettuceEncrypt.Internal;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Hosting.Internal;
+using Microsoft.Extensions.Options;
 using Xunit;
-#if NETCOREAPP2_1
-using IHostEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
-using Environments = Microsoft.Extensions.Hosting.EnvironmentName;
 
+#if NETCOREAPP2_1
+using Environments = Microsoft.Extensions.Hosting.EnvironmentName;
 #endif
 
 namespace LettuceEncrypt.UnitTests
 {
-    public class LettuceEncryptOptionsTests
+    public class LetsEncryptCertificateAuthorityProviderTests
     {
         public static TheoryData<string, Uri> EnvironmentToDefaultAcmeServer()
         {
@@ -33,10 +33,13 @@ namespace LettuceEncrypt.UnitTests
             {
                 EnvironmentName = environmentName
             };
+            var provider = new LetsEncryptCertificateAuthorityProvider(
+                env,
+                Options.Create(new LettuceEncryptOptions()));
 
             Assert.Equal(
                 acmeServer,
-                new LettuceEncryptOptions().GetAcmeServer(env));
+                provider.AcmeDirectoryEndpoint);
         }
 
 
@@ -50,23 +53,26 @@ namespace LettuceEncrypt.UnitTests
                 EnvironmentName = environmentName
             };
 
-            var useStaging = new LettuceEncryptOptions
+            var useStaging = Options.Create(new LettuceEncryptOptions
             {
                 UseStagingServer = true,
-            };
+            });
+            var provider = new LetsEncryptCertificateAuthorityProvider(env, useStaging);
 
             Assert.Equal(
                 WellKnownServers.LetsEncryptStagingV2,
-                useStaging.GetAcmeServer(env));
+                provider.AcmeDirectoryEndpoint);
 
-            var useProduction = new LettuceEncryptOptions
+            var useProduction = Options.Create(new LettuceEncryptOptions
             {
                 UseStagingServer = false,
-            };
+            });
+
+            provider = new LetsEncryptCertificateAuthorityProvider(env, useProduction);
 
             Assert.Equal(
                 WellKnownServers.LetsEncryptV2,
-                useProduction.GetAcmeServer(env));
+                provider.AcmeDirectoryEndpoint);
         }
     }
 }

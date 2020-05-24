@@ -8,12 +8,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using LettuceEncrypt.Accounts;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
-
-#if NETSTANDARD2_0
-using IHostEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
-#endif
 
 namespace LettuceEncrypt.Internal
 {
@@ -24,22 +18,20 @@ namespace LettuceEncrypt.Internal
 
         public FileSystemAccountStore(
             ILogger logger,
-            IOptions<LettuceEncryptOptions> options,
-            IHostEnvironment env)
-            : this(new DirectoryInfo(AppContext.BaseDirectory), logger, options, env)
+            ICertificateAuthorityProvider certificateAuthority)
+            : this(new DirectoryInfo(AppContext.BaseDirectory), logger, certificateAuthority)
         {
         }
 
         public FileSystemAccountStore(
             DirectoryInfo rootDirectory,
             ILogger logger,
-            IOptions<LettuceEncryptOptions> options,
-            IHostEnvironment env)
+            ICertificateAuthorityProvider certificateAuthority)
         {
             _logger = logger;
 
             var topAccountDir = rootDirectory.CreateSubdirectory("accounts");
-            var directoryUri = options.Value.GetAcmeServer(env);
+            var directoryUri = certificateAuthority.AcmeDirectoryEndpoint;
             var subPath = Path.Combine(directoryUri.Authority, directoryUri.LocalPath.Substring(1));
             _accountDir = topAccountDir.CreateSubdirectory(subPath);
         }

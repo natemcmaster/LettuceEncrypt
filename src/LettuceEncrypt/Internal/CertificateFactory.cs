@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
@@ -17,7 +18,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 #if NETSTANDARD2_0
-using IHostEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
 using IHostApplicationLifetime = Microsoft.Extensions.Hosting.IApplicationLifetime;
 #endif
 
@@ -29,6 +29,7 @@ namespace LettuceEncrypt.Internal
         private readonly IOptions<LettuceEncryptOptions> _options;
         private readonly IHttpChallengeResponseStore _challengeStore;
         private readonly IAccountStore _accountRepository;
+        private readonly ICertificateAuthorityProvider _certificateAuthority;
         private readonly ILogger _logger;
         private readonly TlsAlpnChallengeResponder _tlsAlpnChallengeResponder;
         private readonly TaskCompletionSource<object?> _appStarted;
@@ -41,15 +42,16 @@ namespace LettuceEncrypt.Internal
             IHttpChallengeResponseStore challengeStore,
             IAccountStore? accountRepository,
             ILogger logger,
-            IHostEnvironment env,
             IHostApplicationLifetime appLifetime,
-            TlsAlpnChallengeResponder tlsAlpnChallengeResponder)
+            TlsAlpnChallengeResponder tlsAlpnChallengeResponder,
+            ICertificateAuthorityProvider certificateAuthority)
         {
             _tosChecker = tosChecker;
             _options = options;
             _challengeStore = challengeStore;
             _logger = logger;
             _tlsAlpnChallengeResponder = tlsAlpnChallengeResponder;
+            _certificateAuthority = certificateAuthority;
 
             _appStarted = new TaskCompletionSource<object?>();
             appLifetime.ApplicationStarted.Register(() => _appStarted.TrySetResult(null));
@@ -58,11 +60,8 @@ namespace LettuceEncrypt.Internal
                 _appStarted.TrySetResult(null);
             }
 
-            _accountRepository = accountRepository ?? new FileSystemAccountStore(logger, options, env);
-            AcmeServer = _options.Value.GetAcmeServer(env);
+            _accountRepository = accountRepository ?? new FileSystemAccountStore(logger, certificateAuthority);
         }
-
-        public Uri AcmeServer { get; }
 
         public async Task<AccountModel> GetOrCreateAccountAsync(CancellationToken cancellationToken)
         {
@@ -72,7 +71,9 @@ namespace LettuceEncrypt.Internal
                 ? KeyFactory.FromDer(account.PrivateKey)
                 : null;
 
-            _context = new AcmeContext(AcmeServer, acmeAccountKey);
+            var directoryUri = _certificateAuthority.AcmeDirectoryEndpoint;
+            _logger.LogInformation("Using certificate authority {directoryUri}", directoryUri);
+            _context = new AcmeContext(directoryUri, acmeAccountKey);
 
             if (account != null && await ExistingAccountIsValidAsync(_context))
             {
@@ -84,7 +85,6 @@ namespace LettuceEncrypt.Internal
 
         private async Task<AccountModel> CreateAccount(CancellationToken cancellationToken)
         {
-
             cancellationToken.ThrowIfCancellationRequested();
             Debug.Assert(_context != null);
 
@@ -105,7 +105,7 @@ namespace LettuceEncrypt.Internal
             var account = new AccountModel
             {
                 Id = accountId,
-                EmailAddresses = new[] { options.EmailAddress },
+                EmailAddresses = new[] {options.EmailAddress},
                 PrivateKey = _context!.AccountKey.ToDer(),
             };
 
@@ -202,7 +202,8 @@ namespace LettuceEncrypt.Internal
             return await CompleteCertificateRequestAsync(orderContext, cancellationToken);
         }
 
-        private IEnumerable<Task> BeginValidateAllAuthorizations(IEnumerable<IAuthorizationContext> authorizations, CancellationToken cancellationToken)
+        private IEnumerable<Task> BeginValidateAllAuthorizations(IEnumerable<IAuthorizationContext> authorizations,
+            CancellationToken cancellationToken)
         {
             foreach (var authorization in authorizations)
             {
@@ -210,7 +211,8 @@ namespace LettuceEncrypt.Internal
             }
         }
 
-        private async Task ValidateDomainOwnershipAsync(IAuthorizationContext authorizationContext, CancellationToken cancellationToken)
+        private async Task ValidateDomainOwnershipAsync(IAuthorizationContext authorizationContext,
+            CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -259,11 +261,14 @@ namespace LettuceEncrypt.Internal
                         case AuthorizationStatus.Invalid:
                             throw InvalidAuthorizationError(authorization);
                         case AuthorizationStatus.Revoked:
-                            throw new InvalidOperationException($"The authorization to verify domainName '{domainName}' has been revoked.");
+                            throw new InvalidOperationException(
+                                $"The authorization to verify domainName '{domainName}' has been revoked.");
                         case AuthorizationStatus.Expired:
-                            throw new InvalidOperationException($"The authorization to verify domainName '{domainName}' has expired.");
+                            throw new InvalidOperationException(
+                                $"The authorization to verify domainName '{domainName}' has expired.");
                         default:
-                            throw new ArgumentOutOfRangeException("authorization", "Unexpected response from server while validating domain ownership.");
+                            throw new ArgumentOutOfRangeException("authorization",
+                                "Unexpected response from server while validating domain ownership.");
                     }
                 }
 
@@ -289,7 +294,8 @@ namespace LettuceEncrypt.Internal
             var httpChallenge = await authorizationContext.Http();
             if (httpChallenge == null)
             {
-                throw new InvalidOperationException($"Did not receive challenge information for challenge type {ChallengeTypes.Http01}");
+                throw new InvalidOperationException(
+                    $"Did not receive challenge information for challenge type {ChallengeTypes.Http01}");
             }
 
             var keyAuth = httpChallenge.KeyAuthz;
@@ -335,12 +341,14 @@ namespace LettuceEncrypt.Internal
                 _logger.LogTrace("Could not determine reason why validation failed. Response: {resp}", authorization);
             }
 
-            _logger.LogError("Failed to validate ownership of domainName '{domainName}'. Reason: {reason}", domainName, reason);
+            _logger.LogError("Failed to validate ownership of domainName '{domainName}'. Reason: {reason}", domainName,
+                reason);
 
             return new InvalidOperationException($"Failed to validate ownership of domainName '{domainName}'");
         }
 
-        private async Task<X509Certificate2> CompleteCertificateRequestAsync(IOrderContext order, CancellationToken cancellationToken)
+        private async Task<X509Certificate2> CompleteCertificateRequestAsync(IOrderContext order,
+            CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             var commonName = _options.Value.DomainNames[0];
@@ -350,7 +358,7 @@ namespace LettuceEncrypt.Internal
             {
                 CommonName = commonName,
             };
-            var privateKey = KeyFactory.NewKey((Certes.KeyAlgorithm)_options.Value.KeyAlgorithm);
+            var privateKey = KeyFactory.NewKey((Certes.KeyAlgorithm) _options.Value.KeyAlgorithm);
             var acmeCert = await order.Generate(csrInfo, privateKey);
 
             _logger.LogAcmeAction("NewCertificate");

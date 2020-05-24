@@ -1,1 +1,3 @@
 #nullable enable
+LettuceEncrypt.ICertificateAuthorityProvider
+LettuceEncrypt.ICertificateAuthorityProvider.AcmeDirectoryEndpoint.get -> System.Uri!

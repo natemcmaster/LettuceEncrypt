@@ -3,12 +3,6 @@
 
 using System;
 using System.Security.Cryptography.X509Certificates;
-using Certes.Acme;
-using Microsoft.Extensions.Hosting;
-
-#if NETSTANDARD2_0
-using IHostEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
-#endif
 
 namespace LettuceEncrypt
 {
@@ -52,21 +46,7 @@ namespace LettuceEncrypt
             set => _useStagingServer = value;
         }
 
-        private bool UseStagingServerExplicitlySet => _useStagingServer.HasValue;
-
-        /// <summary>
-        /// The uri to the server that implements the ACME protocol for certificate generation.
-        /// </summary>
-        internal Uri GetAcmeServer(IHostEnvironment env)
-        {
-            var useStaging = UseStagingServerExplicitlySet
-                ? UseStagingServer
-                : env.IsDevelopment();
-
-            return useStaging
-                ? WellKnownServers.LetsEncryptStagingV2
-                : WellKnownServers.LetsEncryptV2;
-        }
+        internal bool UseStagingServerExplicitlySet => _useStagingServer.HasValue;
 
         /// <summary>
         /// A certificate to use if a certifcates cannot be created automatically.

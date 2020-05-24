@@ -6,38 +6,29 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure;
-using Azure.Security.KeyVault.Secrets;
 using LettuceEncrypt.Accounts;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-
-#if NETSTANDARD2_0
-using IHostEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
-#endif
 
 namespace LettuceEncrypt.Azure.Internal
 {
     internal class AzureKeyVaultAccountStore : IAccountStore
     {
         private readonly ILogger<AzureKeyVaultAccountStore> _logger;
-        private readonly IOptions<AzureKeyVaultLettuceEncryptOptions> _akOptions;
-        private readonly IOptions<LettuceEncryptOptions> _leOptions;
-        private readonly IHostEnvironment _env;
+        private readonly IOptions<AzureKeyVaultLettuceEncryptOptions> _options;
+        private readonly ICertificateAuthorityProvider _certificateAuthority;
         private readonly ISecretClientFactory _secretClientFactory;
 
         public AzureKeyVaultAccountStore(
             ILogger<AzureKeyVaultAccountStore> logger,
-            IOptions<AzureKeyVaultLettuceEncryptOptions> akOptions,
-            IOptions<LettuceEncryptOptions> leOptions,
-            IHostEnvironment env,
-            ISecretClientFactory secretClientFactory)
+            IOptions<AzureKeyVaultLettuceEncryptOptions> options,
+            ISecretClientFactory secretClientFactory,
+            ICertificateAuthorityProvider certificateAuthority)
         {
             _logger = logger;
-            _akOptions = akOptions;
-            _leOptions = leOptions;
-            _env = env;
+            _options = options;
             _secretClientFactory = secretClientFactory;
+            _certificateAuthority = certificateAuthority;
         }
 
         public async Task SaveAccountAsync(AccountModel account, CancellationToken cancellationToken)
@@ -96,14 +87,14 @@ namespace LettuceEncrypt.Azure.Internal
             const int MaxLength = 127;
             string name;
 
-            var options = _akOptions.Value;
+            var options = _options.Value;
             if (!string.IsNullOrEmpty(options.AccountKeySecretName))
             {
                 name = options.AccountKeySecretName!;
             }
             else
             {
-                var acmeServer = _leOptions.Value.GetAcmeServer(_env);
+                var acmeServer = _certificateAuthority.AcmeDirectoryEndpoint;
                 name = acmeServer.Host;
             }
 

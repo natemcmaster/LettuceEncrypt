@@ -1,24 +1,30 @@
+using System;
 using System.Threading.Tasks;
 using Azure;
 using Azure.Security.KeyVault.Secrets;
 using Certes;
 using LettuceEncrypt.Accounts;
 using LettuceEncrypt.Azure.Internal;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Hosting.Internal;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
 
-#if NETCOREAPP2_1
-using IHostEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
-#endif
 
 namespace LettuceEncrypt.Azure.UnitTests
 {
     public class AzureKeyVaultAccountStoreTests
     {
+        private ICertificateAuthorityProvider _mockCertificateAuthority;
+
+        public AzureKeyVaultAccountStoreTests()
+        {
+            var mock = new Mock<ICertificateAuthorityProvider>();
+            mock.Setup(g => g.AcmeDirectoryEndpoint)
+                .Returns(new Uri("https://acme-v02.api.letsencrypt.org/directory"));
+            _mockCertificateAuthority = mock.Object;
+        }
+
         [Fact]
         public async Task StoresAccountAsJsonSecret()
         {
@@ -27,9 +33,8 @@ namespace LettuceEncrypt.Azure.UnitTests
             var store = new AzureKeyVaultAccountStore(
                 NullLogger<AzureKeyVaultAccountStore>.Instance,
                 Options.Create(new AzureKeyVaultLettuceEncryptOptions()),
-                Options.Create(new LettuceEncryptOptions()),
-                new HostingEnvironment {EnvironmentName = "Production"},
-                secretClientFactory);
+                secretClientFactory,
+                _mockCertificateAuthority);
 
             var accountModel = new AccountModel
             {
@@ -54,9 +59,8 @@ namespace LettuceEncrypt.Azure.UnitTests
             var store = new AzureKeyVaultAccountStore(
                 NullLogger<AzureKeyVaultAccountStore>.Instance,
                 Options.Create(new AzureKeyVaultLettuceEncryptOptions()),
-                Options.Create(new LettuceEncryptOptions()),
-                new HostingEnvironment {EnvironmentName = "Production"},
-                secretClientFactory);
+                secretClientFactory,
+                _mockCertificateAuthority);
 
             secretClient.Setup(c =>
                     c.GetSecretAsync(It.IsAny<string>(),
@@ -78,9 +82,8 @@ namespace LettuceEncrypt.Azure.UnitTests
             var store = new AzureKeyVaultAccountStore(
                 NullLogger<AzureKeyVaultAccountStore>.Instance,
                 Options.Create(new AzureKeyVaultLettuceEncryptOptions()),
-                Options.Create(new LettuceEncryptOptions()),
-                new HostingEnvironment {EnvironmentName = "Production"},
-                secretClientFactory);
+                secretClientFactory,
+                _mockCertificateAuthority);
             var returnSecret = Response.FromValue(new KeyVaultSecret(name, SampleSecretValue), null);
 
             secretClient.Setup(c =>

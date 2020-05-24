@@ -8,13 +8,7 @@ using LettuceEncrypt.Accounts;
 using LettuceEncrypt.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-
-#if NETSTANDARD2_0
-using IHostEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
-#endif
 
 namespace LettuceEncrypt
 {
@@ -73,8 +67,7 @@ namespace LettuceEncrypt
 
             builder.Services.TryAddSingleton<IAccountStore>(services => new FileSystemAccountStore(directory,
                     services.GetRequiredService<ILogger<FileSystemAccountStore>>(),
-                    services.GetRequiredService<IOptions<LettuceEncryptOptions>>(),
-                    services.GetRequiredService<IHostEnvironment>()));
+                    services.GetRequiredService<ICertificateAuthorityProvider>()));
 
             return builder;
         }

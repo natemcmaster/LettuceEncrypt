@@ -8,12 +8,9 @@ using LettuceEncrypt.Internal.IO;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
-
-#if NETSTANDARD2_0
-using IHostEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
-#endif
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection
@@ -43,6 +40,8 @@ namespace Microsoft.Extensions.DependencyInjection
             Action<LettuceEncryptOptions> configure)
         {
             services.AddTransient<IConfigureOptions<KestrelServerOptions>, KestrelOptionsSetup>();
+
+            services.TryAddSingleton<ICertificateAuthorityProvider, LetsEncryptCertificateAuthorityProvider>();
 
             services.AddSingleton<CertificateSelector>()
                 .AddSingleton<IConsole>(PhysicalConsole.Singleton)
