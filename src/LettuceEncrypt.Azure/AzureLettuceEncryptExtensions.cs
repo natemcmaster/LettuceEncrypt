@@ -1,11 +1,14 @@
-﻿// Copyright (c) Nate McMaster.
+// Copyright (c) Nate McMaster.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
 using LettuceEncrypt;
 using LettuceEncrypt.Accounts;
 using LettuceEncrypt.Azure;
+using LettuceEncrypt.Azure.Internal;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection
@@ -34,12 +37,17 @@ namespace Microsoft.Extensions.DependencyInjection
             this ILettuceEncryptServiceBuilder builder,
             Action<AzureKeyVaultLettuceEncryptOptions> configure)
         {
-            builder.Services.TryAddSingleton<AzureKeyVaultCertificateRepository>();
-            builder.Services.TryAddSingleton<IAccountStore, AzureKeyVaultAccountStore>();
-            builder.Services.TryAddEnumerable(
+            var services = builder.Services;
+            services
+                .AddSingleton<ICertificateClientFactory, CertificateClientFactory>()
+                .AddSingleton<ISecretClientFactory, SecretClientFactory>();
+
+            services.TryAddSingleton<AzureKeyVaultCertificateRepository>();
+            services.TryAddSingleton<IAccountStore, AzureKeyVaultAccountStore>();
+            services.TryAddEnumerable(
                 ServiceDescriptor.Singleton<ICertificateRepository, AzureKeyVaultCertificateRepository>(x =>
                     x.GetRequiredService<AzureKeyVaultCertificateRepository>()));
-            builder.Services.TryAddEnumerable(
+            services.TryAddEnumerable(
                 ServiceDescriptor.Singleton<ICertificateSource, AzureKeyVaultCertificateRepository>(x =>
                     x.GetRequiredService<AzureKeyVaultCertificateRepository>()));
 

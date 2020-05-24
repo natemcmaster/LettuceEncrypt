@@ -5,6 +5,7 @@ using Azure.Security.KeyVault.Certificates;
 using Azure.Security.KeyVault.Secrets;
 using LettuceEncrypt.UnitTests;
 using LettuceEncrypt;
+using LettuceEncrypt.Azure.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Hosting.Internal;
@@ -71,12 +72,16 @@ namespace LettuceEncrypt.Azure.UnitTests
             const string Domain2 = "azure.com";
 
             var certClient = new Mock<CertificateClient>();
-            var secretClient = new Mock<SecretClient>();
+            var certClientFactory = new Mock<ICertificateClientFactory>();
+            certClientFactory.Setup(c => c.Create()).Returns(certClient.Object);
             var options = Options.Create(new LettuceEncryptOptions());
 
             options.Value.DomainNames = new[] {Domain1, Domain2};
 
-            var repository = new AzureKeyVaultCertificateRepository(certClient.Object, secretClient.Object, options,
+            var repository = new AzureKeyVaultCertificateRepository(
+                certClientFactory.Object,
+                Mock.Of<ISecretClientFactory>(),
+                options,
                 NullLogger<AzureKeyVaultCertificateRepository>.Instance);
             foreach (var domain in options.Value.DomainNames)
             {
@@ -96,13 +101,16 @@ namespace LettuceEncrypt.Azure.UnitTests
             const string Domain1 = "github.com";
             const string Domain2 = "azure.com";
 
-            var certClient = new Mock<CertificateClient>();
             var secretClient = new Mock<SecretClient>();
+            var secretClientFactory = new Mock<ISecretClientFactory>();
+            secretClientFactory.Setup(c => c.Create()).Returns(secretClient.Object);
             var options = Options.Create(new LettuceEncryptOptions());
 
             options.Value.DomainNames = new[] {Domain1, Domain2};
 
-            var repository = new AzureKeyVaultCertificateRepository(certClient.Object, secretClient.Object, options,
+            var repository = new AzureKeyVaultCertificateRepository(
+                Mock.Of<ICertificateClientFactory>(),
+                secretClientFactory.Object, options,
                 NullLogger<AzureKeyVaultCertificateRepository>.Instance);
 
             var certificates = await repository.GetCertificatesAsync(CancellationToken.None);

@@ -16,7 +16,7 @@ using Microsoft.Extensions.Options;
 using IHostEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
 #endif
 
-namespace LettuceEncrypt.Azure
+namespace LettuceEncrypt.Azure.Internal
 {
     internal class AzureKeyVaultAccountStore : IAccountStore
     {
@@ -24,20 +24,20 @@ namespace LettuceEncrypt.Azure
         private readonly IOptions<AzureKeyVaultLettuceEncryptOptions> _akOptions;
         private readonly IOptions<LettuceEncryptOptions> _leOptions;
         private readonly IHostEnvironment _env;
-        private readonly SecretClient _secretClient;
+        private readonly ISecretClientFactory _secretClientFactory;
 
         public AzureKeyVaultAccountStore(
             ILogger<AzureKeyVaultAccountStore> logger,
             IOptions<AzureKeyVaultLettuceEncryptOptions> akOptions,
             IOptions<LettuceEncryptOptions> leOptions,
             IHostEnvironment env,
-            SecretClient keyClient)
+            ISecretClientFactory secretClientFactory)
         {
             _logger = logger;
             _akOptions = akOptions;
             _leOptions = leOptions;
             _env = env;
-            _secretClient = keyClient ?? throw new ArgumentNullException(nameof(keyClient));
+            _secretClientFactory = secretClientFactory;
         }
 
         public async Task SaveAccountAsync(AccountModel account, CancellationToken cancellationToken)
@@ -47,7 +47,9 @@ namespace LettuceEncrypt.Azure
             var secretValue = JsonSerializer.Serialize(account);
             try
             {
-                await _secretClient.SetSecretAsync(secretName, secretValue, cancellationToken);
+                var secretClient = _secretClientFactory.Create();
+
+                await secretClient.SetSecretAsync(secretName, secretValue, cancellationToken);
             }
             catch (Exception ex)
             {
@@ -61,7 +63,9 @@ namespace LettuceEncrypt.Azure
             var secretName = GetSecretName();
             try
             {
-                var secret = await _secretClient.GetSecretAsync(secretName, version: null, cancellationToken);
+                var secretClient = _secretClientFactory.Create();
+
+                var secret = await secretClient.GetSecretAsync(secretName, version: null, cancellationToken);
 
                 _logger.LogInformation("Found account key in {secretName}, version {version}",
                     secret.Value.Name,

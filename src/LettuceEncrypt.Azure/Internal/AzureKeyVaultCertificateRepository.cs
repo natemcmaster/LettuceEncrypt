@@ -9,37 +9,28 @@ using System.Threading.Tasks;
 using Azure;
 using Azure.Identity;
 using Azure.Security.KeyVault.Certificates;
-using Azure.Security.KeyVault.Secrets;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace LettuceEncrypt.Azure
+namespace LettuceEncrypt.Azure.Internal
 {
     internal class AzureKeyVaultCertificateRepository : ICertificateRepository, ICertificateSource
     {
         private readonly IOptions<LettuceEncryptOptions> _encryptOptions;
         private readonly ILogger<AzureKeyVaultCertificateRepository> _logger;
-        private readonly CertificateClient _certificateClient;
-        private readonly SecretClient _secretClient;
+        private readonly ICertificateClientFactory _certificateClientFactory;
+        private readonly ISecretClientFactory _secretClientFactory;
 
         public AzureKeyVaultCertificateRepository(
-            CertificateClient certificateClient,
-            SecretClient secretClient,
+            ICertificateClientFactory certificateClientFactory,
+            ISecretClientFactory secretClientFactory,
             IOptions<LettuceEncryptOptions> encryptOptions,
             ILogger<AzureKeyVaultCertificateRepository> logger)
         {
-            _certificateClient = certificateClient ?? throw new ArgumentNullException(nameof(certificateClient));
-            _secretClient = secretClient ?? throw new ArgumentNullException(nameof(secretClient));
+            _certificateClientFactory = certificateClientFactory ?? throw new ArgumentNullException(nameof(_certificateClientFactory));
+            _secretClientFactory = secretClientFactory ?? throw new ArgumentNullException(nameof(secretClientFactory));
             _encryptOptions = encryptOptions ?? throw new ArgumentNullException(nameof(encryptOptions));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
-
-        public AzureKeyVaultCertificateRepository(
-            IOptions<LettuceEncryptOptions> encryptOptions,
-            IOptions<AzureKeyVaultLettuceEncryptOptions> options,
-            ILogger<AzureKeyVaultCertificateRepository> logger)
-            : this(CreateCertificateClient(options), CreateSecretClient(options), encryptOptions, logger)
-        {
         }
 
         public async Task<IEnumerable<X509Certificate2>> GetCertificatesAsync(CancellationToken cancellationToken)
@@ -66,8 +57,9 @@ namespace LettuceEncrypt.Azure
             try
             {
                 var normalizedName = NormalizeHostName(domain);
+                var certificateClient = _certificateClientFactory.Create();
 
-                var certificate = await _certificateClient.GetCertificateAsync(normalizedName, token);
+                var certificate = await certificateClient.GetCertificateAsync(normalizedName, token);
 
                 return new X509Certificate2(certificate.Value.Cer);
             }
@@ -96,8 +88,9 @@ namespace LettuceEncrypt.Azure
             try
             {
                 var normalizedName = NormalizeHostName(domain);
+                var secretClient = _secretClientFactory.Create();
 
-                var certificate = await _secretClient.GetSecretAsync(normalizedName, null, token);
+                var certificate = await secretClient.GetSecretAsync(normalizedName, null, token);
 
                 return new X509Certificate2(Convert.FromBase64String(certificate.Value.Value));
             }
@@ -148,7 +141,9 @@ namespace LettuceEncrypt.Azure
 
             try
             {
-                await _certificateClient.ImportCertificateAsync(options, cancellationToken);
+                var certificateClient = _certificateClientFactory.Create();
+
+                await certificateClient.ImportCertificateAsync(options, cancellationToken);
 
                 _logger.LogInformation("Imported certificate into Azure KeyVault for {Domain}", domainName);
             }
@@ -176,45 +171,5 @@ namespace LettuceEncrypt.Azure
         /// See https://docs.microsoft.com/en-us/rest/api/keyvault/ImportCertificate/ImportCertificate.
         /// </summary>
         internal static string NormalizeHostName(string hostName) => hostName.Replace(".", "-");
-
-        private static CertificateClient CreateCertificateClient(IOptions<AzureKeyVaultLettuceEncryptOptions> options)
-        {
-            if (options is null)
-            {
-                throw new ArgumentNullException(nameof(options));
-            }
-
-            var value = options.Value;
-
-            if (string.IsNullOrEmpty(value.AzureKeyVaultEndpoint))
-            {
-                throw new ArgumentException("Missing required option: AzureKeyVaultEndpoint");
-            }
-
-            var vaultUri = new Uri(value.AzureKeyVaultEndpoint);
-            var credentials = value.Credentials ?? new DefaultAzureCredential();
-
-            return new CertificateClient(vaultUri, credentials);
-        }
-
-        private static SecretClient CreateSecretClient(IOptions<AzureKeyVaultLettuceEncryptOptions> options)
-        {
-            if (options is null)
-            {
-                throw new ArgumentNullException(nameof(options));
-            }
-
-            var value = options.Value;
-
-            if (string.IsNullOrEmpty(value.AzureKeyVaultEndpoint))
-            {
-                throw new ArgumentException("Missing required option: AzureKeyVaultEndpoint");
-            }
-
-            var vaultUri = new Uri(value.AzureKeyVaultEndpoint);
-            var credentials = value.Credentials ?? new DefaultAzureCredential();
-
-            return new SecretClient(vaultUri, credentials);
-        }
     }
 }
