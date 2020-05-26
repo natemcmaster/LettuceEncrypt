@@ -3,16 +3,16 @@
 
 using System;
 
-namespace LettuceEncrypt
+namespace LettuceEncrypt.Acme
 {
     /// <summary>
     /// Provides configuration for the certificate authority which implements the ACME protocol.
     /// </summary>
-    public interface ICertificateAuthorityProvider
+    public interface ICertificateAuthorityConfiguration
     {
         /// <summary>
         /// The base uri of the ACME protocol.
         /// </summary>
-        Uri AcmeDirectoryEndpoint { get; }
+        Uri AcmeDirectoryUri { get; }
     }
 }

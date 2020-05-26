@@ -8,6 +8,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
 using LettuceEncrypt.Accounts;
+using LettuceEncrypt.Acme;
 using LettuceEncrypt.Internal.IO;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
@@ -40,7 +41,7 @@ namespace LettuceEncrypt.Internal
         private readonly IClock _clock;
         private readonly IHostApplicationLifetime _applicationLifetime;
         private readonly TlsAlpnChallengeResponder _tlsAlpnChallengeResponder;
-        private readonly ICertificateAuthorityProvider _certificateAuthority;
+        private readonly ICertificateAuthorityConfiguration _certificateAuthority;
         private const string ErrorMessage = "Failed to create certificate";
 
         public AcmeCertificateLoader(
@@ -55,7 +56,7 @@ namespace LettuceEncrypt.Internal
             IClock clock,
             IHostApplicationLifetime applicationLifetime,
             TlsAlpnChallengeResponder tlsAlpnChallengeResponder,
-            ICertificateAuthorityProvider certificateAuthority,
+            ICertificateAuthorityConfiguration certificateAuthority,
             IAccountStore? accountStore = default)
         {
             _selector = selector;

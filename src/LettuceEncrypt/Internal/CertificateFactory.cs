@@ -13,6 +13,7 @@ using Certes;
 using Certes.Acme;
 using Certes.Acme.Resource;
 using LettuceEncrypt.Accounts;
+using LettuceEncrypt.Acme;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -29,7 +30,7 @@ namespace LettuceEncrypt.Internal
         private readonly IOptions<LettuceEncryptOptions> _options;
         private readonly IHttpChallengeResponseStore _challengeStore;
         private readonly IAccountStore _accountRepository;
-        private readonly ICertificateAuthorityProvider _certificateAuthority;
+        private readonly ICertificateAuthorityConfiguration _certificateAuthority;
         private readonly ILogger _logger;
         private readonly TlsAlpnChallengeResponder _tlsAlpnChallengeResponder;
         private readonly TaskCompletionSource<object?> _appStarted;
@@ -44,7 +45,7 @@ namespace LettuceEncrypt.Internal
             ILogger logger,
             IHostApplicationLifetime appLifetime,
             TlsAlpnChallengeResponder tlsAlpnChallengeResponder,
-            ICertificateAuthorityProvider certificateAuthority)
+            ICertificateAuthorityConfiguration certificateAuthority)
         {
             _tosChecker = tosChecker;
             _options = options;
@@ -71,7 +72,7 @@ namespace LettuceEncrypt.Internal
                 ? KeyFactory.FromDer(account.PrivateKey)
                 : null;
 
-            var directoryUri = _certificateAuthority.AcmeDirectoryEndpoint;
+            var directoryUri = _certificateAuthority.AcmeDirectoryUri;
             _logger.LogInformation("Using certificate authority {directoryUri}", directoryUri);
             _context = new AcmeContext(directoryUri, acmeAccountKey);
 

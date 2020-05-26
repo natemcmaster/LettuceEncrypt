@@ -57,7 +57,8 @@ namespace LettuceEncrypt
         public X509Certificate2? FallbackCertificate { get; set; }
 
         /// <summary>
-        /// How long before certificate expiration will be renewal attempted
+        /// How long before certificate expiration will be renewal attempted.
+        /// Set to <c>null</c> to disable automatic renewal.
         /// </summary>
         public TimeSpan? RenewDaysInAdvance { get; set; } = TimeSpan.FromDays(30);
 
@@ -67,7 +68,7 @@ namespace LettuceEncrypt
         public TimeSpan? RenewalCheckPeriod { get; set; } = TimeSpan.FromDays(1);
 
         /// <summary>
-        /// Asymetric encryption algorithm: RS256, ES256, ES384, ES512
+        /// The asymmetric algorithm used for generating a private key for certificates: RS256, ES256, ES384, ES512
         /// </summary>
         public KeyAlgorithm KeyAlgorithm { get; set; } = KeyAlgorithm.ES256;
     }

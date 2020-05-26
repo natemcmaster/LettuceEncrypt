@@ -3,6 +3,7 @@
 
 using System;
 using Certes.Acme;
+using LettuceEncrypt.Acme;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 
@@ -12,18 +13,18 @@ using IHostEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
 
 namespace LettuceEncrypt.Internal
 {
-    internal class LetsEncryptCertificateAuthorityProvider : ICertificateAuthorityProvider
+    internal class DefaultCertificateAuthorityConfiguration : ICertificateAuthorityConfiguration
     {
         private readonly IHostEnvironment _env;
         private readonly IOptions<LettuceEncryptOptions> _options;
 
-        public LetsEncryptCertificateAuthorityProvider(IHostEnvironment env, IOptions<LettuceEncryptOptions> options)
+        public DefaultCertificateAuthorityConfiguration(IHostEnvironment env, IOptions<LettuceEncryptOptions> options)
         {
             _env = env ?? throw new ArgumentNullException(nameof(env));
             _options = options ?? throw new ArgumentNullException(nameof(options));
         }
 
-        public Uri AcmeDirectoryEndpoint
+        public Uri AcmeDirectoryUri
         {
             get
             {

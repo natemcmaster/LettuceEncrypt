@@ -105,7 +105,7 @@ namespace LettuceEncrypt.UnitTests
                 UseStagingServer = true
             });
             var mockCertificateAuthority =
-                new LetsEncryptCertificateAuthorityProvider(Mock.Of<IHostEnvironment>(), options);
+                new DefaultCertificateAuthorityConfiguration(Mock.Of<IHostEnvironment>(), options);
 
             return new FileSystemAccountStore(
                 _testDir,

@@ -4,6 +4,7 @@ using Azure;
 using Azure.Security.KeyVault.Secrets;
 using Certes;
 using LettuceEncrypt.Accounts;
+using LettuceEncrypt.Acme;
 using LettuceEncrypt.Azure.Internal;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
@@ -15,12 +16,12 @@ namespace LettuceEncrypt.Azure.UnitTests
 {
     public class AzureKeyVaultAccountStoreTests
     {
-        private ICertificateAuthorityProvider _mockCertificateAuthority;
+        private ICertificateAuthorityConfiguration _mockCertificateAuthority;
 
         public AzureKeyVaultAccountStoreTests()
         {
-            var mock = new Mock<ICertificateAuthorityProvider>();
-            mock.Setup(g => g.AcmeDirectoryEndpoint)
+            var mock = new Mock<ICertificateAuthorityConfiguration>();
+            mock.Setup(g => g.AcmeDirectoryUri)
                 .Returns(new Uri("https://acme-v02.api.letsencrypt.org/directory"));
             _mockCertificateAuthority = mock.Object;
         }

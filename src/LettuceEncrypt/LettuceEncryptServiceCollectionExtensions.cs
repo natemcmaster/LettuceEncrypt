@@ -3,6 +3,7 @@
 
 using System;
 using LettuceEncrypt;
+using LettuceEncrypt.Acme;
 using LettuceEncrypt.Internal;
 using LettuceEncrypt.Internal.IO;
 using Microsoft.AspNetCore.Hosting;
@@ -41,7 +42,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             services.AddTransient<IConfigureOptions<KestrelServerOptions>, KestrelOptionsSetup>();
 
-            services.TryAddSingleton<ICertificateAuthorityProvider, LetsEncryptCertificateAuthorityProvider>();
+            services.TryAddSingleton<ICertificateAuthorityConfiguration, DefaultCertificateAuthorityConfiguration>();
 
             services.AddSingleton<CertificateSelector>()
                 .AddSingleton<IConsole>(PhysicalConsole.Singleton)

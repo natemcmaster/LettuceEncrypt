@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Azure;
 using LettuceEncrypt.Accounts;
+using LettuceEncrypt.Acme;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -16,14 +17,14 @@ namespace LettuceEncrypt.Azure.Internal
     {
         private readonly ILogger<AzureKeyVaultAccountStore> _logger;
         private readonly IOptions<AzureKeyVaultLettuceEncryptOptions> _options;
-        private readonly ICertificateAuthorityProvider _certificateAuthority;
+        private readonly ICertificateAuthorityConfiguration _certificateAuthority;
         private readonly ISecretClientFactory _secretClientFactory;
 
         public AzureKeyVaultAccountStore(
             ILogger<AzureKeyVaultAccountStore> logger,
             IOptions<AzureKeyVaultLettuceEncryptOptions> options,
             ISecretClientFactory secretClientFactory,
-            ICertificateAuthorityProvider certificateAuthority)
+            ICertificateAuthorityConfiguration certificateAuthority)
         {
             _logger = logger;
             _options = options;
@@ -94,8 +95,7 @@ namespace LettuceEncrypt.Azure.Internal
             }
             else
             {
-                var acmeServer = _certificateAuthority.AcmeDirectoryEndpoint;
-                name = acmeServer.Host;
+                name = _certificateAuthority.AcmeDirectoryUri.Host;
             }
 
             name = "le-account-" + name.Replace(".", "-");

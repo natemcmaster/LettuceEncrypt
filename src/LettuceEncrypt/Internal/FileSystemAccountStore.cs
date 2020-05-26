@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using LettuceEncrypt.Accounts;
+using LettuceEncrypt.Acme;
 using Microsoft.Extensions.Logging;
 
 namespace LettuceEncrypt.Internal
@@ -18,7 +19,7 @@ namespace LettuceEncrypt.Internal
 
         public FileSystemAccountStore(
             ILogger logger,
-            ICertificateAuthorityProvider certificateAuthority)
+            ICertificateAuthorityConfiguration certificateAuthority)
             : this(new DirectoryInfo(AppContext.BaseDirectory), logger, certificateAuthority)
         {
         }
@@ -26,12 +27,12 @@ namespace LettuceEncrypt.Internal
         public FileSystemAccountStore(
             DirectoryInfo rootDirectory,
             ILogger logger,
-            ICertificateAuthorityProvider certificateAuthority)
+            ICertificateAuthorityConfiguration certificateAuthority)
         {
             _logger = logger;
 
             var topAccountDir = rootDirectory.CreateSubdirectory("accounts");
-            var directoryUri = certificateAuthority.AcmeDirectoryEndpoint;
+            var directoryUri = certificateAuthority.AcmeDirectoryUri;
             var subPath = Path.Combine(directoryUri.Authority, directoryUri.LocalPath.Substring(1));
             _accountDir = topAccountDir.CreateSubdirectory(subPath);
         }

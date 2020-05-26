@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Linq;
 using LettuceEncrypt.Accounts;
+using LettuceEncrypt.Acme;
 using LettuceEncrypt.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -67,7 +68,7 @@ namespace LettuceEncrypt
 
             builder.Services.TryAddSingleton<IAccountStore>(services => new FileSystemAccountStore(directory,
                     services.GetRequiredService<ILogger<FileSystemAccountStore>>(),
-                    services.GetRequiredService<ICertificateAuthorityProvider>()));
+                    services.GetRequiredService<ICertificateAuthorityConfiguration>()));
 
             return builder;
         }

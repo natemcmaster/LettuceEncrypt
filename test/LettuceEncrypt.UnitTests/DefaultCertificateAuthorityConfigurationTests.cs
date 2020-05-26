@@ -12,7 +12,7 @@ using Environments = Microsoft.Extensions.Hosting.EnvironmentName;
 
 namespace LettuceEncrypt.UnitTests
 {
-    public class LetsEncryptCertificateAuthorityProviderTests
+    public class DefaultCertificateAuthorityConfigurationTests
     {
         public static TheoryData<string, Uri> EnvironmentToDefaultAcmeServer()
         {
@@ -33,13 +33,13 @@ namespace LettuceEncrypt.UnitTests
             {
                 EnvironmentName = environmentName
             };
-            var provider = new LetsEncryptCertificateAuthorityProvider(
+            var provider = new DefaultCertificateAuthorityConfiguration(
                 env,
                 Options.Create(new LettuceEncryptOptions()));
 
             Assert.Equal(
                 acmeServer,
-                provider.AcmeDirectoryEndpoint);
+                provider.AcmeDirectoryUri);
         }
 
 
@@ -57,22 +57,22 @@ namespace LettuceEncrypt.UnitTests
             {
                 UseStagingServer = true,
             });
-            var provider = new LetsEncryptCertificateAuthorityProvider(env, useStaging);
+            var provider = new DefaultCertificateAuthorityConfiguration(env, useStaging);
 
             Assert.Equal(
                 WellKnownServers.LetsEncryptStagingV2,
-                provider.AcmeDirectoryEndpoint);
+                provider.AcmeDirectoryUri);
 
             var useProduction = Options.Create(new LettuceEncryptOptions
             {
                 UseStagingServer = false,
             });
 
-            provider = new LetsEncryptCertificateAuthorityProvider(env, useProduction);
+            provider = new DefaultCertificateAuthorityConfiguration(env, useProduction);
 
             Assert.Equal(
                 WellKnownServers.LetsEncryptV2,
-                provider.AcmeDirectoryEndpoint);
+                provider.AcmeDirectoryUri);
         }
     }
 }
