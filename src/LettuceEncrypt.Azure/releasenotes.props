@@ -4,6 +4,12 @@
 First release! This is basically the same as McMaster.AspNetCore.LetsEncrypt.Azure 0.5.0, but has been renamed.
 
 See https://github.com/natemcmaster/LettuceEncrypt/#Usage for instructions.
+
+Changes since 0.5.0:
+
+* Support configuring Azure Key Vault settings from appsettings.json under the 'LettuceEncrypt:AzureKeyVault' section.
+* The private key for accessing the account is now stored in the Azure Key Vault as well under a secret
+  named 'le-account-${acmeserver}'. This ensures certificates can be renewed later using the same account.
     </PackageReleaseNotes>
 
     <PackageReleaseNotes>$(PackageReleaseNotes.Trim())</PackageReleaseNotes>

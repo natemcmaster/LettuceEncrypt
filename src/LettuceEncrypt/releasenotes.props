@@ -9,6 +9,7 @@ Changes since 0.5.0:
 * Renamed namespaces, classes, and methods to 'LettuceEncrypt'
 * Fix an error when saving certs to disk when running as a Linux system account with systemd
 * Update dependencies versions to latest
+* Fix invalid and duplicate warnings invalid certificate chains
     </PackageReleaseNotes>
 
     <PackageReleaseNotes>$(PackageReleaseNotes.Trim())</PackageReleaseNotes>
