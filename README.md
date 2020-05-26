@@ -3,7 +3,7 @@
 [![Build Status][azdo-badge]][azdo-url] [![Nuget][nuget-badge]][nuget-url]
 
 [azdo-badge]: https://dev.azure.com/natemcmaster/github/_apis/build/status/LettuceEncrypt?branchName=master
-[azdo-url]: https://dev.azure.com/natemcmaster/github/_build/latest?definitionId=10&branchName=master
+[azdo-url]: https://dev.azure.com/natemcmaster/github/_build/latest?definitionId=11&branchName=master
 [nuget-badge]: https://img.shields.io/nuget/v/LettuceEncrypt?color=blue
 [nuget-url]: https://nuget.org/packages/LettuceEncrypt
 [ACME]: https://en.wikipedia.org/wiki/Automated_Certificate_Management_Environment
@@ -17,8 +17,8 @@ It then configures Kestrel to use this certificate for all HTTPS traffic.
 See [usage instructions below](#usage) to get started.
 
 Created and developed by [@natemcmaster](https://github.com/natemcmaster) with ❤️from Seattle ☕️.
-This project was formerly known as "McMaster.AspNetCore.LetsEncrypt", but has been renamed for
-trademark reasons. This project is **not an official
+This project was formerly known as "McMaster.AspNetCore.LetsEncrypt", but [has been renamed for
+trademark reasons](https://github.com/natemcmaster/LettuceEncrypt/issues/99). This project is **not an official
 offering** from Let's Encrypt® or ISRG™.
 
 Special thanks to my sponsors!
