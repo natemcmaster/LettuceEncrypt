@@ -232,12 +232,26 @@ namespace LettuceEncrypt.Internal
 
             cancellationToken.ThrowIfCancellationRequested();
 
+            var enabledChallengeHandlers = 0;
             if (_tlsAlpnChallengeResponder.IsEnabled)
             {
+                enabledChallengeHandlers++;
                 await PrepareTlsAlpnChallengeResponseAsync(authorizationContext, domainName, cancellationToken);
             }
 
-            await PrepareHttpChallengeResponseAsync(authorizationContext, cancellationToken);
+            if (_options.Value.AllowedChallengeTypes.HasFlag(ChallengeType.Http01))
+            {
+                enabledChallengeHandlers++;
+                await PrepareHttpChallengeResponseAsync(authorizationContext, cancellationToken);
+            }
+
+            if (enabledChallengeHandlers == 0)
+            {
+                var challengeTypes = string.Join(", ", Enum.GetNames(typeof(ChallengeType)));
+                throw new InvalidOperationException(
+                    "Could not find a method for validating domain ownership. " +
+                    "Ensure at least one kind of these challenge types is configured: " + challengeTypes);
+            }
 
             var retries = 60;
             var delay = TimeSpan.FromSeconds(2);

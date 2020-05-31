@@ -1,5 +1,11 @@
 #nullable enable
+LettuceEncrypt.Acme.ChallengeType
+LettuceEncrypt.Acme.ChallengeType.Http01 = 1 -> LettuceEncrypt.Acme.ChallengeType
+LettuceEncrypt.Acme.ChallengeType.TlsAlpn01 = 2 -> LettuceEncrypt.Acme.ChallengeType
+LettuceEncrypt.Acme.ChallengeType.Any = 65535 -> LettuceEncrypt.Acme.ChallengeType
 LettuceEncrypt.Acme.ICertificateAuthorityConfiguration
 LettuceEncrypt.Acme.ICertificateAuthorityConfiguration.AcmeDirectoryUri.get -> System.Uri!
+LettuceEncrypt.LettuceEncryptOptions.AllowedChallengeTypes.get -> LettuceEncrypt.Acme.ChallengeType
+LettuceEncrypt.LettuceEncryptOptions.AllowedChallengeTypes.set -> void
 Microsoft.AspNetCore.Hosting.LettuceEncryptKestrelHttpsOptionsExtensions
 static Microsoft.AspNetCore.Hosting.LettuceEncryptKestrelHttpsOptionsExtensions.UseLettuceEncrypt(this Microsoft.AspNetCore.Server.Kestrel.Https.HttpsConnectionAdapterOptions! httpsOptions, System.IServiceProvider! applicationServices) -> Microsoft.AspNetCore.Server.Kestrel.Https.HttpsConnectionAdapterOptions!

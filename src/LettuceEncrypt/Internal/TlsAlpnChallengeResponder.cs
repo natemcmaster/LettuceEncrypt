@@ -8,9 +8,11 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
+using LettuceEncrypt.Acme;
 using LettuceEncrypt.Internal.IO;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Org.BouncyCastle.Asn1;
 
 namespace LettuceEncrypt.Internal
@@ -29,14 +31,17 @@ namespace LettuceEncrypt.Internal
 #endif
         private readonly IClock _clock;
         private readonly ILogger<TlsAlpnChallengeResponder> _logger;
+        private readonly IOptions<LettuceEncryptOptions> _options;
         private readonly CertificateSelector _certificateSelector;
         private int _openChallenges = 0;
 
         public TlsAlpnChallengeResponder(
+            IOptions<LettuceEncryptOptions> options,
             CertificateSelector certificateSelector,
             IClock clock,
             ILogger<TlsAlpnChallengeResponder> logger)
         {
+            _options = options ?? throw new ArgumentNullException(nameof(options));
             _certificateSelector = certificateSelector ?? throw new ArgumentNullException(nameof(certificateSelector));
             _clock = clock ?? throw new ArgumentNullException(nameof(clock));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -52,7 +57,7 @@ namespace LettuceEncrypt.Internal
         }
 
 #elif NETCOREAPP3_1
-        public bool IsEnabled => true;
+        public bool IsEnabled => _options.Value.AllowedChallengeTypes.HasFlag(ChallengeType.TlsAlpn01);
 
         public void OnSslAuthenticate(ConnectionContext context, SslServerAuthenticationOptions options)
         {
