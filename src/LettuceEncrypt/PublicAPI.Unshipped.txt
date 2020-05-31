@@ -1,3 +1,5 @@
 #nullable enable
 LettuceEncrypt.Acme.ICertificateAuthorityConfiguration
 LettuceEncrypt.Acme.ICertificateAuthorityConfiguration.AcmeDirectoryUri.get -> System.Uri!
+Microsoft.AspNetCore.Hosting.LettuceEncryptKestrelHttpsOptionsExtensions
+static Microsoft.AspNetCore.Hosting.LettuceEncryptKestrelHttpsOptionsExtensions.UseLettuceEncrypt(this Microsoft.AspNetCore.Server.Kestrel.Https.HttpsConnectionAdapterOptions! httpsOptions, System.IServiceProvider! applicationServices) -> Microsoft.AspNetCore.Server.Kestrel.Https.HttpsConnectionAdapterOptions!
