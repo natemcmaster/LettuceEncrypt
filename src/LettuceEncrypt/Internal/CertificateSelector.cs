@@ -6,13 +6,14 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+using McMaster.AspNetCore.Kestrel.Certificates;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace LettuceEncrypt.Internal
 {
-    internal class CertificateSelector
+    internal class CertificateSelector : IServerCertificateSelector
     {
         private readonly ConcurrentDictionary<string, X509Certificate2> _certs =
             new ConcurrentDictionary<string, X509Certificate2>(StringComparer.OrdinalIgnoreCase);

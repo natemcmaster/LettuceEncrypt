@@ -1,0 +1,5 @@
+#nullable enable
+McMaster.AspNetCore.Kestrel.Certificates.IServerCertificateSelector
+McMaster.AspNetCore.Kestrel.Certificates.IServerCertificateSelector.Select(Microsoft.AspNetCore.Connections.ConnectionContext! context, string? domainName) -> System.Security.Cryptography.X509Certificates.X509Certificate2?
+Microsoft.AspNetCore.Hosting.KestrelHttpsOptionsExtensions
+static Microsoft.AspNetCore.Hosting.KestrelHttpsOptionsExtensions.UseServerCertificateSelector(this Microsoft.AspNetCore.Server.Kestrel.Https.HttpsConnectionAdapterOptions! httpsOptions, McMaster.AspNetCore.Kestrel.Certificates.IServerCertificateSelector! certificateSelector) -> Microsoft.AspNetCore.Server.Kestrel.Https.HttpsConnectionAdapterOptions!

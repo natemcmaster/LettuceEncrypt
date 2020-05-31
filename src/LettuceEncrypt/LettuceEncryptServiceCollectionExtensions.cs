@@ -6,6 +6,7 @@ using LettuceEncrypt;
 using LettuceEncrypt.Acme;
 using LettuceEncrypt.Internal;
 using LettuceEncrypt.Internal.IO;
+using McMaster.AspNetCore.Kestrel.Certificates;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
@@ -44,7 +45,9 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.TryAddSingleton<ICertificateAuthorityConfiguration, DefaultCertificateAuthorityConfiguration>();
 
-            services.AddSingleton<CertificateSelector>()
+            services
+                .AddSingleton<CertificateSelector>()
+                .AddSingleton<IServerCertificateSelector>(s => s.GetRequiredService<CertificateSelector>())
                 .AddSingleton<IConsole>(PhysicalConsole.Singleton)
                 .AddSingleton<IClock, SystemClock>()
                 .AddSingleton<TermsOfServiceChecker>()
