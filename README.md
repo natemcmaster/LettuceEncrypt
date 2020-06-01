@@ -16,7 +16,7 @@ When enabled, your web server will **automatically** generate an HTTPS certifica
 It then configures Kestrel to use this certificate for all HTTPS traffic.
 See [usage instructions below](#usage) to get started.
 
-Created and developed by [@natemcmaster](https://github.com/natemcmaster) with ❤️from Seattle ☕️.
+Created and developed by [@natemcmaster](https://github.com/natemcmaster) with ❤️ from Seattle ☕️.
 This project was formerly known as "McMaster.AspNetCore.LetsEncrypt", but [has been renamed for
 trademark reasons](https://github.com/natemcmaster/LettuceEncrypt/issues/99). This project is **not an official
 offering** from Let's Encrypt® or ISRG™.
@@ -77,6 +77,45 @@ A few required options should be set, typically via the appsettings.json file.
 ```
 
 ## Additional options
+
+### Kestrel configuration
+
+If your code is using the `.UseKestrel()` method to configure IP addresses, ports, or HTTPS settings,
+you will also need to call `UseLettuceEncrypt`. This is required to make Lettuce Encrypt work.
+
+#### Example: ConfigureHttpsDefaults
+
+If calling `ConfigureHttpsDefaults`, use `UseLettuceEncrypt` like this:
+
+```c#
+webBuilder.UseKestrel(k =>
+{
+    var appServices = k.ApplicationServices;
+    k.ConfigureHttpsDefaults(h =>
+    {
+        h.ClientCertificateMode = ClientCertificateMode.RequireCertificate;
+        h.UseLettuceEncrypt(appServices);
+    });
+});
+```
+
+#### Example: Listen + UseHttps
+If using `Listen` + `UseHttps` to manually configure Kestrel's address binding, use `UseLettuceEncrypt` like this:
+
+```c#
+webBuilder.UseKestrel(k =>
+{
+    var appServices = k.ApplicationServices;
+    k.Listen(
+        IPAddress.Any, 443,
+        o => o.UseHttps(h =>
+        {
+            h.UseLettuceEncrypt(appServices);
+        }));
+});
+```
+
+### Customizing storage
 
 Certificates are stored to the machine's X.509 store by default. Certificates can be stored in additional
 locations by using extension methods after calling `AddLettuceEncrypt()` in the `Startup` class.

@@ -25,12 +25,12 @@ namespace LettuceEncrypt.Internal
             options.ConfigureHttpsDefaults(o =>
             {
 #if NETCOREAPP3_0
-                o.OnAuthenticate = _tlsAlpnChallengeResponder.OnSslAuthenticate;
+                o.UseLettuceEncrypt(_certificateSelector, _tlsAlpnChallengeResponder);
 #elif NETSTANDARD2_0
+                o.UseServerCertificateSelector(_certificateSelector);
 #else
 #error Update TFMs
 #endif
-                o.UseServerCertificateSelector(_certificateSelector);
             });
         }
     }
