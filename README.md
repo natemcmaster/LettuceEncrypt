@@ -80,11 +80,12 @@ A few required options should be set, typically via the appsettings.json file.
 
 ### Kestrel configuration
 
-If your code is using the `.UseKestrel` method to configure address/port and/or HTTPS settings, you will need to
-also add a call to enable Lettuce Encrypt. This is required, otherwise LettuceEncrypt certificate automation
-will not be configured correctly with the rest of your HTTPS settings.
+If your code is using the `.UseKestrel()` method to configure IP addresses, ports, or HTTPS settings,
+you will also need to call `UseLettuceEncrypt`. This is required to make Lettuce Encrypt work.
 
-Common example: if calling `ConfigureHttpsDefaults`, you need to add `UseLettuceEncrypt` like this:
+#### Example: ConfigureHttpsDefaults
+
+If calling `ConfigureHttpsDefaults`, use `UseLettuceEncrypt` like this:
 
 ```c#
 webBuilder.UseKestrel(k =>
@@ -98,15 +99,15 @@ webBuilder.UseKestrel(k =>
 });
 ```
 
-Likewise, for any usage of `.UseHttps`
-
-Common example: if calling `ConfigureHttpsDefaults`, you need to add `UseLettuceEncrypt` like this:
+#### Example: Listen + UseHttps
+If using `Listen` + `UseHttps` to manually configure Kestrel's address binding, use `UseLettuceEncrypt` like this:
 
 ```c#
 webBuilder.UseKestrel(k =>
 {
     var appServices = k.ApplicationServices;
-    k.Listen(IPAddress.Any, 443,
+    k.Listen(
+        IPAddress.Any, 443,
         o => o.UseHttps(h =>
         {
             h.UseLettuceEncrypt(appServices);
