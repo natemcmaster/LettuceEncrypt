@@ -3,8 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
@@ -24,20 +22,21 @@ using IHostApplicationLifetime = Microsoft.Extensions.Hosting.IApplicationLifeti
 
 namespace LettuceEncrypt.Internal
 {
-    internal class CertificateFactory
+    internal class AcmeCertificateFactory
     {
+        private readonly AcmeClientFactory _acmeClientFactory;
         private readonly TermsOfServiceChecker _tosChecker;
         private readonly IOptions<LettuceEncryptOptions> _options;
         private readonly IHttpChallengeResponseStore _challengeStore;
         private readonly IAccountStore _accountRepository;
-        private readonly ICertificateAuthorityConfiguration _certificateAuthority;
         private readonly ILogger _logger;
         private readonly TlsAlpnChallengeResponder _tlsAlpnChallengeResponder;
         private readonly TaskCompletionSource<object?> _appStarted;
-        private AcmeContext? _context;
-        private IAccountContext? _accountContext;
+        private AcmeClient? _client;
+        private IKey? _acmeAccountKey;
 
-        public CertificateFactory(
+        public AcmeCertificateFactory(
+            AcmeClientFactory acmeClientFactory,
             TermsOfServiceChecker tosChecker,
             IOptions<LettuceEncryptOptions> options,
             IHttpChallengeResponseStore challengeStore,
@@ -47,12 +46,12 @@ namespace LettuceEncrypt.Internal
             TlsAlpnChallengeResponder tlsAlpnChallengeResponder,
             ICertificateAuthorityConfiguration certificateAuthority)
         {
+            _acmeClientFactory = acmeClientFactory;
             _tosChecker = tosChecker;
             _options = options;
             _challengeStore = challengeStore;
             _logger = logger;
             _tlsAlpnChallengeResponder = tlsAlpnChallengeResponder;
-            _certificateAuthority = certificateAuthority;
 
             _appStarted = new TaskCompletionSource<object?>();
             appLifetime.ApplicationStarted.Register(() => _appStarted.TrySetResult(null));
@@ -68,15 +67,13 @@ namespace LettuceEncrypt.Internal
         {
             var account = await _accountRepository.GetAccountAsync(cancellationToken);
 
-            var acmeAccountKey = account != null
+            _acmeAccountKey = account != null
                 ? KeyFactory.FromDer(account.PrivateKey)
-                : null;
+                : KeyFactory.NewKey(Certes.KeyAlgorithm.ES256);
 
-            var directoryUri = _certificateAuthority.AcmeDirectoryUri;
-            _logger.LogInformation("Using certificate authority {directoryUri}", directoryUri);
-            _context = new AcmeContext(directoryUri, acmeAccountKey);
+            _client = _acmeClientFactory.Create(_acmeAccountKey);
 
-            if (account != null && await ExistingAccountIsValidAsync(_context))
+            if (account != null && await ExistingAccountIsValidAsync())
             {
                 return account;
             }
@@ -87,42 +84,43 @@ namespace LettuceEncrypt.Internal
         private async Task<AccountModel> CreateAccount(CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            Debug.Assert(_context != null);
+            if (_client == null || _acmeAccountKey == null)
+            {
+                throw new InvalidOperationException();
+            }
 
-            var tosUri = await _context.TermsOfService();
+            var tosUri = await _client.GetTermsOfServiceAsync();
 
             _tosChecker.EnsureTermsAreAccepted(tosUri);
 
             var options = _options.Value;
             _logger.LogInformation("Creating new account for {email}", options.EmailAddress);
-            _accountContext = await _context.NewAccount(options.EmailAddress, termsOfServiceAgreed: true);
-            _logger.LogAcmeAction("NewRegistration");
+            var accountId = await _client.CreateAccountAsync(options.EmailAddress);
 
-            if (!int.TryParse(_accountContext.Location.Segments.Last(), out var accountId))
-            {
-                accountId = 0;
-            }
-
-            var account = new AccountModel
+            var accountModel = new AccountModel
             {
                 Id = accountId,
                 EmailAddresses = new[] {options.EmailAddress},
-                PrivateKey = _context!.AccountKey.ToDer(),
+                PrivateKey = _acmeAccountKey.ToDer(),
             };
 
-            await _accountRepository.SaveAccountAsync(account, cancellationToken);
+            await _accountRepository.SaveAccountAsync(accountModel, cancellationToken);
 
-            return account;
+            return accountModel;
         }
 
-        private async Task<bool> ExistingAccountIsValidAsync(AcmeContext context)
+        private async Task<bool> ExistingAccountIsValidAsync()
         {
+            if (_client == null)
+            {
+                throw new InvalidOperationException();
+            }
+
             // double checks the account is still valid
             Account existingAccount;
             try
             {
-                _accountContext = await context.Account();
-                existingAccount = await _accountContext.Resource();
+                existingAccount = await _client.GetAccountAsync();
             }
             catch (AcmeRequestException exception)
             {
@@ -145,9 +143,9 @@ namespace LettuceEncrypt.Internal
 
             if (existingAccount.TermsOfServiceAgreed != true)
             {
-                var tosUri = await _context.TermsOfService();
+                var tosUri = await _client.GetTermsOfServiceAsync();
                 _tosChecker.EnsureTermsAreAccepted(tosUri);
-                await _accountContext.Update(agreeTermsOfService: true);
+                await _client.AgreeToTermsOfServiceAsync();
             }
 
             return true;
@@ -156,18 +154,19 @@ namespace LettuceEncrypt.Internal
         public async Task<X509Certificate2> CreateCertificateAsync(CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            Debug.Assert(_context != null);
-            Debug.Assert(_accountContext != null);
+            if (_client == null)
+            {
+                throw new InvalidOperationException();
+            }
 
             IOrderContext? orderContext = null;
-            var orderListContext = await _accountContext!.Orders();
-            if (orderListContext != null)
+            var orders = await _client.GetOrdersAsync();
+            if (orders.Any())
             {
                 var expectedDomains = new HashSet<string>(_options.Value.DomainNames);
-                var orders = await orderListContext.Orders();
                 foreach (var order in orders)
                 {
-                    var orderDetails = await order.Resource();
+                    var orderDetails = await _client.GetOrderDetailsAsync(order);
                     if (orderDetails.Status != OrderStatus.Pending)
                     {
                         continue;
@@ -190,11 +189,11 @@ namespace LettuceEncrypt.Internal
             if (orderContext == null)
             {
                 _logger.LogDebug("Creating new order for a certificate");
-                orderContext = await _context!.NewOrder(_options.Value.DomainNames);
+                orderContext = await _client.CreateOrderAsync(_options.Value.DomainNames);
             }
 
             cancellationToken.ThrowIfCancellationRequested();
-            var authorizations = await orderContext.Authorizations();
+            var authorizations = await _client.GetOrderAuthorizations(orderContext);
 
             cancellationToken.ThrowIfCancellationRequested();
             await Task.WhenAll(BeginValidateAllAuthorizations(authorizations, cancellationToken));
@@ -216,8 +215,12 @@ namespace LettuceEncrypt.Internal
             CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
+            if (_client == null)
+            {
+                throw new InvalidOperationException();
+            }
 
-            var authorization = await authorizationContext.Resource();
+            var authorization = await _client.GetAuthorizationAsync(authorizationContext);
             var domainName = authorization.Identifier.Value;
 
             if (authorization.Status == AuthorizationStatus.Valid)
@@ -248,7 +251,7 @@ namespace LettuceEncrypt.Internal
 
                     cancellationToken.ThrowIfCancellationRequested();
 
-                    authorization = await authorizationContext.Resource();
+                    authorization = await _client.GetAuthorizationAsync(authorizationContext);
 
                     _logger.LogAcmeAction("GetAuthorization");
 
@@ -291,8 +294,12 @@ namespace LettuceEncrypt.Internal
             CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
+            if (_client == null)
+            {
+                throw new InvalidOperationException();
+            }
 
-            var httpChallenge = await authorizationContext.Http();
+            var httpChallenge = await _client.CreateChallengeAsync(authorizationContext, ChallengeTypes.Http01);
             if (httpChallenge == null)
             {
                 throw new InvalidOperationException(
@@ -306,7 +313,7 @@ namespace LettuceEncrypt.Internal
             await _appStarted.Task;
 
             _logger.LogTrace("Requesting server to validate HTTP challenge");
-            await httpChallenge.Validate();
+            await _client.ValidateChallengeAsync(httpChallenge);
         }
 
         private async Task PrepareTlsAlpnChallengeResponseAsync(
@@ -315,8 +322,12 @@ namespace LettuceEncrypt.Internal
             CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
+            if (_client == null)
+            {
+                throw new InvalidOperationException();
+            }
 
-            var tlsAlpnChallenge = await authorizationContext.TlsAlpn();
+            var tlsAlpnChallenge = await _client.CreateChallengeAsync(authorizationContext, ChallengeTypes.TlsAlpn01);
 
             _tlsAlpnChallengeResponder.PrepareChallengeCert(domainName, tlsAlpnChallenge.KeyAuthz);
 
@@ -324,7 +335,7 @@ namespace LettuceEncrypt.Internal
             await _appStarted.Task;
 
             _logger.LogTrace("Requesting server to validate TLS/ALPN challenge");
-            await tlsAlpnChallenge.Validate();
+            await _client.ValidateChallengeAsync(tlsAlpnChallenge);
         }
 
         private Exception InvalidAuthorizationError(Authorization authorization)
@@ -352,6 +363,11 @@ namespace LettuceEncrypt.Internal
             CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
+            if (_client == null)
+            {
+                throw new InvalidOperationException();
+            }
+
             var commonName = _options.Value.DomainNames[0];
             _logger.LogDebug("Creating cert for {commonName}", commonName);
 
@@ -360,7 +376,7 @@ namespace LettuceEncrypt.Internal
                 CommonName = commonName,
             };
             var privateKey = KeyFactory.NewKey((Certes.KeyAlgorithm) _options.Value.KeyAlgorithm);
-            var acmeCert = await order.Generate(csrInfo, privateKey);
+            var acmeCert = await _client.GetCertificateAsync(csrInfo, privateKey, order);
 
             _logger.LogAcmeAction("NewCertificate");
 

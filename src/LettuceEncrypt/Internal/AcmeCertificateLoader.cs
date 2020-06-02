@@ -22,7 +22,7 @@ namespace LettuceEncrypt.Internal
     /// </summary>
     internal class AcmeCertificateLoader : BackgroundService
     {
-        private readonly AcmeCertificateCreatorFactory _certificateCreatorFactory;
+        private readonly AcmeCertificateFactory _acmeCertificateFactory;
         private readonly CertificateSelector _selector;
         private readonly IOptions<LettuceEncryptOptions> _options;
         private readonly ILogger _logger;
@@ -34,7 +34,7 @@ namespace LettuceEncrypt.Internal
         private const string ErrorMessage = "Failed to create certificate";
 
         public AcmeCertificateLoader(
-            AcmeCertificateCreatorFactory certificateCreatorFactory,
+            AcmeCertificateFactory acmeCertificateFactory,
             CertificateSelector selector,
             IOptions<LettuceEncryptOptions> options,
             ILogger<AcmeCertificateLoader> logger,
@@ -43,7 +43,7 @@ namespace LettuceEncrypt.Internal
             IEnumerable<ICertificateRepository> certificateRepositories,
             IClock clock)
         {
-            _certificateCreatorFactory = certificateCreatorFactory;
+            _acmeCertificateFactory = acmeCertificateFactory;
             _selector = selector;
             _options = options;
             _logger = logger;
@@ -122,9 +122,7 @@ namespace LettuceEncrypt.Internal
 
         private async Task CreateCertificateAsync(string[] domainNames, CancellationToken cancellationToken)
         {
-            var factory = _certificateCreatorFactory.Create();
-
-            var account = await factory.GetOrCreateAccountAsync(cancellationToken);
+            var account = await _acmeCertificateFactory.GetOrCreateAccountAsync(cancellationToken);
             _logger.LogInformation("Using account {accountId}", account.Id);
 
             try
@@ -132,7 +130,7 @@ namespace LettuceEncrypt.Internal
                 _logger.LogInformation("Creating certificate for {hostname}",
                     string.Join(",", domainNames));
 
-                var cert = await factory.CreateCertificateAsync(cancellationToken);
+                var cert = await _acmeCertificateFactory.CreateCertificateAsync(cancellationToken);
 
                 _logger.LogInformation("Created certificate {subjectName} ({thumbprint})",
                     cert.Subject,
