@@ -54,6 +54,8 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddSingleton<IHostedService, StartupCertificateLoader>()
                 .AddSingleton<ICertificateSource, DeveloperCertLoader>()
                 .AddSingleton<IHostedService, AcmeCertificateLoader>()
+                .AddSingleton<AcmeCertificateFactory>()
+                .AddSingleton<AcmeClientFactory>()
                 .AddSingleton<IHttpChallengeResponseStore, InMemoryHttpChallengeResponseStore>()
                 .AddSingleton<X509CertStore>()
                 .AddSingleton<ICertificateSource>(x => x.GetRequiredService<X509CertStore>())
