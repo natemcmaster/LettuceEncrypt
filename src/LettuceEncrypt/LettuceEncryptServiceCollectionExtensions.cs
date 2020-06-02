@@ -5,6 +5,7 @@ using System;
 using LettuceEncrypt;
 using LettuceEncrypt.Acme;
 using LettuceEncrypt.Internal;
+using LettuceEncrypt.Internal.AcmeStates;
 using LettuceEncrypt.Internal.IO;
 using McMaster.AspNetCore.Kestrel.Certificates;
 using Microsoft.AspNetCore.Hosting;
@@ -71,6 +72,14 @@ namespace Microsoft.Extensions.DependencyInjection
             });
 
             services.Configure(configure);
+
+            // The state machine should run in its own scope
+            services.AddScoped<AcmeStateMachineContext>();
+
+            services.AddSingleton(TerminalState.Singleton);
+
+            // States should always be transient
+            services.AddTransient<ServerStartupState>();
 
             return new LettuceEncryptServiceBuilder(services);
         }
