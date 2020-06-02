@@ -79,7 +79,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton(TerminalState.Singleton);
 
             // States should always be transient
-            services.AddTransient<ServerStartupState>();
+            services
+                .AddTransient<ServerStartupState>()
+                .AddTransient<CheckForRenewalState>()
+                .AddTransient<BeginCertificateCreationState>();
 
             return new LettuceEncryptServiceBuilder(services);
         }
