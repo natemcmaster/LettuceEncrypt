@@ -2,8 +2,8 @@
 
 [![Build Status][azdo-badge]][azdo-url] [![Nuget][nuget-badge]][nuget-url]
 
-[azdo-badge]: https://dev.azure.com/natemcmaster/github/_apis/build/status/LettuceEncrypt?branchName=master
-[azdo-url]: https://dev.azure.com/natemcmaster/github/_build/latest?definitionId=11&branchName=master
+[azdo-badge]: https://dev.azure.com/natemcmaster/github/_apis/build/status/LettuceEncrypt?branchName=main
+[azdo-url]: https://dev.azure.com/natemcmaster/github/_build/?definitionId=11
 [nuget-badge]: https://img.shields.io/nuget/v/LettuceEncrypt?color=blue
 [nuget-url]: https://nuget.org/packages/LettuceEncrypt
 [ACME]: https://en.wikipedia.org/wiki/Automated_Certificate_Management_Environment
