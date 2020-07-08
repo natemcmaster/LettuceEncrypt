@@ -41,7 +41,7 @@ namespace LettuceEncrypt.Internal
             IOptions<LettuceEncryptOptions> options,
             IHttpChallengeResponseStore challengeStore,
             IAccountStore? accountRepository,
-            ILogger logger,
+            ILogger<AcmeCertificateFactory> logger,
             IHostApplicationLifetime appLifetime,
             TlsAlpnChallengeResponder tlsAlpnChallengeResponder,
             ICertificateAuthorityConfiguration certificateAuthority)
