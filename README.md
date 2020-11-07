@@ -12,7 +12,7 @@ LettuceEncrypt for ASP.NET Core
 [ACME]: https://en.wikipedia.org/wiki/Automated_Certificate_Management_Environment
 [Let's Encrypt]: https://letsencrypt.org/
 
-LettuceEncrypt 🥬 provides API for ASP.NET Core projects to integrate with a certificate authority (CA), such as
+LettuceEncrypt provides API for ASP.NET Core projects to integrate with a certificate authority (CA), such as
 [Let's Encrypt], for free, automatic HTTPS (SSL/TLS) certificates using the [ACME] protocol.
 
 When enabled, your web server will **automatically** generate an HTTPS certificate during start up.
@@ -28,7 +28,7 @@ Special thanks to my sponsors!
 
 * [@bordenit](https://github.com/bordenit)
 
-This project is 100% organic and best served cold with ranch and carrots.
+This project is 100% organic and best served cold with ranch and carrots. 🥬
 
 ## Will this work for me?
 
