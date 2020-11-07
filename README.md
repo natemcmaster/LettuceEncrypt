@@ -1,4 +1,7 @@
-# LettuceEncrypt 🥬 for ASP.NET Core
+<h1>
+<img src="./logo.png" width="42" height="42" style="vertical-align: middle;"/>
+LettuceEncrypt for ASP.NET Core
+</h1>
 
 [![Build Status][azdo-badge]][azdo-url] [![Nuget][nuget-badge]][nuget-url]
 
