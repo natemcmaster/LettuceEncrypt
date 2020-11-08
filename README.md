@@ -24,10 +24,6 @@ This project was formerly known as "McMaster.AspNetCore.LetsEncrypt", but [has b
 trademark reasons](https://github.com/natemcmaster/LettuceEncrypt/issues/99). This project is **not an official
 offering** from Let's Encrypt® or ISRG™.
 
-Special thanks to my sponsors!
-
-* [@bordenit](https://github.com/bordenit)
-
 This project is 100% organic and best served cold with ranch and carrots. 🥬
 
 ## Will this work for me?
