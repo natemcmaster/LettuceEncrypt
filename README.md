@@ -1,5 +1,5 @@
 <h1>
-<img src="./logo.png" width="42" height="42" style="vertical-align: middle;"/>
+<img src="./src/icon.png" width="42" height="42"/>
 LettuceEncrypt for ASP.NET Core
 </h1>
 

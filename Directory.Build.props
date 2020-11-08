@@ -42,6 +42,17 @@
     <PackageVersion Condition="'$(IncludePreReleaseLabelInPackageVersion)' == 'true'">$(PackageVersion)-$(VersionSuffix)</PackageVersion>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageIconUrl>https://raw.githubusercontent.com/wiki/natemcmaster/LettuceEncrypt/logo.png</PackageIconUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="$(MSBuildThisDirectory)/src/icon.png" Pack="true" Visible="false" PackagePath="/">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
   <Import Project="$(MSBuildProjectDirectory)/releasenotes.props"
           Condition="Exists('$(MSBuildProjectDirectory)/releasenotes.props')" />
 </Project>
