@@ -18,10 +18,6 @@ This only works with Kestrel, which is the default server configuration for ASP.
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="$(PackageIcon)" Pack="true" PackagePath="images/" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Certes" Version="2.3.4" />
   </ItemGroup>
 

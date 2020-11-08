@@ -47,9 +47,11 @@
     <PackageIconUrl>https://raw.githubusercontent.com/wiki/natemcmaster/LettuceEncrypt/logo.png</PackageIconUrl>
   </PropertyGroup>
 
-  <ItemGroup>
-    <None Include="$(MSBuildThisDirectory)/src/icon.png" Pack="true" Visible="false" PackagePath="/">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  <ItemGroup Condition=" '$(IsPackable)' == 'true' ">
+    <None Include="$(MSBuildThisFileDirectory)src\icon.png">
+      <Pack>true</Pack>
+      <PackagePath>/$(PackageIcon)</PackagePath>
+      <Visible>false</Visible>
     </None>
   </ItemGroup>
 
