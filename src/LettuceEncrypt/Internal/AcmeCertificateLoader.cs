@@ -44,10 +44,9 @@ namespace LettuceEncrypt.Internal
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            var serverType = _server.GetType().FullName!;
-
-            if (!(serverType.StartsWith(nameof(KestrelServer))))
+            if (!(_server.GetType().Name.StartsWith(nameof(KestrelServer))))
             {
+                var serverType = _server.GetType().FullName!;
                 _logger.LogWarning(
                     "LettuceEncrypt can only be used with Kestrel and is not supported on {serverType} servers. Skipping certificate provisioning.",
                     serverType);
