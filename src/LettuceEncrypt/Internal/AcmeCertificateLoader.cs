@@ -46,7 +46,7 @@ namespace LettuceEncrypt.Internal
         {
             if (!(_server.GetType().Name.StartsWith(nameof(KestrelServer))))
             {
-                var serverType = _server.GetType().FullName!;
+                var serverType = _server.GetType().FullName;
                 _logger.LogWarning(
                     "LettuceEncrypt can only be used with Kestrel and is not supported on {serverType} servers. Skipping certificate provisioning.",
                     serverType);
