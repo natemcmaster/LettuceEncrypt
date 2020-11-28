@@ -3,6 +3,7 @@
 
 using System;
 using System.Net.Security;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -106,6 +107,15 @@ namespace LettuceEncrypt.Internal
 
             // This cert is ephemeral and does not need to be stored for reuse later
             var cert = csr.CreateSelfSigned(_clock.Now.AddDays(-1), _clock.Now.AddDays(1));
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                // SSLStream on Windows throws with ephemeral key sets
+                // workaround from https://github.com/dotnet/runtime/issues/23749#issuecomment-388231655
+                var originalCert = cert;
+                cert = new X509Certificate2(cert.Export(X509ContentType.Pkcs12));
+                originalCert.Dispose();
+            }
 
             Interlocked.Increment(ref _openChallenges);
             _certificateSelector.AddChallengeCert(cert);

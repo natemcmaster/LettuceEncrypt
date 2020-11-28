@@ -5,7 +5,9 @@ using System;
 using LettuceEncrypt;
 using LettuceEncrypt.Acme;
 using LettuceEncrypt.Internal;
+using LettuceEncrypt.Internal.AcmeStates;
 using LettuceEncrypt.Internal.IO;
+using McMaster.AspNetCore.Kestrel.Certificates;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
@@ -44,13 +46,17 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.TryAddSingleton<ICertificateAuthorityConfiguration, DefaultCertificateAuthorityConfiguration>();
 
-            services.AddSingleton<CertificateSelector>()
+            services
+                .AddSingleton<CertificateSelector>()
+                .AddSingleton<IServerCertificateSelector>(s => s.GetRequiredService<CertificateSelector>())
                 .AddSingleton<IConsole>(PhysicalConsole.Singleton)
                 .AddSingleton<IClock, SystemClock>()
                 .AddSingleton<TermsOfServiceChecker>()
                 .AddSingleton<IHostedService, StartupCertificateLoader>()
                 .AddSingleton<ICertificateSource, DeveloperCertLoader>()
                 .AddSingleton<IHostedService, AcmeCertificateLoader>()
+                .AddSingleton<AcmeCertificateFactory>()
+                .AddSingleton<AcmeClientFactory>()
                 .AddSingleton<IHttpChallengeResponseStore, InMemoryHttpChallengeResponseStore>()
                 .AddSingleton<X509CertStore>()
                 .AddSingleton<ICertificateSource>(x => x.GetRequiredService<X509CertStore>())
@@ -66,6 +72,17 @@ namespace Microsoft.Extensions.DependencyInjection
             });
 
             services.Configure(configure);
+
+            // The state machine should run in its own scope
+            services.AddScoped<AcmeStateMachineContext>();
+
+            services.AddSingleton(TerminalState.Singleton);
+
+            // States should always be transient
+            services
+                .AddTransient<ServerStartupState>()
+                .AddTransient<CheckForRenewalState>()
+                .AddTransient<BeginCertificateCreationState>();
 
             return new LettuceEncryptServiceBuilder(services);
         }

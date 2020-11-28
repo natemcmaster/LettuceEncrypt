@@ -1,31 +1,30 @@
-# LettuceEncrypt 🥬 for ASP.NET Core
+<h1>
+<img src="./src/icon.png" width="42" height="42"/>
+LettuceEncrypt for ASP.NET Core
+</h1>
 
 [![Build Status][azdo-badge]][azdo-url] [![Nuget][nuget-badge]][nuget-url]
 
-[azdo-badge]: https://dev.azure.com/natemcmaster/github/_apis/build/status/LettuceEncrypt?branchName=master
-[azdo-url]: https://dev.azure.com/natemcmaster/github/_build/latest?definitionId=10&branchName=master
+[azdo-badge]: https://dev.azure.com/natemcmaster/github/_apis/build/status/LettuceEncrypt?branchName=main
+[azdo-url]: https://dev.azure.com/natemcmaster/github/_build/?definitionId=11
 [nuget-badge]: https://img.shields.io/nuget/v/LettuceEncrypt?color=blue
 [nuget-url]: https://nuget.org/packages/LettuceEncrypt
 [ACME]: https://en.wikipedia.org/wiki/Automated_Certificate_Management_Environment
 [Let's Encrypt]: https://letsencrypt.org/
 
-LettuceEncrypt 🥬 provides API for ASP.NET Core projects to integrate with a certificate authority (CA), such as
+LettuceEncrypt provides API for ASP.NET Core projects to integrate with a certificate authority (CA), such as
 [Let's Encrypt], for free, automatic HTTPS (SSL/TLS) certificates using the [ACME] protocol.
 
 When enabled, your web server will **automatically** generate an HTTPS certificate during start up.
 It then configures Kestrel to use this certificate for all HTTPS traffic.
 See [usage instructions below](#usage) to get started.
 
-Created and developed by [@natemcmaster](https://github.com/natemcmaster) with ❤️from Seattle ☕️.
-This project was formerly known as "McMaster.AspNetCore.LetsEncrypt", but has been renamed for
-trademark reasons. This project is **not an official
+Created and developed by [@natemcmaster](https://github.com/natemcmaster) with ❤️ from Seattle ☕️.
+This project was formerly known as "McMaster.AspNetCore.LetsEncrypt", but [has been renamed for
+trademark reasons](https://github.com/natemcmaster/LettuceEncrypt/issues/99). This project is **not an official
 offering** from Let's Encrypt® or ISRG™.
 
-Special thanks to my sponsors!
-
-* [@bordenit](https://github.com/bordenit)
-
-This project is 100% organic and best served cold with ranch and carrots.
+This project is 100% organic and best served cold with ranch and carrots. 🥬
 
 ## Will this work for me?
 
@@ -77,6 +76,45 @@ A few required options should be set, typically via the appsettings.json file.
 ```
 
 ## Additional options
+
+### Kestrel configuration
+
+If your code is using the `.UseKestrel()` method to configure IP addresses, ports, or HTTPS settings,
+you will also need to call `UseLettuceEncrypt`. This is required to make Lettuce Encrypt work.
+
+#### Example: ConfigureHttpsDefaults
+
+If calling `ConfigureHttpsDefaults`, use `UseLettuceEncrypt` like this:
+
+```c#
+webBuilder.UseKestrel(k =>
+{
+    var appServices = k.ApplicationServices;
+    k.ConfigureHttpsDefaults(h =>
+    {
+        h.ClientCertificateMode = ClientCertificateMode.RequireCertificate;
+        h.UseLettuceEncrypt(appServices);
+    });
+});
+```
+
+#### Example: Listen + UseHttps
+If using `Listen` + `UseHttps` to manually configure Kestrel's address binding, use `UseLettuceEncrypt` like this:
+
+```c#
+webBuilder.UseKestrel(k =>
+{
+    var appServices = k.ApplicationServices;
+    k.Listen(
+        IPAddress.Any, 443,
+        o => o.UseHttps(h =>
+        {
+            h.UseLettuceEncrypt(appServices);
+        }));
+});
+```
+
+### Customizing storage
 
 Certificates are stored to the machine's X.509 store by default. Certificates can be stored in additional
 locations by using extension methods after calling `AddLettuceEncrypt()` in the `Startup` class.

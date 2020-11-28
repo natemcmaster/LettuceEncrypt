@@ -18,11 +18,7 @@ This only works with Kestrel, which is the default server configuration for ASP.
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="$(PackageIcon)" Pack="true" PackagePath="images/" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Certes" Version="2.3.3" />
+    <PackageReference Include="Certes" Version="2.3.4" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.0'">
@@ -30,9 +26,12 @@ This only works with Kestrel, which is the default server configuration for ASP.
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-    <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel.Core" Version="2.1.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.1.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.1.1" />
     <PackageReference Include="System.Text.Json" Version="4.7.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Kestrel.Certificates\McMaster.AspNetCore.Kestrel.Certificates.csproj" />
   </ItemGroup>
 
 </Project>
