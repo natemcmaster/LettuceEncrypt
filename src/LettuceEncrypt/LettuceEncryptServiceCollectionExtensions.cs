@@ -51,12 +51,12 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddSingleton<IServerCertificateSelector>(s => s.GetRequiredService<CertificateSelector>())
                 .AddSingleton<IConsole>(PhysicalConsole.Singleton)
                 .AddSingleton<IClock, SystemClock>()
-                .AddSingleton<TermsOfServiceChecker>()
+                .AddSingleton<ITermsOfServiceChecker, TermsOfServiceChecker>()
                 .AddSingleton<IHostedService, StartupCertificateLoader>()
                 .AddSingleton<ICertificateSource, DeveloperCertLoader>()
                 .AddSingleton<IHostedService, AcmeCertificateLoader>()
                 .AddSingleton<AcmeCertificateFactory>()
-                .AddSingleton<AcmeClientFactory>()
+                .AddSingleton<IAcmeClientFactory, AcmeClientFactory>()
                 .AddSingleton<IHttpChallengeResponseStore, InMemoryHttpChallengeResponseStore>()
                 .AddSingleton<X509CertStore>()
                 .AddSingleton<ICertificateSource>(x => x.GetRequiredService<X509CertStore>())
@@ -82,7 +82,11 @@ namespace Microsoft.Extensions.DependencyInjection
             services
                 .AddTransient<ServerStartupState>()
                 .AddTransient<CheckForRenewalState>()
-                .AddTransient<BeginCertificateCreationState>();
+                .AddTransient<BeginCertificateCreationState>()
+                .AddTransient<InitializeAcmeAccountState>()
+                .AddTransient<CreateAcmeAccountState>()
+                .AddTransient<RevalidateAccountStatusState>()
+                .AddTransient<GenerateCertificateState>();
 
             return new LettuceEncryptServiceBuilder(services);
         }

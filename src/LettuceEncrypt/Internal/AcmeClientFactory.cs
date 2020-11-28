@@ -7,7 +7,12 @@ using Microsoft.Extensions.Logging;
 
 namespace LettuceEncrypt.Internal
 {
-    internal class AcmeClientFactory
+    interface IAcmeClientFactory
+    {
+        IAcmeClient Create(IKey acmeAccountKey);
+    }
+
+    class AcmeClientFactory : IAcmeClientFactory
     {
         private readonly ICertificateAuthorityConfiguration _certificateAuthority;
         private readonly ILogger<AcmeClient> _logger;
@@ -20,7 +25,7 @@ namespace LettuceEncrypt.Internal
             _logger = logger;
         }
 
-        public AcmeClient Create(IKey acmeAccountKey)
+        public IAcmeClient Create(IKey acmeAccountKey)
         {
             var directoryUri = _certificateAuthority.AcmeDirectoryUri;
 

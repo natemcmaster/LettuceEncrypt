@@ -12,11 +12,10 @@ using Microsoft.Extensions.Logging;
 
 namespace LettuceEncrypt.Internal
 {
-    internal class AcmeClient
+    class AcmeClient : IAcmeClient
     {
         private readonly AcmeContext _context;
         private readonly ILogger<AcmeClient> _logger;
-        private IAccountContext? _accountContext;
 
         public AcmeClient(ILogger<AcmeClient> logger, Uri directoryUri, IKey acmeAccountKey)
         {
@@ -25,25 +24,22 @@ namespace LettuceEncrypt.Internal
             _context = new AcmeContext(directoryUri, acmeAccountKey);
         }
 
-        public async Task<Account> GetAccountAsync()
+        public async Task<IAccountContext> GetAccountAsync()
         {
             _logger.LogAcmeAction("FetchAccount");
-            _accountContext = await _context.Account();
-            _logger.LogAcmeAction("FetchAccountDetails", _accountContext);
-            return await _accountContext.Resource();
+            return await _context.Account();
         }
 
-        public async Task<int> CreateAccountAsync(string emailAddress)
+        public async Task<Account> GetAccountDetailsAsync(IAccountContext accountContext)
+        {
+            _logger.LogAcmeAction("FetchAccountDetails", accountContext);
+            return await accountContext.Resource();
+        }
+
+        public async Task<IAccountContext> CreateAccountAsync(string emailAddress)
         {
             _logger.LogAcmeAction("NewAccount");
-            _accountContext = await _context.NewAccount(emailAddress, termsOfServiceAgreed: true);
-
-            if (!int.TryParse(_accountContext.Location.Segments.Last(), out var accountId))
-            {
-                accountId = 0;
-            }
-
-            return accountId;
+            return await _context.NewAccount(emailAddress, termsOfServiceAgreed: true);
         }
 
         public async Task<Uri> GetTermsOfServiceAsync()
@@ -52,30 +48,22 @@ namespace LettuceEncrypt.Internal
             return await _context.TermsOfService();
         }
 
-        public async Task AgreeToTermsOfServiceAsync()
+        public async Task AgreeToTermsOfServiceAsync(IAccountContext accountContext)
         {
-            if (_accountContext == null)
-            {
-                throw MissingAccountContext();
-            }
             _logger.LogAcmeAction("UpdateTOS");
-            await _accountContext.Update(agreeTermsOfService: true);
+            await accountContext.Update(agreeTermsOfService: true);
         }
 
-        public async Task<IEnumerable<IOrderContext>> GetOrdersAsync()
+        public async Task<IEnumerable<IOrderContext>> GetOrdersAsync(IAccountContext accountContext)
         {
-            if (_accountContext == null)
-            {
-                throw MissingAccountContext();
-            }
-
             _logger.LogAcmeAction("FetchOrderList");
-            var orderListContext = await _accountContext.Orders();
+            var orderListContext = await accountContext.Orders();
 
             if (orderListContext == null)
             {
                 return Enumerable.Empty<IOrderContext>();
             }
+
             _logger.LogAcmeAction("FetchOrderDetails", orderListContext);
             return await orderListContext.Orders();
         }
@@ -104,7 +92,8 @@ namespace LettuceEncrypt.Internal
             return await authorizationContext.Resource();
         }
 
-        public async Task<IChallengeContext> CreateChallengeAsync(IAuthorizationContext authorizationContext, string challengeType)
+        public async Task<IChallengeContext> CreateChallengeAsync(IAuthorizationContext authorizationContext,
+            string challengeType)
         {
             _logger.LogAcmeAction("CreateChallenge", authorizationContext);
             return await authorizationContext.Challenge(challengeType);
@@ -121,7 +110,5 @@ namespace LettuceEncrypt.Internal
             _logger.LogAcmeAction("GenerateCertificate", order);
             return await order.Generate(csrInfo, privateKey);
         }
-
-        private Exception MissingAccountContext() => new InvalidOperationException("Account wasn't initialized yet");
     }
 }

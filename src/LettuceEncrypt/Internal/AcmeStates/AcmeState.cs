@@ -20,25 +20,23 @@ namespace LettuceEncrypt.Internal.AcmeStates
         private TerminalState() {}
 
         public Task<IAcmeState> MoveNextAsync(CancellationToken cancellationToken)
-        {
-            throw new OperationCanceledException();
-        }
+            => throw new OperationCanceledException();
     }
 
     internal abstract class AcmeState : IAcmeState
     {
-        private readonly AcmeStateMachineContext _context;
-
-        public AcmeState(AcmeStateMachineContext context)
+        protected AcmeState(AcmeStateMachineContext context)
         {
-            _context = context;
+            Context = context;
         }
+
+        protected AcmeStateMachineContext Context { get; }
 
         public abstract Task<IAcmeState> MoveNextAsync(CancellationToken cancellationToken);
 
-        protected T MoveTo<T>() where T : IAcmeState
+        protected virtual T MoveTo<T>() where T : IAcmeState
         {
-            return _context.Services.GetRequiredService<T>();
+            return Context.Services.GetRequiredService<T>();
         }
     }
 

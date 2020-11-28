@@ -8,7 +8,12 @@ using Microsoft.Extensions.Options;
 
 namespace LettuceEncrypt.Internal
 {
-    internal class TermsOfServiceChecker
+    interface ITermsOfServiceChecker
+    {
+        void EnsureTermsAreAccepted(Uri termsOfServiceUri);
+    }
+
+    class TermsOfServiceChecker : ITermsOfServiceChecker
     {
         private readonly IConsole _console;
         private readonly IOptions<LettuceEncryptOptions> _options;
