@@ -1,5 +1,8 @@
 <Project>
   <PropertyGroup>
+    <PackageReleaseNotes Condition="'$(VersionPrefix)' == '1.0.1'">
+* Fix bug in detecting Kestrel in .NET 5
+    </PackageReleaseNotes>
     <PackageReleaseNotes Condition="'$(VersionPrefix)' == '1.0.0'">
 First release! This is basically the same as McMaster.AspNetCore.LetsEncrypt 0.5.0, but has been renamed.
 
