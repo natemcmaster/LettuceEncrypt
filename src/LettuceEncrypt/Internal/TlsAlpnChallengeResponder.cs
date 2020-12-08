@@ -11,6 +11,7 @@ using System.Threading;
 using LettuceEncrypt.Internal.IO;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Org.BouncyCastle.Asn1;
 
 namespace LettuceEncrypt.Internal
@@ -33,27 +34,29 @@ namespace LettuceEncrypt.Internal
         private int _openChallenges = 0;
 
         public TlsAlpnChallengeResponder(
+            IOptions<LettuceEncryptOptions> options,
             CertificateSelector certificateSelector,
             IClock clock,
             ILogger<TlsAlpnChallengeResponder> logger)
         {
+            // TLS ALPN not supported on .NET Standard. Requires .NET Core 3
+#if NETCOREAPP3_0
+            IsEnabled = options.Value.Challenges.Contains(Certes.Acme.Resource.ChallengeTypes.TlsAlpn01);
+#endif
             _certificateSelector = certificateSelector ?? throw new ArgumentNullException(nameof(certificateSelector));
             _clock = clock ?? throw new ArgumentNullException(nameof(clock));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-#if NETSTANDARD2_0
-        // TLS ALPN not supported on .NET Standard. Requires .NET Core 3
-        public bool IsEnabled => false;
+        public bool IsEnabled { get; }
 
+#if NETSTANDARD2_0
         public void PrepareChallengeCert(string domainName, string keyAuthorization)
         {
             throw new PlatformNotSupportedException();
         }
 
 #elif NETCOREAPP3_0
-        public bool IsEnabled => true;
-
         public void OnSslAuthenticate(ConnectionContext context, SslServerAuthenticationOptions options)
         {
             if (_openChallenges > 0)

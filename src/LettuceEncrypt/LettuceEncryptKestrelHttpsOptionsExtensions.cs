@@ -62,7 +62,11 @@ namespace Microsoft.AspNetCore.Hosting
             TlsAlpnChallengeResponder tlsAlpnChallengeResponder
         )
         {
-            httpsOptions.OnAuthenticate = tlsAlpnChallengeResponder.OnSslAuthenticate;
+            if (tlsAlpnChallengeResponder.IsEnabled)
+            {
+                httpsOptions.OnAuthenticate = tlsAlpnChallengeResponder.OnSslAuthenticate;
+            }
+
             httpsOptions.UseServerCertificateSelector(selector);
             return httpsOptions;
         }
