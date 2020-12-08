@@ -1,7 +1,9 @@
 // Copyright (c) Nate McMaster.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
+using Certes.Acme.Resource;
 using System;
+using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 
 namespace LettuceEncrypt
@@ -45,6 +47,18 @@ namespace LettuceEncrypt
             get => _useStagingServer ?? false;
             set => _useStagingServer = value;
         }
+
+        /// <summary>
+        /// Identifies the challenge types to be used.
+        /// </summary>
+        public ICollection<string> Challenges =
+#if NETSTANDARD2_0
+            new HashSet<string> { ChallengeTypes.Http01 };
+#elif NETCOREAPP3_0
+            new HashSet<string> { ChallengeTypes.Http01, ChallengeTypes.TlsAlpn01 };
+#else
+#error Update TFMs
+#endif
 
         internal bool UseStagingServerExplicitlySet => _useStagingServer.HasValue;
 

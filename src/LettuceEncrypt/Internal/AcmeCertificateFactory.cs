@@ -100,7 +100,7 @@ namespace LettuceEncrypt.Internal
             var accountModel = new AccountModel
             {
                 Id = accountId,
-                EmailAddresses = new[] {options.EmailAddress},
+                EmailAddresses = new[] { options.EmailAddress },
                 PrivateKey = _acmeAccountKey.ToDer(),
             };
 
@@ -299,6 +299,12 @@ namespace LettuceEncrypt.Internal
                 throw new InvalidOperationException();
             }
 
+            if (!_options.Value.Challenges.Contains(ChallengeTypes.Http01))
+            {
+                _logger.LogTrace("{ChallengeType} was not registered to be used.", ChallengeTypes.Http01);
+                return;
+            }
+
             var httpChallenge = await _client.CreateChallengeAsync(authorizationContext, ChallengeTypes.Http01);
             if (httpChallenge == null)
             {
@@ -325,6 +331,12 @@ namespace LettuceEncrypt.Internal
             if (_client == null)
             {
                 throw new InvalidOperationException();
+            }
+
+            if (!_options.Value.Challenges.Contains(ChallengeTypes.TlsAlpn01))
+            {
+                _logger.LogTrace("{ChallengeType} was not registered to be used.", ChallengeTypes.TlsAlpn01);
+                return;
             }
 
             var tlsAlpnChallenge = await _client.CreateChallengeAsync(authorizationContext, ChallengeTypes.TlsAlpn01);
@@ -375,7 +387,7 @@ namespace LettuceEncrypt.Internal
             {
                 CommonName = commonName,
             };
-            var privateKey = KeyFactory.NewKey((Certes.KeyAlgorithm) _options.Value.KeyAlgorithm);
+            var privateKey = KeyFactory.NewKey((Certes.KeyAlgorithm)_options.Value.KeyAlgorithm);
             var acmeCert = await _client.GetCertificateAsync(csrInfo, privateKey, order);
 
             _logger.LogAcmeAction("NewCertificate");
