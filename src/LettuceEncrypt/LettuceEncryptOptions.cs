@@ -51,7 +51,7 @@ namespace LettuceEncrypt
         /// <summary>
         /// Identifies the challenge types to be used.
         /// </summary>
-        public ICollection<string> Challenges =
+        public ICollection<string> Challenges { get; } =
 #if NETSTANDARD2_0
             new HashSet<string> { ChallengeTypes.Http01 };
 #elif NETCOREAPP3_0
