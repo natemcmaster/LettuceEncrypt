@@ -24,7 +24,7 @@ namespace LettuceEncrypt.Internal
         {
             options.ConfigureHttpsDefaults(o =>
             {
-#if NETCOREAPP3_0
+#if NETCOREAPP3_1
                 o.UseLettuceEncrypt(_certificateSelector, _tlsAlpnChallengeResponder);
 #elif NETSTANDARD2_0
                 o.UseServerCertificateSelector(_certificateSelector);

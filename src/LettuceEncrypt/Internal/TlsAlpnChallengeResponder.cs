@@ -24,7 +24,7 @@ namespace LettuceEncrypt.Internal
         // See RFC8737 section 6.1
         private static readonly Oid s_acmeExtensionOid = new Oid("1.3.6.1.5.5.7.1.31");
         private const string ProtocolName = "acme-tls/1";
-#if NETCOREAPP3_0
+#if NETCOREAPP3_1
         private static readonly SslApplicationProtocol s_acmeTlsProtocol = new SslApplicationProtocol(ProtocolName);
 #endif
         private readonly IClock _clock;
@@ -51,7 +51,7 @@ namespace LettuceEncrypt.Internal
             throw new PlatformNotSupportedException();
         }
 
-#elif NETCOREAPP3_0
+#elif NETCOREAPP3_1
         public bool IsEnabled => true;
 
         public void OnSslAuthenticate(ConnectionContext context, SslServerAuthenticationOptions options)
