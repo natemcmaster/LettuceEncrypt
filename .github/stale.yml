@@ -8,7 +8,7 @@ daysUntilClose: 14
 staleLabel: closed-stale
 # Skip issues in a milestone
 exemptMilestones: true
-# Skipp issues assigned to someone
+# Skip issues assigned to someone
 exemptAssignees: true
 exemptLabels:
 - announcement

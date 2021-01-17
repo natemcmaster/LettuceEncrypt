@@ -35,8 +35,8 @@ namespace LettuceEncrypt.UnitTests
         }
 
         [SkippableFact]
-        [SkipOnAzurePipelinesWindows(SkipReason =
-            "On Windows in Azure Pipelines, adding certs to store doesn't work for unclear reasons.")]
+        [SkipOnWindowsCIBuild(SkipReason =
+            "On Windows in CI, adding certs to store doesn't work for unclear reasons.")]
         public async Task ItFindsCertByCommonNameAsync()
         {
             var commonName = "x509store.read.test.natemcmaster.com";
@@ -62,8 +62,8 @@ namespace LettuceEncrypt.UnitTests
         }
 
         [SkippableFact]
-        [SkipOnAzurePipelinesWindows(SkipReason =
-            "On Windows in Azure Pipelines, adding certs to store doesn't work for unclear reasons.")]
+        [SkipOnWindowsCIBuild(SkipReason =
+            "On Windows in CI, adding certs to store doesn't work for unclear reasons.")]
         public async Task ItSavesCertificates()
         {
             var commonName = "x509store.save.test.natemcmaster.com";
