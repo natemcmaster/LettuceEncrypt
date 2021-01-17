@@ -1,9 +1,11 @@
-﻿using System.Linq;
+﻿// Copyright (c) Nate McMaster.
+// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
+
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure.Security.KeyVault.Certificates;
 using Azure.Security.KeyVault.Secrets;
-using LettuceEncrypt;
 using LettuceEncrypt.Azure.Internal;
 using LettuceEncrypt.UnitTests;
 using Microsoft.Extensions.DependencyInjection;

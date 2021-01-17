@@ -1,3 +1,6 @@
+// Copyright (c) Nate McMaster.
+// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
+
 using System;
 using System.Threading.Tasks;
 using Azure;
@@ -16,7 +19,7 @@ namespace LettuceEncrypt.Azure.UnitTests
 {
     public class AzureKeyVaultAccountStoreTests
     {
-        private ICertificateAuthorityConfiguration _mockCertificateAuthority;
+        private readonly ICertificateAuthorityConfiguration _mockCertificateAuthority;
 
         public AzureKeyVaultAccountStoreTests()
         {

@@ -22,10 +22,10 @@ namespace LettuceEncrypt.Internal
     internal class TlsAlpnChallengeResponder
     {
         // See RFC8737 section 6.1
-        private static readonly Oid s_acmeExtensionOid = new Oid("1.3.6.1.5.5.7.1.31");
+        private static readonly Oid s_acmeExtensionOid = new("1.3.6.1.5.5.7.1.31");
         private const string ProtocolName = "acme-tls/1";
 #if NETCOREAPP3_1
-        private static readonly SslApplicationProtocol s_acmeTlsProtocol = new SslApplicationProtocol(ProtocolName);
+        private static readonly SslApplicationProtocol s_acmeTlsProtocol = new(ProtocolName);
 #endif
         private readonly IClock _clock;
         private readonly ILogger<TlsAlpnChallengeResponder> _logger;

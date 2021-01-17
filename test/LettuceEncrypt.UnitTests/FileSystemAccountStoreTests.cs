@@ -24,7 +24,7 @@ namespace LettuceEncrypt.UnitTests
     public class FileSystemAccountStoreTests : IDisposable
     {
         private readonly DirectoryInfo _testDir =
-            new DirectoryInfo(Path.Combine(AppContext.BaseDirectory, Path.GetRandomFileName()));
+            new(Path.Combine(AppContext.BaseDirectory, Path.GetRandomFileName()));
 
         public void Dispose()
         {

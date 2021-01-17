@@ -9,7 +9,7 @@ using Microsoft.Extensions.Options;
 
 namespace LettuceEncrypt.Internal.AcmeStates
 {
-    class CheckForRenewalState : AcmeState
+    internal class CheckForRenewalState : AcmeState
     {
         private readonly ILogger<CheckForRenewalState> _logger;
         private readonly IOptions<LettuceEncryptOptions> _options;

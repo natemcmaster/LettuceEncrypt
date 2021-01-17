@@ -31,7 +31,7 @@ namespace LettuceEncrypt.Internal
         private readonly IAccountStore _accountRepository;
         private readonly ILogger _logger;
         private readonly TlsAlpnChallengeResponder _tlsAlpnChallengeResponder;
-        private readonly TaskCompletionSource<object?> _appStarted;
+        private readonly TaskCompletionSource<object?> _appStarted = new();
         private AcmeClient? _client;
         private IKey? _acmeAccountKey;
 
@@ -53,7 +53,6 @@ namespace LettuceEncrypt.Internal
             _logger = logger;
             _tlsAlpnChallengeResponder = tlsAlpnChallengeResponder;
 
-            _appStarted = new TaskCompletionSource<object?>();
             appLifetime.ApplicationStarted.Register(() => _appStarted.TrySetResult(null));
             if (appLifetime.ApplicationStarted.IsCancellationRequested)
             {
@@ -238,7 +237,7 @@ namespace LettuceEncrypt.Internal
                 await PrepareTlsAlpnChallengeResponseAsync(authorizationContext, domainName, cancellationToken);
             }
 
-            await PrepareHttpChallengeResponseAsync(authorizationContext, domainName, cancellationToken);
+            await PrepareHttpChallengeResponseAsync(authorizationContext, cancellationToken);
 
             var retries = 60;
             var delay = TimeSpan.FromSeconds(2);
@@ -270,6 +269,7 @@ namespace LettuceEncrypt.Internal
                         case AuthorizationStatus.Expired:
                             throw new InvalidOperationException(
                                 $"The authorization to verify domainName '{domainName}' has expired.");
+                        case AuthorizationStatus.Deactivated:
                         default:
                             throw new ArgumentOutOfRangeException("authorization",
                                 "Unexpected response from server while validating domain ownership.");
@@ -290,7 +290,6 @@ namespace LettuceEncrypt.Internal
 
         private async Task PrepareHttpChallengeResponseAsync(
             IAuthorizationContext authorizationContext,
-            string domainName,
             CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();

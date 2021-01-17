@@ -15,7 +15,8 @@
     <WarnOnPackingNonPackableProject>false</WarnOnPackingNonPackableProject>
     <IncludeSymbols>true</IncludeSymbols>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    <LangVersion>8.0</LangVersion>
+    <LangVersion>9.0</LangVersion>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)src\StrongName.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
     <NoWarn>$(NoWarn);NU5105</NoWarn>

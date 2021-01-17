@@ -16,10 +16,10 @@ namespace LettuceEncrypt.Internal
     internal class CertificateSelector : IServerCertificateSelector
     {
         private readonly ConcurrentDictionary<string, X509Certificate2> _certs =
-            new ConcurrentDictionary<string, X509Certificate2>(StringComparer.OrdinalIgnoreCase);
+            new(StringComparer.OrdinalIgnoreCase);
 
         private readonly ConcurrentDictionary<string, X509Certificate2> _challengeCerts =
-            new ConcurrentDictionary<string, X509Certificate2>(StringComparer.OrdinalIgnoreCase);
+            new(StringComparer.OrdinalIgnoreCase);
 
         private readonly IOptions<LettuceEncryptOptions> _options;
         private readonly ILogger<CertificateSelector> _logger;

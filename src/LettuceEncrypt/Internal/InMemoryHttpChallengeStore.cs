@@ -8,8 +8,7 @@ namespace LettuceEncrypt.Internal
 {
     internal class InMemoryHttpChallengeResponseStore : IHttpChallengeResponseStore
     {
-        private readonly ConcurrentDictionary<string, string> _values
-            = new ConcurrentDictionary<string, string>();
+        private readonly ConcurrentDictionary<string, string> _values = new();
 
         public void AddChallengeResponse(string token, string response)
             => _values.AddOrUpdate(token, response, (_, __) => response);

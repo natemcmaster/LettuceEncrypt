@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) Nate McMaster.
+// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
+
+using System;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
@@ -8,7 +11,9 @@ namespace LettuceEncrypt.UnitTests
     public class TestUtils
     {
         public static X509Certificate2 CreateTestCert(string commonName, DateTimeOffset? expires = null)
-            => CreateTestCert(new[] { commonName }, expires);
+        {
+            return CreateTestCert(new[] { commonName }, expires);
+        }
 
         public static X509Certificate2 CreateTestCert(string[] domainNames, DateTimeOffset? expires = null)
         {

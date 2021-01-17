@@ -1,7 +1,9 @@
-﻿using System;
+﻿// Copyright (c) Nate McMaster.
+// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
+
+using System;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
-using LettuceEncrypt;
 using LettuceEncrypt.Internal;
 using McMaster.Extensions.Xunit;
 using Microsoft.Extensions.Logging.Abstractions;

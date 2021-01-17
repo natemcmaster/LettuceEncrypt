@@ -1,5 +1,7 @@
+// Copyright (c) Nate McMaster.
+// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
+
 using System;
-using LettuceEncrypt;
 using LettuceEncrypt.Internal;
 using LettuceEncrypt.Internal.IO;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -11,7 +13,7 @@ namespace LettuceEncrypt.UnitTests
 {
     public class TermsOfServiceCheckerTests
     {
-        private readonly Uri _tosUri = new Uri("https://any");
+        private readonly Uri _tosUri = new("https://any");
 
         [Fact]
         public void UnreadableConsoleAndUnsetInOptions()

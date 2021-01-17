@@ -1,3 +1,4 @@
+#pragma warning disable IDE0073
 // Copying liberally from https://github.com/dotnet/wcf/blob/811e3290ecf0b9a1a2a412e8e584caf44a7b3a29/src/System.Private.ServiceModel/src/System/IdentityModel/Claims/X509CertificateClaimSet.cs
 // Hopefully unnecessary one day - https://github.com/dotnet/corefx/issues/22068
 

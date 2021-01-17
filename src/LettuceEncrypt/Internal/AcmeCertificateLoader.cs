@@ -44,7 +44,7 @@ namespace LettuceEncrypt.Internal
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            if (!(_server.GetType().Name.StartsWith(nameof(KestrelServer))))
+            if (!_server.GetType().Name.StartsWith(nameof(KestrelServer)))
             {
                 var serverType = _server.GetType().FullName;
                 _logger.LogWarning(

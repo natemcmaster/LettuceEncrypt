@@ -125,7 +125,7 @@ namespace LettuceEncrypt.Azure.Internal
 
             _logger.LogInformation("Saving certificate for {domainName} in Azure KeyVault.", domainName);
 
-            if (!(await ShouldImportVersionAsync(domainName, certificate, cancellationToken)))
+            if (!await ShouldImportVersionAsync(domainName, certificate, cancellationToken))
             {
                 _logger.LogInformation(
                     "Certificate for {domainName} is already up-to-date in Azure KeyVault. Skipping importing.",

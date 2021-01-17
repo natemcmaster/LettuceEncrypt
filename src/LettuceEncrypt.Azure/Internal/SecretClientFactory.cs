@@ -13,7 +13,7 @@ namespace LettuceEncrypt.Azure.Internal
         SecretClient Create();
     }
 
-    class SecretClientFactory : ISecretClientFactory
+    internal class SecretClientFactory : ISecretClientFactory
     {
         private readonly IOptions<AzureKeyVaultLettuceEncryptOptions> _options;
 
