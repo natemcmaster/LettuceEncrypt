@@ -62,4 +62,4 @@ if ($ci) {
         "-reporttypes:Cobertura"
 }
 
-write-host -f magenta 'Done'
+write-host -f green 'BUILD SUCCEEDED'

@@ -1,7 +1,7 @@
 <Project InitialTargets="UpdateCiSettings">
 
-  <Target Name="UpdateCiSettings" Condition="'$(CI)' == 'true'">
-    <Message Importance="High" Text="##vso[build.updatebuildnumber]$(PackageVersion)" />
+  <Target Name="UpdateCiSettings" Condition="'$(CI)' == 'true' and '$(MSBuildProjectName)' == 'LettuceEncrypt' ">
+    <Message Importance="High" Text="::set-output name=package_version::$(PackageVersion)" />
   </Target>
 
   <PropertyGroup>
