@@ -3,12 +3,16 @@
 LettuceEncrypt for ASP.NET Core
 </h1>
 
-[![Build Status][azdo-badge]][azdo-url] [![Nuget][nuget-badge]][nuget-url]
+[![Build Status][ci-badge]][ci] [![Code Coverage][codecov-badge]][codecov]
+[![NuGet][nuget-badge] ![NuGet Downloads][nuget-download-badge]][nuget]
 
-[azdo-badge]: https://dev.azure.com/natemcmaster/github/_apis/build/status/LettuceEncrypt?branchName=main
-[azdo-url]: https://dev.azure.com/natemcmaster/github/_build/?definitionId=11
-[nuget-badge]: https://img.shields.io/nuget/v/LettuceEncrypt?color=blue
-[nuget-url]: https://nuget.org/packages/LettuceEncrypt
+[ci]: https://github.com/natemcmaster/LettuceEncrypt/actions?query=workflow%3ACI+branch%3Amain
+[ci-badge]: https://github.com/natemcmaster/LettuceEncrypt/workflows/CI/badge.svg
+[codecov]: https://codecov.io/gh/natemcmaster/LettuceEncrypt
+[codecov-badge]: https://codecov.io/gh/natemcmaster/LettuceEncrypt/branch/main/graph/badge.svg?token=l6uSsHZ8nA
+[nuget]: https://www.nuget.org/packages/LettuceEncrypt/
+[nuget-badge]: https://img.shields.io/nuget/v/LettuceEncrypt.svg?style=flat-square
+[nuget-download-badge]: https://img.shields.io/nuget/dt/LettuceEncrypt?style=flat-square
 [ACME]: https://en.wikipedia.org/wiki/Automated_Certificate_Management_Environment
 [Let's Encrypt]: https://letsencrypt.org/
 
