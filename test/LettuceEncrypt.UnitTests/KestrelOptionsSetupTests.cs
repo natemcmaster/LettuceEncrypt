@@ -25,7 +25,7 @@ namespace LettuceEncrypt.UnitTests
                 typeof(KestrelServerOptions).GetProperty("HttpsDefaults",
                     BindingFlags.Instance | BindingFlags.NonPublic);
             var httpsDefaultsFunc =
-                (Action<HttpsConnectionAdapterOptions>) httpsDefaultsProp.GetMethod.Invoke(kestrelOptions,
+                (Action<HttpsConnectionAdapterOptions>)httpsDefaultsProp.GetMethod.Invoke(kestrelOptions,
                     Array.Empty<object>());
             var httpsDefaults = new HttpsConnectionAdapterOptions();
 

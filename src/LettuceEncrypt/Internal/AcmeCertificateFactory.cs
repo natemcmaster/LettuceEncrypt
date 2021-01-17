@@ -100,7 +100,7 @@ namespace LettuceEncrypt.Internal
             var accountModel = new AccountModel
             {
                 Id = accountId,
-                EmailAddresses = new[] {options.EmailAddress},
+                EmailAddresses = new[] { options.EmailAddress },
                 PrivateKey = _acmeAccountKey.ToDer(),
             };
 
@@ -375,7 +375,7 @@ namespace LettuceEncrypt.Internal
             {
                 CommonName = commonName,
             };
-            var privateKey = KeyFactory.NewKey((Certes.KeyAlgorithm) _options.Value.KeyAlgorithm);
+            var privateKey = KeyFactory.NewKey((Certes.KeyAlgorithm)_options.Value.KeyAlgorithm);
             var acmeCert = await _client.GetCertificateAsync(csrInfo, privateKey, order);
 
             _logger.LogAcmeAction("NewCertificate");

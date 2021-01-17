@@ -17,7 +17,7 @@ namespace LettuceEncrypt.Internal.AcmeStates
     {
         public static TerminalState Singleton { get; } = new TerminalState();
 
-        private TerminalState() {}
+        private TerminalState() { }
 
         public Task<IAcmeState> MoveNextAsync(CancellationToken cancellationToken)
         {

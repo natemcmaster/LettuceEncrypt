@@ -57,7 +57,7 @@ namespace LettuceEncrypt.UnitTests
             var account = new AccountModel
             {
                 Id = 1,
-                EmailAddresses = new[] {"test@test.com"},
+                EmailAddresses = new[] { "test@test.com" },
                 PrivateKey = bytes,
             };
 

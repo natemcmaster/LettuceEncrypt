@@ -32,7 +32,6 @@ if ($ci) {
     & dotnet --info
 }
 
-$isPr = $env:APPVEYOR_PULL_REQUEST_HEAD_COMMIT -or ($env:BUILD_REASON -eq 'PullRequest')
 if (-not (Test-Path variable:\IsCoreCLR)) {
     $IsWindows = $true
 }
@@ -42,6 +41,13 @@ $artifacts = "$PSScriptRoot/artifacts/"
 Remove-Item -Recurse $artifacts -ErrorAction Ignore
 
 exec dotnet tool restore
+
+[string[]] $formatArgs=@()
+if ($ci) {
+    $formatArgs += '--check'
+}
+
+exec dotnet tool run dotnet-format -- -v detailed @formatArgs
 exec dotnet build --configuration $Configuration '-warnaserror:CS1591' @MSBuildArgs
 exec dotnet pack --no-restore --no-build --configuration $Configuration -o $artifacts @MSBuildArgs
 
