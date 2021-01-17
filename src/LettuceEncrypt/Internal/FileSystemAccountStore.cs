@@ -43,7 +43,7 @@ namespace LettuceEncrypt.Internal
 
             foreach (var jsonFile in _accountDir.GetFiles("*.json"))
             {
-                _logger.LogTrace("Parsing {path} for account info",jsonFile);
+                _logger.LogTrace("Parsing {path} for account info", jsonFile);
 
                 var accountModel = await Deserialize(jsonFile, cancellationToken);
                 if (accountModel != null)

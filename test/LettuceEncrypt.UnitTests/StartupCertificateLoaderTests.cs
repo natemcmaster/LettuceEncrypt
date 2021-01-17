@@ -17,7 +17,7 @@ namespace LettuceEncrypt.UnitTests
         public async Task ItLoadsAllCertsIntoSelector()
         {
             var testCert = new X509Certificate2();
-            IEnumerable<X509Certificate2> certs = new[] {testCert};
+            IEnumerable<X509Certificate2> certs = new[] { testCert };
 
             var selector = new Mock<CertificateSelector>(
                 Options.Create(new LettuceEncryptOptions()),
@@ -31,7 +31,7 @@ namespace LettuceEncrypt.UnitTests
             var source2 = CreateCertSource(certs);
 
             var startupLoader = new StartupCertificateLoader(
-                new[] {source1.Object, source2.Object},
+                new[] { source1.Object, source2.Object },
                 selector.Object);
 
             await startupLoader.StartAsync(default);

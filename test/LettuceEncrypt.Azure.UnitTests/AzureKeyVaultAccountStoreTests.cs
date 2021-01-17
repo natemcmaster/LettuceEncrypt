@@ -40,7 +40,7 @@ namespace LettuceEncrypt.Azure.UnitTests
             var accountModel = new AccountModel
             {
                 Id = 1234,
-                EmailAddresses = new[] {"test@example.com"},
+                EmailAddresses = new[] { "test@example.com" },
                 PrivateKey = KeyFactory.NewKey(Certes.KeyAlgorithm.ES512).ToDer(),
             };
 
