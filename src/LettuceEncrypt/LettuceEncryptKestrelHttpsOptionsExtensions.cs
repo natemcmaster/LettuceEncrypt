@@ -39,7 +39,7 @@ namespace Microsoft.AspNetCore.Hosting
                 throw new InvalidOperationException(MissingServicesMessage);
             }
 
-#if NETCOREAPP3_0
+#if NETCOREAPP3_1
             var tlsResponder = applicationServices.GetService<TlsAlpnChallengeResponder>();
             if (tlsResponder is null)
             {
@@ -55,7 +55,7 @@ namespace Microsoft.AspNetCore.Hosting
 #endif
         }
 
-#if NETCOREAPP3_0
+#if NETCOREAPP3_1
         internal static HttpsConnectionAdapterOptions UseLettuceEncrypt(
             this HttpsConnectionAdapterOptions httpsOptions,
             IServerCertificateSelector selector,
