@@ -30,6 +30,10 @@ offering** from Let's Encrypt® or ISRG™.
 
 This project is 100% organic and best served cold with ranch and carrots. 🥬
 
+### Project status 
+
+This project is in maintenance mode. I lost interest in developing features. I will make a patch if there is a security issue. I'll also consider an update if a new .NET major version breaks and the patch fix required is small. Please see https://github.com/natemcmaster/LettuceEncrypt/security/policy if you wish to report a security concern.
+
 ## Will this work for me?
 
 That depends on [which kind of web server you are using](#web-server-scenarios). This library only works with
