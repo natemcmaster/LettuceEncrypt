@@ -40,11 +40,11 @@ namespace LettuceEncrypt.Internal
             TermsOfServiceChecker tosChecker,
             IOptions<LettuceEncryptOptions> options,
             IHttpChallengeResponseStore challengeStore,
-            IAccountStore? accountRepository,
             ILogger<AcmeCertificateFactory> logger,
             IHostApplicationLifetime appLifetime,
             TlsAlpnChallengeResponder tlsAlpnChallengeResponder,
-            ICertificateAuthorityConfiguration certificateAuthority)
+            ICertificateAuthorityConfiguration certificateAuthority,
+            IAccountStore? accountRepository = null)
         {
             _acmeClientFactory = acmeClientFactory;
             _tosChecker = tosChecker;
