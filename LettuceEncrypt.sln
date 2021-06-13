@@ -24,6 +24,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "files", "files", "{A92C89F3
 		CONTRIBUTING.md = CONTRIBUTING.md
 		Directory.Build.props = Directory.Build.props
 		Directory.Build.targets = Directory.Build.targets
+		.config\dotnet-tools.json = .config\dotnet-tools.json
 		README.md = README.md
 	EndProjectSection
 EndProject
@@ -33,7 +34,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LettuceEncrypt.Azure.UnitTe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KeyVault", "samples\KeyVault\KeyVault.csproj", "{6143D097-6983-4A29-9DAE-1DD0EBC900D2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "McMaster.AspNetCore.Kestrel.Certificates", "src\Kestrel.Certificates\McMaster.AspNetCore.Kestrel.Certificates.csproj", "{8131AFC9-ED23-4A3A-9D38-5200E4D8B168}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "McMaster.AspNetCore.Kestrel.Certificates", "src\Kestrel.Certificates\McMaster.AspNetCore.Kestrel.Certificates.csproj", "{8131AFC9-ED23-4A3A-9D38-5200E4D8B168}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
