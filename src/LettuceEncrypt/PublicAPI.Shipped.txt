@@ -10,6 +10,12 @@ LettuceEncrypt.Accounts.AccountModel.PrivateKey.set -> void
 LettuceEncrypt.Accounts.IAccountStore
 LettuceEncrypt.Accounts.IAccountStore.GetAccountAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<LettuceEncrypt.Accounts.AccountModel?>!
 LettuceEncrypt.Accounts.IAccountStore.SaveAccountAsync(LettuceEncrypt.Accounts.AccountModel! account, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task!
+LettuceEncrypt.Acme.ChallengeType
+LettuceEncrypt.Acme.ChallengeType.Any = 65535 -> LettuceEncrypt.Acme.ChallengeType
+LettuceEncrypt.Acme.ChallengeType.Http01 = 1 -> LettuceEncrypt.Acme.ChallengeType
+LettuceEncrypt.Acme.ChallengeType.TlsAlpn01 = 2 -> LettuceEncrypt.Acme.ChallengeType
+LettuceEncrypt.Acme.ICertificateAuthorityConfiguration
+LettuceEncrypt.Acme.ICertificateAuthorityConfiguration.AcmeDirectoryUri.get -> System.Uri!
 LettuceEncrypt.FileSystemStorageExtensions
 LettuceEncrypt.ICertificateRepository
 LettuceEncrypt.ICertificateRepository.SaveAsync(System.Security.Cryptography.X509Certificates.X509Certificate2! certificate, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task!
@@ -25,6 +31,8 @@ LettuceEncrypt.KeyAlgorithm.ES512 = 3 -> LettuceEncrypt.KeyAlgorithm
 LettuceEncrypt.LettuceEncryptOptions
 LettuceEncrypt.LettuceEncryptOptions.AcceptTermsOfService.get -> bool
 LettuceEncrypt.LettuceEncryptOptions.AcceptTermsOfService.set -> void
+LettuceEncrypt.LettuceEncryptOptions.AllowedChallengeTypes.get -> LettuceEncrypt.Acme.ChallengeType
+LettuceEncrypt.LettuceEncryptOptions.AllowedChallengeTypes.set -> void
 LettuceEncrypt.LettuceEncryptOptions.DomainNames.get -> string![]!
 LettuceEncrypt.LettuceEncryptOptions.DomainNames.set -> void
 LettuceEncrypt.LettuceEncryptOptions.EmailAddress.get -> string!
@@ -40,7 +48,9 @@ LettuceEncrypt.LettuceEncryptOptions.RenewDaysInAdvance.get -> System.TimeSpan?
 LettuceEncrypt.LettuceEncryptOptions.RenewDaysInAdvance.set -> void
 LettuceEncrypt.LettuceEncryptOptions.UseStagingServer.get -> bool
 LettuceEncrypt.LettuceEncryptOptions.UseStagingServer.set -> void
+Microsoft.AspNetCore.Hosting.LettuceEncryptKestrelHttpsOptionsExtensions
 Microsoft.Extensions.DependencyInjection.LettuceEncryptServiceCollectionExtensions
 static LettuceEncrypt.FileSystemStorageExtensions.PersistDataToDirectory(this LettuceEncrypt.ILettuceEncryptServiceBuilder! builder, System.IO.DirectoryInfo! directory, string? pfxPassword) -> LettuceEncrypt.ILettuceEncryptServiceBuilder!
-static Microsoft.Extensions.DependencyInjection.LettuceEncryptServiceCollectionExtensions.AddLettuceEncrypt(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services) -> LettuceEncrypt.ILettuceEncryptServiceBuilder!
+static Microsoft.AspNetCore.Hosting.LettuceEncryptKestrelHttpsOptionsExtensions.UseLettuceEncrypt(this Microsoft.AspNetCore.Server.Kestrel.Https.HttpsConnectionAdapterOptions! httpsOptions, System.IServiceProvider! applicationServices) -> Microsoft.AspNetCore.Server.Kestrel.Https.HttpsConnectionAdapterOptions!
 static Microsoft.Extensions.DependencyInjection.LettuceEncryptServiceCollectionExtensions.AddLettuceEncrypt(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, System.Action<LettuceEncrypt.LettuceEncryptOptions!>! configure) -> LettuceEncrypt.ILettuceEncryptServiceBuilder!
+static Microsoft.Extensions.DependencyInjection.LettuceEncryptServiceCollectionExtensions.AddLettuceEncrypt(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services) -> LettuceEncrypt.ILettuceEncryptServiceBuilder!

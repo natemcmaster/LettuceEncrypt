@@ -1,5 +1,19 @@
 <Project>
   <PropertyGroup>
+    <PackageReleaseNotes Condition="$(VersionPrefix.StartsWith('1.1.'))">
+New features:
+ * Add API for controlling whether HTTP-01, TLS-ALPN-01, or both challenge types are used (#197)
+ * create abstraction for SNI certificates in Kestrel (#108)
+ * add API to configure LettuceEncrypt when also calling 'UseKestrel' to configure its HTTPS defaults or endpoints (#109)
+
+Bug fixes:
+ * workaround bug in Windows SSL stream when generating temporary self-signed certs (#110)
+ * fix race condition  causing domain validation to valid sometimes. Run TLS-ALPN-01 first then HTTP-01 (if needed). Don't run in parallel (#198)
+ * Don't unset other HTTPS adapters which configure a OnAuthenticate callback (#199)
+
+Other:
+ * Update package to target .NET Core 3.1 as 3.0 is no longer supported by Microsoft
+    </PackageReleaseNotes>
     <PackageReleaseNotes Condition="'$(VersionPrefix)' == '1.0.1'">
 * Fix bug in detecting Kestrel in .NET 5
     </PackageReleaseNotes>

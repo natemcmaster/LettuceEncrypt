@@ -1,0 +1,9 @@
+<Project>
+  <PropertyGroup>
+    <PackageReleaseNotes Condition="$(VersionPrefix.StartsWith('1.0.'))">
+First stable release!
+    </PackageReleaseNotes>
+
+    <PackageReleaseNotes>$(PackageReleaseNotes.Trim())</PackageReleaseNotes>
+  </PropertyGroup>
+</Project>
