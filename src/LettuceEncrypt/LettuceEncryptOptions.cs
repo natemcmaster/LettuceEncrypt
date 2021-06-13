@@ -3,6 +3,7 @@
 
 using System;
 using System.Security.Cryptography.X509Certificates;
+using LettuceEncrypt.Acme;
 
 namespace LettuceEncrypt
 {
@@ -71,5 +72,11 @@ namespace LettuceEncrypt
         /// The asymmetric algorithm used for generating a private key for certificates: RS256, ES256, ES384, ES512
         /// </summary>
         public KeyAlgorithm KeyAlgorithm { get; set; } = KeyAlgorithm.ES256;
+
+        /// <summary>
+        /// Specifies which kinds of ACME challenges LettuceEncrypt can use to verify domain ownership.
+        /// Defaults to <see cref="ChallengeType.Any"/>.
+        /// </summary>
+        public ChallengeType AllowedChallengeTypes { get; set; } = ChallengeType.Any;
     }
 }

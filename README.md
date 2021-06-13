@@ -251,6 +251,31 @@ class MyAccountStore: IAccountStore
 }
 ```
 
+
+### Changing which challenge types are used
+
+The ACME protocol supports multiple methods for proving you own a DNS name called "challenge types".
+If you wish to manually select which challenge types are used, set the "AllowedChallengeTypes" method.
+The default value is "Any", which means this library will exhaust all supported challenge types before
+giving up.
+
+Current supported values:
+* `Http01` - The HTTP-01 challenge, which uses a well-known URL on the server and a HTTP request/response.
+* `TlsAlpn01` - The TLS-ALPN-01 challenge, which uses an auto-generated, ephemeral certificate in the TLS handshake.
+* `Any` - _(default)_ - use HTTP-01 and/or TLS-ALPN-01
+
+Tip: if you wish to set multiple method types and are use the "appsettings.json" approach, provide a comma-seperated list.
+
+
+```json
+{
+    "LettuceEncrypt": {
+        "AllowedChallengeTypes": "Http01, TlsAlpn01"
+    }
+}
+```
+
+
 ## Testing in development
 
 See the [developer docs](./test/Integration/) for details on how to test in a non-production environment.

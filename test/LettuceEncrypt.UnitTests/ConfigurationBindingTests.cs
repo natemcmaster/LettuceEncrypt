@@ -14,28 +14,19 @@ namespace LettuceEncrypt.Tests
         [Fact]
         public void ItBindsToConfig()
         {
-            var data = new Dictionary<string, string>
+            var options = ParseOptions(new()
             {
                 ["LettuceEncrypt:AcceptTermsOfService"] = "true",
                 ["LettuceEncrypt:DomainNames:0"] = "one.com",
                 ["LettuceEncrypt:DomainNames:1"] = "two.com",
-            };
-            var config = new ConfigurationBuilder()
-                .AddInMemoryCollection(data)
-                .Build();
+                ["LettuceEncrypt:AllowedChallengeTypes"] = "Http01",
+            });
 
-            var services = new ServiceCollection()
-                .AddSingleton<IConfiguration>(config)
-                .AddLettuceEncrypt()
-                .Services
-                .BuildServiceProvider(true);
-
-            var options = services.GetRequiredService<IOptions<LettuceEncryptOptions>>();
-
-            Assert.True(options.Value.AcceptTermsOfService);
-            Assert.Collection(options.Value.DomainNames,
+            Assert.True(options.AcceptTermsOfService);
+            Assert.Collection(options.DomainNames,
                 one => Assert.Equal("one.com", one),
                 two => Assert.Equal("two.com", two));
+            Assert.Equal(Acme.ChallengeType.Http01, options.AllowedChallengeTypes);
         }
 
         [Fact]
@@ -58,6 +49,37 @@ namespace LettuceEncrypt.Tests
             var options = services.GetRequiredService<IOptions<LettuceEncryptOptions>>();
 
             Assert.Equal("code", options.Value.EmailAddress);
+        }
+
+        [Theory]
+        [InlineData("http01", Acme.ChallengeType.Http01)]
+        [InlineData("HTTP01", Acme.ChallengeType.Http01)]
+        [InlineData("Any", Acme.ChallengeType.Any)]
+        [InlineData("TlsAlpn01, http01", Acme.ChallengeType.TlsAlpn01 | Acme.ChallengeType.Http01)]
+        public void ItParsesEnumValuesForChallengeType(string value, Acme.ChallengeType challengeType)
+        {
+            var options = ParseOptions(new()
+            {
+                ["LettuceEncrypt:AllowedChallengeTypes"] = value,
+            });
+
+            Assert.Equal(challengeType, options.AllowedChallengeTypes);
+        }
+
+        private LettuceEncryptOptions ParseOptions(Dictionary<string, string> input)
+        {
+            var config = new ConfigurationBuilder()
+                       .AddInMemoryCollection(input)
+                       .Build();
+
+            var services = new ServiceCollection()
+                .AddSingleton<IConfiguration>(config)
+                .AddLettuceEncrypt()
+                .Services
+                .BuildServiceProvider(true);
+
+            var options = services.GetRequiredService<IOptions<LettuceEncryptOptions>>();
+            return options.Value;
         }
     }
 }
