@@ -85,7 +85,9 @@ namespace LettuceEncrypt.UnitTests
 }";
             var jsonFile = Path.Combine(_testDir.FullName,
                 "accounts/acme-staging-v02.api.letsencrypt.org/directory/1.json");
-            Directory.CreateDirectory(Path.GetDirectoryName(jsonFile));
+            var path = Path.GetDirectoryName(jsonFile);
+            Assert.NotNull(path);
+            Directory.CreateDirectory(path!);
             await File.WriteAllTextAsync(jsonFile, TestJson);
 
             var store = CreateStore();
