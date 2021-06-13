@@ -30,6 +30,7 @@ namespace LettuceEncrypt.Internal
         private readonly IHttpChallengeResponseStore _challengeStore;
         private readonly IAccountStore _accountRepository;
         private readonly ILogger _logger;
+        private readonly IHostApplicationLifetime _appLifetime;
         private readonly TlsAlpnChallengeResponder _tlsAlpnChallengeResponder;
         private readonly TaskCompletionSource<object?> _appStarted = new();
         private AcmeClient? _client;
@@ -51,6 +52,7 @@ namespace LettuceEncrypt.Internal
             _options = options;
             _challengeStore = challengeStore;
             _logger = logger;
+            _appLifetime = appLifetime;
             _tlsAlpnChallengeResponder = tlsAlpnChallengeResponder;
 
             appLifetime.ApplicationStarted.Register(() => _appStarted.TrySetResult(null));
@@ -232,20 +234,21 @@ namespace LettuceEncrypt.Internal
 
             cancellationToken.ThrowIfCancellationRequested();
 
-            var enabledChallengeHandlers = 0;
+            var validators = new List<DomainOwnershipValidator>();
+
             if (_tlsAlpnChallengeResponder.IsEnabled)
             {
-                enabledChallengeHandlers++;
-                await PrepareTlsAlpnChallengeResponseAsync(authorizationContext, domainName, cancellationToken);
+                validators.Add(new TlsAlpn01DomainValidator(
+                    _tlsAlpnChallengeResponder, _appLifetime, _client, _logger, domainName));
             }
 
             if (_options.Value.AllowedChallengeTypes.HasFlag(ChallengeType.Http01))
             {
-                enabledChallengeHandlers++;
-                await PrepareHttpChallengeResponseAsync(authorizationContext, cancellationToken);
+                validators.Add(new Http01DomainValidator(
+                    _challengeStore, _appLifetime, _client, _logger, domainName));
             }
 
-            if (enabledChallengeHandlers == 0)
+            if (validators.Count == 0)
             {
                 var challengeTypes = string.Join(", ", Enum.GetNames(typeof(ChallengeType)));
                 throw new InvalidOperationException(
@@ -253,123 +256,22 @@ namespace LettuceEncrypt.Internal
                     "Ensure at least one kind of these challenge types is configured: " + challengeTypes);
             }
 
-            var retries = 60;
-            var delay = TimeSpan.FromSeconds(2);
-
-            try
+            foreach (var validator in validators)
             {
-                while (retries > 0)
+                cancellationToken.ThrowIfCancellationRequested();
+                try
                 {
-                    retries--;
-
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                    authorization = await _client.GetAuthorizationAsync(authorizationContext);
-
-                    _logger.LogAcmeAction("GetAuthorization");
-
-                    switch (authorization.Status)
-                    {
-                        case AuthorizationStatus.Valid:
-                            return;
-                        case AuthorizationStatus.Pending:
-                            await Task.Delay(delay, cancellationToken);
-                            continue;
-                        case AuthorizationStatus.Invalid:
-                            throw InvalidAuthorizationError(authorization);
-                        case AuthorizationStatus.Revoked:
-                            throw new InvalidOperationException(
-                                $"The authorization to verify domainName '{domainName}' has been revoked.");
-                        case AuthorizationStatus.Expired:
-                            throw new InvalidOperationException(
-                                $"The authorization to verify domainName '{domainName}' has expired.");
-                        case AuthorizationStatus.Deactivated:
-                        default:
-                            throw new ArgumentOutOfRangeException("authorization",
-                                "Unexpected response from server while validating domain ownership.");
-                    }
+                    await validator.ValidateOwnershipAsync(authorizationContext, cancellationToken);
+                    // The method above raises if validation fails. If no exception occurs, we assume validation completed successfully.
+                    return;
                 }
-
-                throw new TimeoutException("Timed out waiting for domain ownership validation.");
-            }
-            finally
-            {
-                if (_tlsAlpnChallengeResponder.IsEnabled)
+                catch (Exception ex)
                 {
-                    // cleanup after authorization is done to skip unnecessary cert lookup on all incoming SSL connections
-                    _tlsAlpnChallengeResponder.DiscardChallenge(domainName);
+                    _logger.LogDebug(ex, "Validation with {validatorType} failed with error: {error}", validator.GetType().Name, ex.Message);
                 }
             }
-        }
 
-        private async Task PrepareHttpChallengeResponseAsync(
-            IAuthorizationContext authorizationContext,
-            CancellationToken cancellationToken)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            if (_client == null)
-            {
-                throw new InvalidOperationException();
-            }
-
-            var httpChallenge = await _client.CreateChallengeAsync(authorizationContext, ChallengeTypes.Http01);
-            if (httpChallenge == null)
-            {
-                throw new InvalidOperationException(
-                    $"Did not receive challenge information for challenge type {ChallengeTypes.Http01}");
-            }
-
-            var keyAuth = httpChallenge.KeyAuthz;
-            _challengeStore.AddChallengeResponse(httpChallenge.Token, keyAuth);
-
-            _logger.LogTrace("Waiting for server to start accepting HTTP requests");
-            await _appStarted.Task;
-
-            _logger.LogTrace("Requesting server to validate HTTP challenge");
-            await _client.ValidateChallengeAsync(httpChallenge);
-        }
-
-        private async Task PrepareTlsAlpnChallengeResponseAsync(
-            IAuthorizationContext authorizationContext,
-            string domainName,
-            CancellationToken cancellationToken)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            if (_client == null)
-            {
-                throw new InvalidOperationException();
-            }
-
-            var tlsAlpnChallenge = await _client.CreateChallengeAsync(authorizationContext, ChallengeTypes.TlsAlpn01);
-
-            _tlsAlpnChallengeResponder.PrepareChallengeCert(domainName, tlsAlpnChallenge.KeyAuthz);
-
-            _logger.LogTrace("Waiting for server to start accepting HTTP requests");
-            await _appStarted.Task;
-
-            _logger.LogTrace("Requesting server to validate TLS/ALPN challenge");
-            await _client.ValidateChallengeAsync(tlsAlpnChallenge);
-        }
-
-        private Exception InvalidAuthorizationError(Authorization authorization)
-        {
-            var reason = "unknown";
-            var domainName = authorization.Identifier.Value;
-            try
-            {
-                var errors = authorization.Challenges.Where(a => a.Error != null).Select(a => a.Error)
-                    .Select(error => $"{error.Type}: {error.Detail}, Code = {error.Status}");
-                reason = string.Join("; ", errors);
-            }
-            catch
-            {
-                _logger.LogTrace("Could not determine reason why validation failed. Response: {resp}", authorization);
-            }
-
-            _logger.LogError("Failed to validate ownership of domainName '{domainName}'. Reason: {reason}", domainName,
-                reason);
-
-            return new InvalidOperationException($"Failed to validate ownership of domainName '{domainName}'");
+            throw new InvalidOperationException($"Failed to validate ownership of domainName '{domainName}'");
         }
 
         private async Task<X509Certificate2> CompleteCertificateRequestAsync(IOrderContext order,
