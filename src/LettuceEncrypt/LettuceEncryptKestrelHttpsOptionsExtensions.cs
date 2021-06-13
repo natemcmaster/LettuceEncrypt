@@ -39,7 +39,7 @@ namespace Microsoft.AspNetCore.Hosting
                 throw new InvalidOperationException(MissingServicesMessage);
             }
 
-#if NETCOREAPP3_1
+#if NETCOREAPP3_1_OR_GREATER
             var tlsResponder = applicationServices.GetService<TlsAlpnChallengeResponder>();
             if (tlsResponder is null)
             {

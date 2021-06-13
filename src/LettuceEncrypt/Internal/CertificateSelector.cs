@@ -76,7 +76,7 @@ namespace LettuceEncrypt.Internal
 
         public X509Certificate2? Select(ConnectionContext context, string? domainName)
         {
-#if NETCOREAPP3_1
+#if NETCOREAPP3_1_OR_GREATER
             if (_challengeCerts.Count > 0)
             {
                 // var sslStream = context.Features.Get<SslStream>();
