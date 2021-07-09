@@ -38,7 +38,7 @@ namespace LettuceEncrypt.Internal
 
         public abstract Task ValidateOwnershipAsync(IAuthorizationContext authzContext, CancellationToken cancellationToken);
 
-        private async Task WaitForChallengeResultAsync(IAuthorizationContext authorizationContext, CancellationToken cancellationToken)
+        protected async Task WaitForChallengeResultAsync(IAuthorizationContext authorizationContext, CancellationToken cancellationToken)
         {
             var retries = 60;
             var delay = TimeSpan.FromSeconds(2);

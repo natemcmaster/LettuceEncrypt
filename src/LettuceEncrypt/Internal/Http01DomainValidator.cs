@@ -29,7 +29,7 @@ namespace LettuceEncrypt.Internal
         public override async Task ValidateOwnershipAsync(IAuthorizationContext authzContext, CancellationToken cancellationToken)
         {
             await PrepareHttpChallengeResponseAsync(authzContext, cancellationToken);
-            await ValidateOwnershipAsync(authzContext, cancellationToken);
+            await WaitForChallengeResultAsync(authzContext, cancellationToken);
         }
 
         private async Task PrepareHttpChallengeResponseAsync(

@@ -30,7 +30,7 @@ namespace LettuceEncrypt.Internal
             try
             {
                 await PrepareTlsAlpnChallengeResponseAsync(authzContext, _domainName, cancellationToken);
-                await ValidateOwnershipAsync(authzContext, cancellationToken);
+                await WaitForChallengeResultAsync(authzContext, cancellationToken);
             }
             finally
             {
