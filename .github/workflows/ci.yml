@@ -93,6 +93,8 @@ jobs:
           name: ${{ env.PACKAGE_VERSION }}
           tag_name: v${{ env.PACKAGE_VERSION }}
           body: |
+            ### How to get this update
+
             Packages have been posted to these feeds:
 
             #### NuGet.org
