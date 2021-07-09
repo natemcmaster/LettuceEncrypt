@@ -14,8 +14,10 @@ Bug fixes:
 Other:
  * Update package to target .NET Core 3.1 as 3.0 is no longer supported by Microsoft
 
-Bug patch 1.1.1:
+Fixes in patch 1.1.1:
  * Fix infinite loop waiting for verification of domain ownership
+ * Check for certificates that new renewal immediately on server startup instead of waiting 24 hours
+ * Optimize loading intermediate certificate change and reduce unnecessary warnings about invalid certs
     </PackageReleaseNotes>
     <PackageReleaseNotes Condition="'$(VersionPrefix)' == '1.0.1'">
 * Fix bug in detecting Kestrel in .NET 5

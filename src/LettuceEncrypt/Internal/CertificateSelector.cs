@@ -34,11 +34,18 @@ namespace LettuceEncrypt.Internal
 
         public virtual void Add(X509Certificate2 certificate)
         {
-            PreloadIntermediateCertificates(certificate);
-
+            var preloaded = false;
             foreach (var dnsName in X509CertificateHelpers.GetAllDnsNames(certificate))
             {
-                AddWithDomainName(_certs, dnsName, certificate);
+                var selectedCert = AddWithDomainName(_certs, dnsName, certificate);
+
+                // Call preload once per certificate, but only if the cetificate is actually selected to be used
+                // for this domain. This is a small optimization which avoids preloading on a cert that may not be used.
+                if (!preloaded && selectedCert == certificate)
+                {
+                    preloaded = true;
+                    PreloadIntermediateCertificates(selectedCert);
+                }
             }
         }
 
@@ -55,10 +62,17 @@ namespace LettuceEncrypt.Internal
             _challengeCerts.TryRemove(domainName, out _);
         }
 
-        private void AddWithDomainName(ConcurrentDictionary<string, X509Certificate2> certs, string domainName,
+        /// <summary>
+        /// Registers the certificate for usage with domain unless there is already a newer cert for this domain.
+        /// </summary>
+        /// <param name="certs"></param>
+        /// <param name="domainName"></param>
+        /// <param name="certificate"></param>
+        /// <returns>The certificate current selected to be used for this domain</returns>
+        private X509Certificate2 AddWithDomainName(ConcurrentDictionary<string, X509Certificate2> certs, string domainName,
             X509Certificate2 certificate)
         {
-            certs.AddOrUpdate(
+            return certs.AddOrUpdate(
                 domainName,
                 certificate,
                 (_, currentCert) =>
