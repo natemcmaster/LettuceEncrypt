@@ -42,8 +42,6 @@ namespace LettuceEncrypt.Internal.AcmeStates
                     return MoveTo<TerminalState>();
                 }
 
-                await Task.Delay(checkPeriod.Value, cancellationToken);
-
                 var domainNames = _options.Value.DomainNames;
                 if (_logger.IsEnabled(LogLevel.Debug))
                 {
@@ -60,6 +58,8 @@ namespace LettuceEncrypt.Internal.AcmeStates
                         return MoveTo<BeginCertificateCreationState>();
                     }
                 }
+
+                await Task.Delay(checkPeriod.Value, cancellationToken);
             }
 
             return MoveTo<TerminalState>();
