@@ -18,7 +18,7 @@ namespace LettuceEncrypt.UnitTests
         [Fact]
         public async Task ItLoadsAllCertsIntoSelector()
         {
-            var testCert = new X509Certificate2();
+            var testCert = TestUtils.CreateTestCert("test1.natemcmaster.com");
             IEnumerable<X509Certificate2> certs = new[] { testCert };
 
             var selector = new Mock<CertificateSelector>(
