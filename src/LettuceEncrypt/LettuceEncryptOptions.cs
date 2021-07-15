@@ -78,5 +78,14 @@ namespace LettuceEncrypt
         /// Defaults to <see cref="ChallengeType.Any"/>.
         /// </summary>
         public ChallengeType AllowedChallengeTypes { get; set; } = ChallengeType.Any;
+
+
+        /// <summary>
+        /// Additional certificates that are accepted as issuers for the created issuers.
+        /// <para>
+        /// This can be null if there are no AdditionalIssuers
+        /// </para>
+        /// </summary>
+        public X509Certificate2Collection? AdditionalIssuers { get; set; }
     }
 }

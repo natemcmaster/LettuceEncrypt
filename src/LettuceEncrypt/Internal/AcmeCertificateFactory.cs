@@ -296,6 +296,17 @@ namespace LettuceEncrypt.Internal
             _logger.LogAcmeAction("NewCertificate");
 
             var pfxBuilder = acmeCert.ToPfx(privateKey);
+
+            var additionalIssuers = _options.Value.AdditionalIssuers;
+
+            if(additionalIssuers != null)
+            {
+                foreach(var cert in additionalIssuers)
+                {
+                    pfxBuilder.AddIssuer(cert.RawData);
+                }
+            }
+
             var pfx = pfxBuilder.Build("HTTPS Cert - " + _options.Value.DomainNames, string.Empty);
             return new X509Certificate2(pfx, string.Empty, X509KeyStorageFlags.Exportable);
         }
