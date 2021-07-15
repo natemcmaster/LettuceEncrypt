@@ -300,8 +300,8 @@ namespace LettuceEncrypt.Internal
 
             var pfxBuilder = acmeCert.ToPfx(privateKey);
 
-            
-            foreach(var additionalIssuersSource in _additionalIssuersSources)
+
+            foreach (var additionalIssuersSource in _additionalIssuersSources)
             {
                 var additionalIssuers = await additionalIssuersSource.GetAdditionalIssuersAsync(cancellationToken);
                 foreach (var cert in additionalIssuers)
