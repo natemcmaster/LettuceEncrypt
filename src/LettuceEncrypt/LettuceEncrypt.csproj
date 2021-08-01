@@ -18,7 +18,7 @@ This only works with Kestrel, which is the default server configuration for ASP.
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Certes" Version="2.3.4" />
+    <PackageReference Include="Certes" Version="3.0.0" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
