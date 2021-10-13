@@ -8,10 +8,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Xunit;
-#if NETCOREAPP2_1
-using IHostEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
-
-#endif
 
 
 namespace LettuceEncrypt.UnitTests

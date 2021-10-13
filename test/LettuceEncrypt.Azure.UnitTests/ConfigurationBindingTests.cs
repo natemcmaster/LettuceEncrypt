@@ -61,7 +61,6 @@ namespace LettuceEncrypt.Azure.UnitTests
             Assert.Equal("https://incode/", options.Value.AzureKeyVaultEndpoint);
         }
 
-#if NETCOREAPP3_1_OR_GREATER
         [Theory]
         [InlineData(null)]
         [InlineData("")]
@@ -79,6 +78,5 @@ namespace LettuceEncrypt.Azure.UnitTests
             var ex = Assert.Throws<OptionsValidationException>(() => options.Value);
             Assert.Contains(nameof(AzureKeyVaultLettuceEncryptOptions.AzureKeyVaultEndpoint), ex.Message);
         }
-#endif
     }
 }

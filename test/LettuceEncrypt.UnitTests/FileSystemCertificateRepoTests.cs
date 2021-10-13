@@ -12,10 +12,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Hosting.Internal;
 using Xunit;
-#if NETCOREAPP2_1
-using IHostEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
-
-#endif
 
 namespace LettuceEncrypt.UnitTests
 {

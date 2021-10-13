@@ -66,7 +66,6 @@ namespace LettuceEncrypt.Tests
             Assert.Equal(challengeType, options.AllowedChallengeTypes);
         }
 
-#if NETCOREAPP3_1_OR_GREATER
         [Fact]
         public void DoesNotSupportWildcardDomains()
         {
@@ -76,7 +75,6 @@ namespace LettuceEncrypt.Tests
                     ["LettuceEncrypt:DomainNames:0"] = "*.natemcmaster.com",
                 }));
         }
-#endif
 
         private LettuceEncryptOptions ParseOptions(Dictionary<string, string> input)
         {

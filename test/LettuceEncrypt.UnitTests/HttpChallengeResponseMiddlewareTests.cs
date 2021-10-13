@@ -10,10 +10,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Moq;
 using Xunit;
-#if NETCOREAPP2_1
-using ApplicationBuilder = Microsoft.AspNetCore.Builder.Internal.ApplicationBuilder;
-
-#endif
 
 namespace LettuceEncrypt.UnitTests
 {

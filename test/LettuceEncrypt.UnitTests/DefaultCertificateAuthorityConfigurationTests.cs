@@ -9,10 +9,6 @@ using Microsoft.Extensions.Hosting.Internal;
 using Microsoft.Extensions.Options;
 using Xunit;
 
-#if NETCOREAPP2_1
-using Environments = Microsoft.Extensions.Hosting.EnvironmentName;
-#endif
-
 namespace LettuceEncrypt.UnitTests
 {
     public class DefaultCertificateAuthorityConfigurationTests
