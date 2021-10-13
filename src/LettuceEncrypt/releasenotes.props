@@ -18,6 +18,9 @@ Fixes in patch 1.1.1:
  * Fix infinite loop waiting for verification of domain ownership
  * Check for certificates that new renewal immediately on server startup instead of waiting 24 hours
  * Optimize loading intermediate certificate change and reduce unnecessary warnings about invalid certs
+
+Fixes in patch 1.1.2:
+ * Raise validation error if attempting to use wildcards
     </PackageReleaseNotes>
     <PackageReleaseNotes Condition="'$(VersionPrefix)' == '1.0.1'">
 * Fix bug in detecting Kestrel in .NET 5

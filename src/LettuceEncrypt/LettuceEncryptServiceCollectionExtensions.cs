@@ -46,6 +46,10 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.TryAddSingleton<ICertificateAuthorityConfiguration, DefaultCertificateAuthorityConfiguration>();
 
+#if NETCOREAPP3_1_OR_GREATER
+            services.TryAddEnumerable(ServiceDescriptor.Singleton<IValidateOptions<LettuceEncryptOptions>, OptionsValdiation>());
+#endif
+
             services
                 .AddSingleton<CertificateSelector>()
                 .AddSingleton<IServerCertificateSelector>(s => s.GetRequiredService<CertificateSelector>())
