@@ -50,6 +50,11 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: "5.0.x"
+      - name: Setup .NET 6
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "6.0.x"
+          include-prerelease: true # required to workaround https://github.com/NuGet/Home/issues/10791
       - name: Run build script
         id: build_script
         run: ./build.ps1 -ci
