@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Certes;
@@ -274,6 +275,29 @@ namespace LettuceEncrypt.Internal
             throw new InvalidOperationException($"Failed to validate ownership of domainName '{domainName}'");
         }
 
+        private byte[] X1RootCertificate => Encoding.ASCII.GetBytes(@"-----BEGIN CERTIFICATE-----
+MIIDrzCCApegAwIBAgIRALqMZiRNaRF4EGZS9urlj+0wDQYJKoZIhvcNAQELBQAw
+cTELMAkGA1UEBhMCVVMxMzAxBgNVBAoTKihTVEFHSU5HKSBJbnRlcm5ldCBTZWN1
+cml0eSBSZXNlYXJjaCBHcm91cDEtMCsGA1UEAxMkKFNUQUdJTkcpIERvY3RvcmVk
+IER1cmlhbiBSb290IENBIFgzMB4XDTAwMDkzMDIxMTIxOVoXDTIxMDEzMDE0MDEx
+NVowcTELMAkGA1UEBhMCVVMxMzAxBgNVBAoTKihTVEFHSU5HKSBJbnRlcm5ldCBT
+ZWN1cml0eSBSZXNlYXJjaCBHcm91cDEtMCsGA1UEAxMkKFNUQUdJTkcpIERvY3Rv
+cmVkIER1cmlhbiBSb290IENBIFgzMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIB
+CgKCAQEAqUZjoRbjgXecPWxXkGCUEXcNrupL7dkbwc0jUTLFEDvcyfD1gYekY5uL
+D19uzYTl0pKZzzDXHJPnJY5EEp27nACFOm8XzX9sORAangP0OnGUkXJZDHM+8cX2
+EHJbfj0lg1JirRF3w2u1/KRuFEvIlWg3FdXdsSFHBF5z1Ij7MLn7Ska5c/5fKsDW
+EYzOMB6EBW1T9RDkVk/Q965EwDT4bR6BOXakasgfKrH9m1f6l9MmA0VnXdw9rZ+s
+TvMHG1yWBqNMSqCKe3jG6caWgN7llEbj5YsCWs32bz2dMftGkXBPcy1fNWvpeT7G
+Dz2Z0QWTlHkyXA2kGw32fdoXLHWOEwIDAQABo0IwQDAOBgNVHQ8BAf8EBAMCAQYw
+DwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUCFfaiceiU3kMT93gkI90uuInc0Qw
+DQYJKoZIhvcNAQELBQADggEBAF7lEtHuSN4j+xFQsM/ujaVKcn57VbrbTecnspmJ
+JA7Hrn6OErshGNO0p1/u14c7tGHKjtF1tEFFSVhbNXlKw9O99AfhmlFgdGcJKEHn
+ZctBB8bhNO387vbiCYIHdU/nSba9MCDYw2/UCtobZ6ao+KJA3IKmPixctAbn2Ikr
+EN9X0SXNP1gnqQP4VhZJIh6cd7rg9MimzoLlMI3m2z11dSGYbh8OWSdvA7aLbSGo
+gDO5H4WD8fgqEG0reSBO89eeH+we+BZxQtBiU3b9VMV0drc+7zC2NbXqeQwu6QTl
+fbJ8ytqcqUy0g5XSE6WCzPOL3H9r0j9G64dfotGlBA5tG6w=
+-----END CERTIFICATE-----");
+
         private async Task<X509Certificate2> CompleteCertificateRequestAsync(IOrderContext order,
             CancellationToken cancellationToken)
         {
@@ -296,6 +320,8 @@ namespace LettuceEncrypt.Internal
             _logger.LogAcmeAction("NewCertificate");
 
             var pfxBuilder = acmeCert.ToPfx(privateKey);
+            pfxBuilder.AddIssuers(X1RootCertificate);
+
             var pfx = pfxBuilder.Build("HTTPS Cert - " + _options.Value.DomainNames, string.Empty);
             return new X509Certificate2(pfx, string.Empty, X509KeyStorageFlags.Exportable);
         }
