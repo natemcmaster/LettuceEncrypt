@@ -4,16 +4,15 @@
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 
-namespace LettuceEncrypt.Internal
+namespace LettuceEncrypt.Internal;
+
+internal class InMemoryHttpChallengeResponseStore : IHttpChallengeResponseStore
 {
-    internal class InMemoryHttpChallengeResponseStore : IHttpChallengeResponseStore
-    {
-        private readonly ConcurrentDictionary<string, string> _values = new();
+    private readonly ConcurrentDictionary<string, string> _values = new();
 
-        public void AddChallengeResponse(string token, string response)
-            => _values.AddOrUpdate(token, response, (_, __) => response);
+    public void AddChallengeResponse(string token, string response)
+        => _values.AddOrUpdate(token, response, (_, __) => response);
 
-        public bool TryGetResponse(string token, [MaybeNullWhen(false)] out string? value)
-            => _values.TryGetValue(token, out value);
-    }
+    public bool TryGetResponse(string token, [MaybeNullWhen(false)] out string? value)
+        => _values.TryGetValue(token, out value);
 }

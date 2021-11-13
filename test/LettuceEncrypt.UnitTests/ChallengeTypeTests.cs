@@ -4,16 +4,15 @@
 using LettuceEncrypt.Acme;
 using Xunit;
 
-namespace LettuceEncrypt.UnitTests
+namespace LettuceEncrypt.UnitTests;
+
+public class ChallengeTypeTests
 {
-    public class ChallengeTypeTests
+    [Fact]
+    public void AnyIsAlwaysTrue()
     {
-        [Fact]
-        public void AnyIsAlwaysTrue()
-        {
-            Assert.True(ChallengeType.Any.HasFlag(ChallengeType.Http01));
-            Assert.True(ChallengeType.Any.HasFlag(ChallengeType.TlsAlpn01));
-            Assert.True(ChallengeType.Any.HasFlag(ChallengeType.Any));
-        }
+        Assert.True(ChallengeType.Any.HasFlag(ChallengeType.Http01));
+        Assert.True(ChallengeType.Any.HasFlag(ChallengeType.TlsAlpn01));
+        Assert.True(ChallengeType.Any.HasFlag(ChallengeType.Any));
     }
 }

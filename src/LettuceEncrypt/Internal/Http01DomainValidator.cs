@@ -1,9 +1,6 @@
 ﻿// Copyright (c) Nate McMaster.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Certes.Acme;
 using Certes.Acme.Resource;
 using Microsoft.Extensions.Hosting;
@@ -13,50 +10,49 @@ using Microsoft.Extensions.Logging;
 using IHostApplicationLifetime = Microsoft.Extensions.Hosting.IApplicationLifetime;
 #endif
 
-namespace LettuceEncrypt.Internal
+namespace LettuceEncrypt.Internal;
+
+internal class Http01DomainValidator : DomainOwnershipValidator
 {
-    internal class Http01DomainValidator : DomainOwnershipValidator
+    private readonly IHttpChallengeResponseStore _challengeStore;
+
+    public Http01DomainValidator(IHttpChallengeResponseStore challengeStore,
+        IHostApplicationLifetime appLifetime,
+        AcmeClient client, ILogger logger, string domainName) : base(appLifetime, client, logger, domainName)
     {
-        private readonly IHttpChallengeResponseStore _challengeStore;
+        _challengeStore = challengeStore;
+    }
 
-        public Http01DomainValidator(IHttpChallengeResponseStore challengeStore,
-            IHostApplicationLifetime appLifetime,
-            AcmeClient client, ILogger logger, string domainName) : base(appLifetime, client, logger, domainName)
+    public override async Task ValidateOwnershipAsync(IAuthorizationContext authzContext, CancellationToken cancellationToken)
+    {
+        await PrepareHttpChallengeResponseAsync(authzContext, cancellationToken);
+        await WaitForChallengeResultAsync(authzContext, cancellationToken);
+    }
+
+    private async Task PrepareHttpChallengeResponseAsync(
+        IAuthorizationContext authorizationContext,
+        CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        if (_client == null)
         {
-            _challengeStore = challengeStore;
+            throw new InvalidOperationException();
         }
 
-        public override async Task ValidateOwnershipAsync(IAuthorizationContext authzContext, CancellationToken cancellationToken)
+        var httpChallenge = await _client.CreateChallengeAsync(authorizationContext, ChallengeTypes.Http01);
+        if (httpChallenge == null)
         {
-            await PrepareHttpChallengeResponseAsync(authzContext, cancellationToken);
-            await WaitForChallengeResultAsync(authzContext, cancellationToken);
+            throw new InvalidOperationException(
+                $"Did not receive challenge information for challenge type {ChallengeTypes.Http01}");
         }
 
-        private async Task PrepareHttpChallengeResponseAsync(
-            IAuthorizationContext authorizationContext,
-            CancellationToken cancellationToken)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            if (_client == null)
-            {
-                throw new InvalidOperationException();
-            }
+        var keyAuth = httpChallenge.KeyAuthz;
+        _challengeStore.AddChallengeResponse(httpChallenge.Token, keyAuth);
 
-            var httpChallenge = await _client.CreateChallengeAsync(authorizationContext, ChallengeTypes.Http01);
-            if (httpChallenge == null)
-            {
-                throw new InvalidOperationException(
-                    $"Did not receive challenge information for challenge type {ChallengeTypes.Http01}");
-            }
+        _logger.LogTrace("Waiting for server to start accepting HTTP requests");
+        await _appStarted.Task;
 
-            var keyAuth = httpChallenge.KeyAuthz;
-            _challengeStore.AddChallengeResponse(httpChallenge.Token, keyAuth);
-
-            _logger.LogTrace("Waiting for server to start accepting HTTP requests");
-            await _appStarted.Task;
-
-            _logger.LogTrace("Requesting server to validate HTTP challenge");
-            await _client.ValidateChallengeAsync(httpChallenge);
-        }
+        _logger.LogTrace("Requesting server to validate HTTP challenge");
+        await _client.ValidateChallengeAsync(httpChallenge);
     }
 }
