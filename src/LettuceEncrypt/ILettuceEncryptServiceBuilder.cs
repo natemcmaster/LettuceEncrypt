@@ -3,16 +3,15 @@
 
 using Microsoft.Extensions.DependencyInjection;
 
-namespace LettuceEncrypt
+namespace LettuceEncrypt;
+
+/// <summary>
+/// An interface for building extension methods to extend LettuceEncrypt configuration.
+/// </summary>
+public interface ILettuceEncryptServiceBuilder
 {
     /// <summary>
-    /// An interface for building extension methods to extend LettuceEncrypt configuration.
+    /// The service collection.
     /// </summary>
-    public interface ILettuceEncryptServiceBuilder
-    {
-        /// <summary>
-        /// The service collection.
-        /// </summary>
-        IServiceCollection Services { get; }
-    }
+    IServiceCollection Services { get; }
 }

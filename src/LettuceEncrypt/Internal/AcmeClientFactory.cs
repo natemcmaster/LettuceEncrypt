@@ -5,26 +5,25 @@ using Certes;
 using LettuceEncrypt.Acme;
 using Microsoft.Extensions.Logging;
 
-namespace LettuceEncrypt.Internal
+namespace LettuceEncrypt.Internal;
+
+internal class AcmeClientFactory
 {
-    internal class AcmeClientFactory
+    private readonly ICertificateAuthorityConfiguration _certificateAuthority;
+    private readonly ILogger<AcmeClient> _logger;
+
+    public AcmeClientFactory(
+        ICertificateAuthorityConfiguration certificateAuthority,
+        ILogger<AcmeClient> logger)
     {
-        private readonly ICertificateAuthorityConfiguration _certificateAuthority;
-        private readonly ILogger<AcmeClient> _logger;
+        _certificateAuthority = certificateAuthority;
+        _logger = logger;
+    }
 
-        public AcmeClientFactory(
-            ICertificateAuthorityConfiguration certificateAuthority,
-            ILogger<AcmeClient> logger)
-        {
-            _certificateAuthority = certificateAuthority;
-            _logger = logger;
-        }
+    public AcmeClient Create(IKey acmeAccountKey)
+    {
+        var directoryUri = _certificateAuthority.AcmeDirectoryUri;
 
-        public AcmeClient Create(IKey acmeAccountKey)
-        {
-            var directoryUri = _certificateAuthority.AcmeDirectoryUri;
-
-            return new AcmeClient(_logger, directoryUri, acmeAccountKey);
-        }
+        return new AcmeClient(_logger, directoryUri, acmeAccountKey);
     }
 }

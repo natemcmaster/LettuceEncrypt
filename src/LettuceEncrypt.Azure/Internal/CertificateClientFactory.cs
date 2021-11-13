@@ -1,40 +1,38 @@
 // Copyright (c) Nate McMaster.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
-using System;
 using Azure.Identity;
 using Azure.Security.KeyVault.Certificates;
 using Microsoft.Extensions.Options;
 
-namespace LettuceEncrypt.Azure.Internal
+namespace LettuceEncrypt.Azure.Internal;
+
+internal interface ICertificateClientFactory
 {
-    internal interface ICertificateClientFactory
+    CertificateClient Create();
+}
+
+internal class CertificateClientFactory : ICertificateClientFactory
+{
+    private readonly IOptions<AzureKeyVaultLettuceEncryptOptions> _options;
+
+    public CertificateClientFactory(IOptions<AzureKeyVaultLettuceEncryptOptions> options)
     {
-        CertificateClient Create();
+        _options = options ?? throw new ArgumentNullException(nameof(options));
     }
 
-    internal class CertificateClientFactory : ICertificateClientFactory
+    public CertificateClient Create()
     {
-        private readonly IOptions<AzureKeyVaultLettuceEncryptOptions> _options;
+        var value = _options.Value;
 
-        public CertificateClientFactory(IOptions<AzureKeyVaultLettuceEncryptOptions> options)
+        if (string.IsNullOrEmpty(value.AzureKeyVaultEndpoint))
         {
-            _options = options ?? throw new ArgumentNullException(nameof(options));
+            throw new ArgumentException("Missing required option: AzureKeyVaultEndpoint");
         }
 
-        public CertificateClient Create()
-        {
-            var value = _options.Value;
+        var vaultUri = new Uri(value.AzureKeyVaultEndpoint);
+        var credentials = value.Credentials ?? new DefaultAzureCredential();
 
-            if (string.IsNullOrEmpty(value.AzureKeyVaultEndpoint))
-            {
-                throw new ArgumentException("Missing required option: AzureKeyVaultEndpoint");
-            }
-
-            var vaultUri = new Uri(value.AzureKeyVaultEndpoint);
-            var credentials = value.Credentials ?? new DefaultAzureCredential();
-
-            return new CertificateClient(vaultUri, credentials);
-        }
+        return new CertificateClient(vaultUri, credentials);
     }
 }

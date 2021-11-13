@@ -5,16 +5,15 @@
 // This code doesn't do anything, but makes C# 8 play nice with netstandard2.0 without
 // having to have a bunch of #if defs all over the place.
 
-namespace System.Diagnostics.CodeAnalysis
-{
-    internal class MaybeNullWhenAttribute : Attribute
-    {
-        public MaybeNullWhenAttribute(bool returnValue)
-        {
-            ReturnValue = returnValue;
-        }
+namespace System.Diagnostics.CodeAnalysis;
 
-        public bool ReturnValue { get; }
+internal class MaybeNullWhenAttribute : Attribute
+{
+    public MaybeNullWhenAttribute(bool returnValue)
+    {
+        ReturnValue = returnValue;
     }
+
+    public bool ReturnValue { get; }
 }
 #endif

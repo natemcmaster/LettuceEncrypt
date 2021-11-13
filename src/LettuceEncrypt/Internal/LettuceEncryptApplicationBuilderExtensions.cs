@@ -4,25 +4,24 @@
 using LettuceEncrypt.Internal;
 
 // ReSharper disable once CheckNamespace
-namespace Microsoft.AspNetCore.Builder
+namespace Microsoft.AspNetCore.Builder;
+
+/// <summary>
+/// Helper methods
+/// </summary>
+internal static class LettuceEncryptApplicationBuilderExtensions
 {
     /// <summary>
-    /// Helper methods
+    /// Adds middleware use to verify domain ownership.
     /// </summary>
-    internal static class LettuceEncryptApplicationBuilderExtensions
+    /// <param name="app">The application builder</param>
+    /// <returns>The application builder</returns>
+    public static IApplicationBuilder UseHttpChallengeResponseMiddleware(this IApplicationBuilder app)
     {
-        /// <summary>
-        /// Adds middleware use to verify domain ownership.
-        /// </summary>
-        /// <param name="app">The application builder</param>
-        /// <returns>The application builder</returns>
-        public static IApplicationBuilder UseHttpChallengeResponseMiddleware(this IApplicationBuilder app)
+        app.Map("/.well-known/acme-challenge", mapped =>
         {
-            app.Map("/.well-known/acme-challenge", mapped =>
-            {
-                mapped.UseMiddleware<HttpChallengeResponseMiddleware>();
-            });
-            return app;
-        }
+            mapped.UseMiddleware<HttpChallengeResponseMiddleware>();
+        });
+        return app;
     }
 }

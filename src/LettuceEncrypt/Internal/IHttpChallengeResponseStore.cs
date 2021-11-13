@@ -3,12 +3,11 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-namespace LettuceEncrypt.Internal
-{
-    internal interface IHttpChallengeResponseStore
-    {
-        void AddChallengeResponse(string token, string response);
+namespace LettuceEncrypt.Internal;
 
-        bool TryGetResponse(string token, [MaybeNullWhen(false)] out string? value);
-    }
+internal interface IHttpChallengeResponseStore
+{
+    void AddChallengeResponse(string token, string response);
+
+    bool TryGetResponse(string token, [MaybeNullWhen(false)] out string? value);
 }
