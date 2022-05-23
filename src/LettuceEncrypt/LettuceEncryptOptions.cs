@@ -77,4 +77,9 @@ public class LettuceEncryptOptions
     /// Defaults to <see cref="ChallengeType.Any"/>.
     /// </summary>
     public ChallengeType AllowedChallengeTypes { get; set; } = ChallengeType.Any;
+
+    /// <summary>
+    /// Optional EAB (External Account Binding) account credentials used for creating new account.
+    /// </summary>
+    public EabCredentials EabCredentials { get; set; } = new();
 }
