@@ -1,5 +1,8 @@
 <Project>
   <PropertyGroup>
+      <PackageReleaseNotes Condition="$(VersionPrefix.StartsWith('1.2.'))">
+Update to latest Azure dependencies. See also the release notes for the main LettuceEncrypt package.
+    </PackageReleaseNotes>
     <PackageReleaseNotes Condition="$(VersionPrefix.StartsWith('1.1.'))">
     </PackageReleaseNotes>
     <PackageReleaseNotes Condition="'$(VersionPrefix)' == '1.0.0'">

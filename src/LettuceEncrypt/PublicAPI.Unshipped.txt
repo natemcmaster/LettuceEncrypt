@@ -1,11 +1,1 @@
 #nullable enable
-LettuceEncrypt.Acme.EabCredentials
-LettuceEncrypt.Acme.EabCredentials.EabCredentials() -> void
-LettuceEncrypt.Acme.EabCredentials.EabKey.get -> string?
-LettuceEncrypt.Acme.EabCredentials.EabKey.set -> void
-LettuceEncrypt.Acme.EabCredentials.EabKeyAlg.get -> string?
-LettuceEncrypt.Acme.EabCredentials.EabKeyAlg.set -> void
-LettuceEncrypt.Acme.EabCredentials.EabKeyId.get -> string?
-LettuceEncrypt.Acme.EabCredentials.EabKeyId.set -> void
-LettuceEncrypt.LettuceEncryptOptions.EabCredentials.get -> LettuceEncrypt.Acme.EabCredentials!
-LettuceEncrypt.LettuceEncryptOptions.EabCredentials.set -> void

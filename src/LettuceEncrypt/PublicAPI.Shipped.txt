@@ -14,6 +14,14 @@ LettuceEncrypt.Acme.ChallengeType
 LettuceEncrypt.Acme.ChallengeType.Any = 65535 -> LettuceEncrypt.Acme.ChallengeType
 LettuceEncrypt.Acme.ChallengeType.Http01 = 1 -> LettuceEncrypt.Acme.ChallengeType
 LettuceEncrypt.Acme.ChallengeType.TlsAlpn01 = 2 -> LettuceEncrypt.Acme.ChallengeType
+LettuceEncrypt.Acme.EabCredentials
+LettuceEncrypt.Acme.EabCredentials.EabCredentials() -> void
+LettuceEncrypt.Acme.EabCredentials.EabKey.get -> string?
+LettuceEncrypt.Acme.EabCredentials.EabKey.set -> void
+LettuceEncrypt.Acme.EabCredentials.EabKeyAlg.get -> string?
+LettuceEncrypt.Acme.EabCredentials.EabKeyAlg.set -> void
+LettuceEncrypt.Acme.EabCredentials.EabKeyId.get -> string?
+LettuceEncrypt.Acme.EabCredentials.EabKeyId.set -> void
 LettuceEncrypt.Acme.ICertificateAuthorityConfiguration
 LettuceEncrypt.Acme.ICertificateAuthorityConfiguration.AcmeDirectoryUri.get -> System.Uri!
 LettuceEncrypt.FileSystemStorageExtensions
@@ -35,6 +43,8 @@ LettuceEncrypt.LettuceEncryptOptions.AllowedChallengeTypes.get -> LettuceEncrypt
 LettuceEncrypt.LettuceEncryptOptions.AllowedChallengeTypes.set -> void
 LettuceEncrypt.LettuceEncryptOptions.DomainNames.get -> string![]!
 LettuceEncrypt.LettuceEncryptOptions.DomainNames.set -> void
+LettuceEncrypt.LettuceEncryptOptions.EabCredentials.get -> LettuceEncrypt.Acme.EabCredentials!
+LettuceEncrypt.LettuceEncryptOptions.EabCredentials.set -> void
 LettuceEncrypt.LettuceEncryptOptions.EmailAddress.get -> string!
 LettuceEncrypt.LettuceEncryptOptions.EmailAddress.set -> void
 LettuceEncrypt.LettuceEncryptOptions.FallbackCertificate.get -> System.Security.Cryptography.X509Certificates.X509Certificate2?
