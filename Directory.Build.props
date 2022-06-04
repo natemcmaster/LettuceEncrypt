@@ -34,7 +34,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <VersionPrefix>1.1.2</VersionPrefix>
+    <VersionPrefix>1.2.0</VersionPrefix>
     <VersionSuffix>beta</VersionSuffix>
     <IncludePreReleaseLabelInPackageVersion Condition="'$(IS_STABLE_BUILD)' != 'true'">true</IncludePreReleaseLabelInPackageVersion>
     <BuildNumber Condition=" '$(BuildNumber)' == '' ">$([MSBuild]::ValueOrDefault($(BUILD_NUMBER), 0))</BuildNumber>
