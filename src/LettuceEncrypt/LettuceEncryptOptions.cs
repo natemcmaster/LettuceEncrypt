@@ -82,4 +82,9 @@ public class LettuceEncryptOptions
     /// Optional EAB (External Account Binding) account credentials used for creating new account.
     /// </summary>
     public EabCredentials EabCredentials { get; set; } = new();
+
+    /// <summary>
+    /// Optional delay in milliseconds before indicating that the challenge is ready for validation.
+    /// </summary>
+    public int ChallengeValidationDelayMs { get; set; } = 0;
 }

@@ -112,6 +112,12 @@ internal class AcmeClient
 
     public async Task<Challenge> ValidateChallengeAsync(IChallengeContext httpChallenge)
     {
+        if (_options.Value.ChallengeValidationDelayMs > 0)
+        {
+            _logger.LogInformation("Awaiting {delayMs}ms before validating challenge", _options.Value.ChallengeValidationDelayMs);
+            await Task.Delay(_options.Value.ChallengeValidationDelayMs);
+        }
+        
         _logger.LogAcmeAction("ValidateChallenge", httpChallenge);
         return await httpChallenge.Validate();
     }

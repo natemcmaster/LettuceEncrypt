@@ -1,1 +1,3 @@
 #nullable enable
+LettuceEncrypt.LettuceEncryptOptions.ChallengeValidationDelayMs.get -> int
+LettuceEncrypt.LettuceEncryptOptions.ChallengeValidationDelayMs.set -> void
