@@ -117,7 +117,7 @@ internal class AcmeClient
             _logger.LogInformation("Awaiting {delayMs}ms before validating challenge", _options.Value.ChallengeValidationDelayMs);
             await Task.Delay(_options.Value.ChallengeValidationDelayMs);
         }
-        
+
         _logger.LogAcmeAction("ValidateChallenge", httpChallenge);
         return await httpChallenge.Validate();
     }
