@@ -20,6 +20,7 @@ jobs:
           days-before-close: 14
           stale-issue-label: stale
           close-issue-label: closed-stale
+          close-issue-reason: not_planned
           exempt-issue-labels: announcement,planning
           exempt-all-milestones: true
           exempt-all-assignees: true
