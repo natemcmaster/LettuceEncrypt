@@ -74,7 +74,7 @@ A few required options should be set, typically via the appsettings.json file.
         // If you don't set this in config, you will need to press "y" whenever the application starts
         "AcceptTermsOfService": true,
 
-        // You must at least one domain name
+        // You must specify at least one domain name
         "DomainNames": [ "example.com", "www.example.com" ],
 
         // You must specify an email address to register with the certificate authority
