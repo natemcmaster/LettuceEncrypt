@@ -29,7 +29,7 @@ To test this project, I recommend the following steps.
     {
         o.DomainNames = new[] { "TMP.ngrok.io" };
         o.UseStagingServer = true; // <--- use staging
-            
+
         o.AcceptTermsOfService = true;
         o.EmailAddress = "admin@example.com";
     });
