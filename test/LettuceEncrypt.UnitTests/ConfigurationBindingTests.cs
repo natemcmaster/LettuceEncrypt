@@ -75,6 +75,20 @@ public class ConfigurationBindingTests
             }));
     }
 
+    [Fact]
+    public void CanSetAdditionalIssuers()
+    {
+        var options = ParseOptions(new()
+        {
+            ["LettuceEncrypt:AdditionalIssuers:0"] = "-----BEGIN CERTIFICATE-----surely-a-certificate-----END CERTIFICATE-----",
+            ["LettuceEncrypt:AdditionalIssuers:1"] = "-----BEGIN CERTIFICATE-----surely-another-certificate-----END CERTIFICATE-----",
+        });
+
+        Assert.Collection(options.AdditionalIssuers,
+            one => Assert.Equal("-----BEGIN CERTIFICATE-----surely-a-certificate-----END CERTIFICATE-----", one),
+            two => Assert.Equal("-----BEGIN CERTIFICATE-----surely-another-certificate-----END CERTIFICATE-----", two));
+    }
+
     private LettuceEncryptOptions ParseOptions(Dictionary<string, string> input)
     {
         var config = new ConfigurationBuilder()
