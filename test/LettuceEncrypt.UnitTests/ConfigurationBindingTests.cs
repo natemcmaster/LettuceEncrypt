@@ -89,7 +89,7 @@ public class ConfigurationBindingTests
             two => Assert.Equal("-----BEGIN CERTIFICATE-----surely-another-certificate-----END CERTIFICATE-----", two));
     }
 
-    private LettuceEncryptOptions ParseOptions(Dictionary<string, string> input)
+    private static LettuceEncryptOptions ParseOptions(Dictionary<string, string> input)
     {
         var config = new ConfigurationBuilder()
                    .AddInMemoryCollection(input)
