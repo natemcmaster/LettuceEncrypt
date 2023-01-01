@@ -25,14 +25,14 @@ To test this project, I recommend the following steps.
 4. Set your app to use Let's Encrypt staging environment so you don't hit rate limits in generating certificates.
 
 ```csharp
-    .UseLettuceEncrypt(o =>
+    services.AddLettuceEncrypt(o =>
     {
         o.DomainNames = new[] { "TMP.ngrok.io" };
         o.UseStagingServer = true; // <--- use staging
 
         o.AcceptTermsOfService = true;
         o.EmailAddress = "admin@example.com";
-    })
+    });
 ```
 
 5. `dotnet run` your application.
