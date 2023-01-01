@@ -9,7 +9,7 @@ To test this project, I recommend the following steps.
 
 1. Download and install [ngrok](https://ngrok.io), a command-line tool for creating a publically accessible tunnel to your computer.
 
-2. Start ngrok by running `ngrok http -bind-tls=false 5000`. This will create a temporary, public URL `http://TMP.ngrok.io`
+2. Start `ngrok v2` by running `ngrok http -bind-tls=false 5000` or `ngrok v3` by `ngrok http --scheme=http 5000`. This will create a temporary, public URL `http://TMP.ngrok.io`
 
 ![ngrok](https://i.imgur.com/Vl8Egsv.png)
 
