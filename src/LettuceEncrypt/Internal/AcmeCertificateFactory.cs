@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using Certes;
 using Certes.Acme;
 using Certes.Acme.Resource;
@@ -291,6 +292,13 @@ internal class AcmeCertificateFactory
         _logger.LogAcmeAction("NewCertificate");
 
         var pfxBuilder = acmeCert.ToPfx(privateKey);
+
+        _logger.LogDebug("Adding {IssuerCount} additional issuers to certes before building pfx certificate file", _options.Value.AdditionalIssuers.Length);
+        foreach (var issuer in _options.Value.AdditionalIssuers)
+        {
+            pfxBuilder.AddIssuer(Encoding.UTF8.GetBytes(issuer));
+        }
+
         var pfx = pfxBuilder.Build("HTTPS Cert - " + _options.Value.DomainNames, string.Empty);
         return new X509Certificate2(pfx, string.Empty, X509KeyStorageFlags.Exportable);
     }

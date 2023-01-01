@@ -49,7 +49,18 @@ public class LettuceEncryptOptions
     internal bool UseStagingServerExplicitlySet => _useStagingServer.HasValue;
 
     /// <summary>
-    /// A certificate to use if a certifcates cannot be created automatically.
+    /// Additional issuers passed to certes before building the successfully downloaded certificate,
+    /// used internally by certes to verify the issuer for authenticity.
+    /// <para>
+    /// This is useful especially when using a staging server (e.g. for integration tests) with a root certificate
+    /// that is not part of certes' embedded resources.
+    /// See https://github.com/fszlin/certes/tree/v3.0.0/src/Certes/Resources/Certificates for context.
+    /// </para>
+    /// </summary>
+    public string[] AdditionalIssuers { get; set; } = Array.Empty<string>();
+
+    /// <summary>
+    /// A certificate to use if a certificates cannot be created automatically.
     /// <para>
     /// This can be null if there is not fallback certificate.
     /// </para>
