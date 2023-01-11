@@ -11,7 +11,7 @@ internal class OptionsValidation : IValidateOptions<LettuceEncryptOptions>
     {
         foreach (var dnsName in options.DomainNames)
         {
-            if (dnsName.IndexOf('*') >= 0)
+            if (dnsName.Contains('*'))
             {
                 return ValidateOptionsResult.Fail($"Cannot use '*' in domain name '{dnsName}'. Wildcard domains are not supported.");
             }
