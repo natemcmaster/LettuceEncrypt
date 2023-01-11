@@ -45,7 +45,7 @@ public static class LettuceEncryptServiceCollectionExtensions
 
         services.TryAddSingleton<ICertificateAuthorityConfiguration, DefaultCertificateAuthorityConfiguration>();
 
-        services.TryAddEnumerable(ServiceDescriptor.Singleton<IValidateOptions<LettuceEncryptOptions>, OptionsValdiation>());
+        services.TryAddEnumerable(ServiceDescriptor.Singleton<IValidateOptions<LettuceEncryptOptions>, OptionsValidation>());
 
         services
             .AddSingleton<CertificateSelector>()

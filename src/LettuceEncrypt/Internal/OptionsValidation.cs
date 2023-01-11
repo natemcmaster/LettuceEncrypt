@@ -5,7 +5,7 @@ using Microsoft.Extensions.Options;
 
 namespace LettuceEncrypt.Internal;
 
-internal class OptionsValdiation : IValidateOptions<LettuceEncryptOptions>
+internal class OptionsValidation : IValidateOptions<LettuceEncryptOptions>
 {
     public ValidateOptionsResult Validate(string name, LettuceEncryptOptions options)
     {
