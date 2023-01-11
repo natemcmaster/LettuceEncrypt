@@ -37,7 +37,7 @@ internal class CertificateSelector : IServerCertificateSelector
         {
             var selectedCert = AddWithDomainName(_certs, dnsName, certificate);
 
-            // Call preload once per certificate, but only if the cetificate is actually selected to be used
+            // Call preload once per certificate, but only if the certificate is actually selected to be used
             // for this domain. This is a small optimization which avoids preloading on a cert that may not be used.
             if (!preloaded && selectedCert == certificate)
             {
