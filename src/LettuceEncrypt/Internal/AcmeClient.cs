@@ -122,5 +122,5 @@ internal class AcmeClient
         return await order.Generate(csrInfo, privateKey);
     }
 
-    private Exception MissingAccountContext() => new InvalidOperationException("Account wasn't initialized yet");
+    private static Exception MissingAccountContext() => new InvalidOperationException("Account wasn't initialized yet");
 }

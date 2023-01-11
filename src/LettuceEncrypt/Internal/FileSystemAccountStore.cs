@@ -53,7 +53,7 @@ internal class FileSystemAccountStore : IAccountStore
         return default;
     }
 
-    private async Task<AccountModel?> Deserialize(FileInfo jsonFile, CancellationToken cancellationToken)
+    private static async Task<AccountModel?> Deserialize(FileInfo jsonFile, CancellationToken cancellationToken)
     {
         using var fileStream = jsonFile.OpenRead();
         var deserializeOptions = new JsonSerializerOptions
