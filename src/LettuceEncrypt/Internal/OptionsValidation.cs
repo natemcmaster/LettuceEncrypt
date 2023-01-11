@@ -1,7 +1,6 @@
 // Copyright (c) Nate McMaster.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
-#if NETCOREAPP3_1_OR_GREATER
 using Microsoft.Extensions.Options;
 
 namespace LettuceEncrypt.Internal;
@@ -21,4 +20,3 @@ internal class OptionsValdiation : IValidateOptions<LettuceEncryptOptions>
         return ValidateOptionsResult.Success;
     }
 }
-#endif

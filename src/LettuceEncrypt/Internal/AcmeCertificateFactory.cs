@@ -12,10 +12,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-#if NETSTANDARD2_0
-using IHostApplicationLifetime = Microsoft.Extensions.Hosting.IApplicationLifetime;
-#endif
-
 namespace LettuceEncrypt.Internal;
 
 internal class AcmeCertificateFactory

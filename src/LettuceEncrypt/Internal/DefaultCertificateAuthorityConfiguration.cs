@@ -6,10 +6,6 @@ using LettuceEncrypt.Acme;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 
-#if NETSTANDARD2_0
-using IHostEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
-#endif
-
 namespace LettuceEncrypt.Internal;
 
 internal class DefaultCertificateAuthorityConfiguration : ICertificateAuthorityConfiguration

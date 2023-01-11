@@ -38,7 +38,6 @@ public static class LettuceEncryptKestrelHttpsOptionsExtensions
             throw new InvalidOperationException(MissingServicesMessage);
         }
 
-#if NETCOREAPP3_1_OR_GREATER
         var tlsResponder = applicationServices.GetService<TlsAlpnChallengeResponder>();
         if (tlsResponder is null)
         {
@@ -46,20 +45,12 @@ public static class LettuceEncryptKestrelHttpsOptionsExtensions
         }
 
         return httpsOptions.UseLettuceEncrypt(selector, tlsResponder);
-
-#elif NETSTANDARD2_0
-        return httpsOptions.UseServerCertificateSelector(selector);
-#else
-#error Update TFMs
-#endif
     }
 
-#if NETCOREAPP3_1_OR_GREATER
     internal static HttpsConnectionAdapterOptions UseLettuceEncrypt(
         this HttpsConnectionAdapterOptions httpsOptions,
         IServerCertificateSelector selector,
-        TlsAlpnChallengeResponder tlsAlpnChallengeResponder
-    )
+        TlsAlpnChallengeResponder tlsAlpnChallengeResponder)
     {
         // Check if this handler is already set. If so, chain our handler before it.
         var otherHandler = httpsOptions.OnAuthenticate;
@@ -72,8 +63,4 @@ public static class LettuceEncryptKestrelHttpsOptionsExtensions
         httpsOptions.UseServerCertificateSelector(selector);
         return httpsOptions;
     }
-#elif NETSTANDARD2_0
-#else
-#error Update TFMs
-#endif
 }

@@ -88,7 +88,6 @@ internal class CertificateSelector : IServerCertificateSelector
 
     public X509Certificate2? Select(ConnectionContext context, string? domainName)
     {
-#if NETCOREAPP3_1_OR_GREATER
         if (_challengeCerts.Count > 0)
         {
             // var sslStream = context.Features.Get<SslStream>();
@@ -102,10 +101,6 @@ internal class CertificateSelector : IServerCertificateSelector
                 return challengeCert;
             }
         }
-#elif NETSTANDARD2_0
-#else
-#error Update TFMs
-#endif
 
         if (domainName == null || !_certs.TryGetValue(domainName, out var retVal))
         {

@@ -47,7 +47,7 @@ public static class FileSystemStorageExtensions
 
         foreach (var serviceDescriptor in otherFileSystemRepoServices)
         {
-            var otherRepo = (FileSystemCertificateRepository)serviceDescriptor.ImplementationInstance;
+            var otherRepo = (FileSystemCertificateRepository)serviceDescriptor.ImplementationInstance!;
             if (otherRepo.RootDir.Equals(directory))
             {
                 if (otherRepo.PfxPassword != pfxPassword)
