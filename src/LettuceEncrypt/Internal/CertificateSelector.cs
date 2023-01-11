@@ -112,7 +112,7 @@ internal class CertificateSelector : IServerCertificateSelector
 
     public void Reset(string domainName)
     {
-        _certs.TryRemove(domainName, out var _);
+        _certs.TryRemove(domainName, out _);
     }
 
     public bool TryGet(string domainName, out X509Certificate2? certificate)
@@ -131,9 +131,9 @@ internal class CertificateSelector : IServerCertificateSelector
         using var chain = new X509Chain
         {
             ChainPolicy =
-                {
-                    RevocationMode = X509RevocationMode.NoCheck
-                }
+            {
+                RevocationMode = X509RevocationMode.NoCheck
+            }
         };
 
         var commonName = X509CertificateHelpers.GetCommonName(certificate);

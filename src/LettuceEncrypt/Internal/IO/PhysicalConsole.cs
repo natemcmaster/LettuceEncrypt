@@ -7,7 +7,7 @@ namespace LettuceEncrypt.Internal.IO;
 
 internal class PhysicalConsole : IConsole
 {
-    public static PhysicalConsole Singleton { get; } = new PhysicalConsole();
+    public static PhysicalConsole Singleton { get; } = new();
 
     private PhysicalConsole()
     {
