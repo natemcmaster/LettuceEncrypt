@@ -6,19 +6,17 @@ using Certes.Acme.Resource;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-#if NETSTANDARD2_0
-using IHostApplicationLifetime = Microsoft.Extensions.Hosting.IApplicationLifetime;
-#endif
-
 namespace LettuceEncrypt.Internal;
 
 internal class Http01DomainValidator : DomainOwnershipValidator
 {
     private readonly IHttpChallengeResponseStore _challengeStore;
 
-    public Http01DomainValidator(IHttpChallengeResponseStore challengeStore,
+    public Http01DomainValidator(
+        IHttpChallengeResponseStore challengeStore,
         IHostApplicationLifetime appLifetime,
-        AcmeClient client, ILogger logger, string domainName) : base(appLifetime, client, logger, domainName)
+        AcmeClient client, ILogger logger, string domainName)
+        : base(appLifetime, client, logger, domainName)
     {
         _challengeStore = challengeStore;
     }

@@ -38,12 +38,9 @@ internal class AcmeClient
         var eabCredentials = _options.Value.EabCredentials;
         _accountContext = await _context.NewAccount(emailAddress, termsOfServiceAgreed: true, eabKeyId: eabCredentials.EabKeyId, eabKey: eabCredentials.EabKey, eabKeyAlg: eabCredentials.EabKeyAlg);
 
-        if (!int.TryParse(_accountContext.Location.Segments.Last(), out var accountId))
-        {
-            accountId = 0;
-        }
-
-        return accountId;
+        return int.TryParse(_accountContext.Location.Segments.Last(), out var accountId)
+            ? accountId
+            : 0;
     }
 
     public async Task<Uri> GetTermsOfServiceAsync()
@@ -122,5 +119,5 @@ internal class AcmeClient
         return await order.Generate(csrInfo, privateKey);
     }
 
-    private Exception MissingAccountContext() => new InvalidOperationException("Account wasn't initialized yet");
+    private static Exception MissingAccountContext() => new InvalidOperationException("Account wasn't initialized yet");
 }

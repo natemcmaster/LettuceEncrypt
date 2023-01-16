@@ -12,7 +12,7 @@ internal interface IAcmeState
 
 internal class TerminalState : IAcmeState
 {
-    public static TerminalState Singleton { get; } = new TerminalState();
+    public static TerminalState Singleton { get; } = new();
 
     private TerminalState() { }
 

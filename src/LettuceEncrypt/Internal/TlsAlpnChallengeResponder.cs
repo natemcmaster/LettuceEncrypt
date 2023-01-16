@@ -24,9 +24,7 @@ internal class TlsAlpnChallengeResponder
     // See RFC8737 section 6.1
     private static readonly Oid s_acmeExtensionOid = new("1.3.6.1.5.5.7.1.31");
     private const string ProtocolName = "acme-tls/1";
-#if NETCOREAPP3_1_OR_GREATER
     private static readonly SslApplicationProtocol s_acmeTlsProtocol = new(ProtocolName);
-#endif
     private readonly IClock _clock;
     private readonly ILogger<TlsAlpnChallengeResponder> _logger;
     private readonly IOptions<LettuceEncryptOptions> _options;
@@ -45,23 +43,13 @@ internal class TlsAlpnChallengeResponder
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-#if NETSTANDARD2_0
-    // TLS ALPN not supported on .NET Standard. Requires .NET Core 3
-    public bool IsEnabled => false;
-
-    public void PrepareChallengeCert(string domainName, string keyAuthorization)
-    {
-        throw new PlatformNotSupportedException();
-    }
-
-#elif NETCOREAPP3_1_OR_GREATER
     public bool IsEnabled => _options.Value.AllowedChallengeTypes.HasFlag(ChallengeType.TlsAlpn01);
 
     public void OnSslAuthenticate(ConnectionContext context, SslServerAuthenticationOptions options)
     {
         if (_openChallenges > 0)
         {
-            options.ApplicationProtocols.Add(s_acmeTlsProtocol);
+            (options.ApplicationProtocols ??= new List<SslApplicationProtocol>()).Add(s_acmeTlsProtocol);
         }
     }
 
@@ -123,9 +111,6 @@ internal class TlsAlpnChallengeResponder
         Interlocked.Increment(ref _openChallenges);
         _certificateSelector.AddChallengeCert(cert);
     }
-#else
-#error Update TFMs
-#endif
 
     public void DiscardChallenge(string domainName)
     {

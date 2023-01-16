@@ -22,7 +22,7 @@ public static class FileSystemStorageExtensions
     /// </summary>
     /// <param name="builder"></param>
     /// <param name="directory">The root directory for storing information. Information may be stored in subdirectories.</param>
-    /// <param name="pfxPassword">Set to null or empty for passwordless .pfx files.</param>
+    /// <param name="pfxPassword">Set to null or empty for password-less .pfx files.</param>
     /// <returns></returns>
     public static ILettuceEncryptServiceBuilder PersistDataToDirectory(
         this ILettuceEncryptServiceBuilder builder,
@@ -47,7 +47,7 @@ public static class FileSystemStorageExtensions
 
         foreach (var serviceDescriptor in otherFileSystemRepoServices)
         {
-            var otherRepo = (FileSystemCertificateRepository)serviceDescriptor.ImplementationInstance;
+            var otherRepo = (FileSystemCertificateRepository)serviceDescriptor.ImplementationInstance!;
             if (otherRepo.RootDir.Equals(directory))
             {
                 if (otherRepo.PfxPassword != pfxPassword)

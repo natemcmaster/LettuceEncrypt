@@ -37,7 +37,7 @@ internal static class X509CertificateHelpers
         foreach (var ext in cert.Extensions)
         {
             // Extension is SAN2
-            if (ext.Oid.Value == X509SubjectAlternativeNameConstants.Oid)
+            if (ext.Oid?.Value == X509SubjectAlternativeNameConstants.Oid)
             {
                 var asnString = ext.Format(false);
                 if (string.IsNullOrWhiteSpace(asnString))
@@ -47,7 +47,7 @@ internal static class X509CertificateHelpers
 
                 // SubjectAlternativeNames might contain something other than a dNSName,
                 // so we have to parse through and only use the dNSNames
-                // <identifier><delimter><value><separator(s)>
+                // <identifier><delimiter><value><separator(s)>
 
                 var rawDnsEntries =
                     asnString.Split(new string[1] { X509SubjectAlternativeNameConstants.Separator }, StringSplitOptions.RemoveEmptyEntries);
@@ -144,7 +144,7 @@ internal static class X509CertificateHelpers
                 // e.g.,
                 // Windows: x509ExtensionFormattedString is: "DNS Name=not-real-subject-name, DNS Name=example.com"
                 // Linux:   x509ExtensionFormattedString is: "DNS:not-real-subject-name, DNS:example.com"
-                // Parse: <identifier><delimter><value><separator(s)>
+                // Parse: <identifier><delimiter><value><separator(s)>
 
                 var delimiterIndex = x509ExtensionFormattedString.IndexOf(subjectName1, StringComparison.Ordinal) - 1;
                 s_delimiter = x509ExtensionFormattedString[delimiterIndex];

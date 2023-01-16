@@ -57,13 +57,10 @@ public static class AzureLettuceEncryptExtensions
                 config?.Bind("LettuceEncrypt:AzureKeyVault", o));
         });
 
-        var options = services
+        services
             .AddOptions<AzureKeyVaultLettuceEncryptOptions>()
-            .Configure(configure);
-
-#if FEATURE_VALIDATE_DATA_ANNOTATIONS
-        options.ValidateDataAnnotations();
-#endif
+            .Configure(configure)
+            .ValidateDataAnnotations();
 
         return builder;
     }

@@ -21,15 +21,6 @@ internal class KestrelOptionsSetup : IConfigureOptions<KestrelServerOptions>
 
     public void Configure(KestrelServerOptions options)
     {
-        options.ConfigureHttpsDefaults(o =>
-        {
-#if NETCOREAPP3_1_OR_GREATER
-            o.UseLettuceEncrypt(_certificateSelector, _tlsAlpnChallengeResponder);
-#elif NETSTANDARD2_0
-                o.UseServerCertificateSelector(_certificateSelector);
-#else
-#error Update TFMs
-#endif
-        });
+        options.ConfigureHttpsDefaults(o => o.UseLettuceEncrypt(_certificateSelector, _tlsAlpnChallengeResponder));
     }
 }
