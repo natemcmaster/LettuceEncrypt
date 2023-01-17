@@ -1,3 +1,4 @@
 #nullable enable
+LettuceEncrypt.Acme.ICertificateAuthorityConfiguration.IssuerCertificates.get -> string![]!
 LettuceEncrypt.LettuceEncryptOptions.AdditionalIssuers.get -> string![]!
 LettuceEncrypt.LettuceEncryptOptions.AdditionalIssuers.set -> void

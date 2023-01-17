@@ -12,4 +12,11 @@ public interface ICertificateAuthorityConfiguration
     /// The base uri of the ACME protocol.
     /// </summary>
     Uri AcmeDirectoryUri { get; }
+
+    /// <summary>
+    /// Certificates passed to certes before building the successfully downloaded certificate,
+    /// used internally by certes to verify the issuer for authenticity.
+    /// </summary>
+    /// <seealso cref="LettuceEncryptOptions.AdditionalIssuers" />
+    public string[] IssuerCertificates => Array.Empty<string>();
 }

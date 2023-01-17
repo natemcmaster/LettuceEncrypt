@@ -24,6 +24,7 @@ internal class AcmeCertificateFactory
     private readonly ILogger _logger;
     private readonly IHostApplicationLifetime _appLifetime;
     private readonly TlsAlpnChallengeResponder _tlsAlpnChallengeResponder;
+    private readonly ICertificateAuthorityConfiguration _certificateAuthority;
     private readonly TaskCompletionSource<object?> _appStarted = new();
     private AcmeClient? _client;
     private IKey? _acmeAccountKey;
@@ -46,6 +47,7 @@ internal class AcmeCertificateFactory
         _logger = logger;
         _appLifetime = appLifetime;
         _tlsAlpnChallengeResponder = tlsAlpnChallengeResponder;
+        _certificateAuthority = certificateAuthority;
 
         appLifetime.ApplicationStarted.Register(() => _appStarted.TrySetResult(null));
         if (appLifetime.ApplicationStarted.IsCancellationRequested)
@@ -289,8 +291,10 @@ internal class AcmeCertificateFactory
 
         var pfxBuilder = acmeCert.ToPfx(privateKey);
 
-        _logger.LogDebug("Adding {IssuerCount} additional issuers to certes before building pfx certificate file", _options.Value.AdditionalIssuers.Length);
-        foreach (var issuer in _options.Value.AdditionalIssuers)
+        _logger.LogDebug(
+            "Adding {IssuerCount} additional issuers to certes before building pfx certificate file",
+            _options.Value.AdditionalIssuers.Length + _certificateAuthority.IssuerCertificates.Length);
+        foreach (var issuer in _options.Value.AdditionalIssuers.Concat(_certificateAuthority.IssuerCertificates))
         {
             pfxBuilder.AddIssuer(Encoding.UTF8.GetBytes(issuer));
         }
