@@ -43,18 +43,18 @@ public sealed class AcmeCertificateFactoryTest
         => new()
         {
             {
-                new LettuceEncryptOptions() { AdditionalIssuers = new [] { Encoding.UTF8.GetString(TestBytes1), Encoding.UTF8.GetString(TestBytes2), Encoding.UTF8.GetString(TestBytes3) } },
+                new LettuceEncryptOptions() { AdditionalIssuers = new[] { Encoding.UTF8.GetString(TestBytes1), Encoding.UTF8.GetString(TestBytes2), Encoding.UTF8.GetString(TestBytes3) } },
                 new DefaultCertificateAuthorityConfiguration(new HostingEnvironment(), Options.Create(new LettuceEncryptOptions())),
                 ImmutableArray.Create(TestBytes1, TestBytes2, TestBytes3)
             },
             {
                 new LettuceEncryptOptions(),
-                new StubCertificateAuthorityConfiguration(new [] { Encoding.UTF8.GetString(TestBytes1), Encoding.UTF8.GetString(TestBytes2), Encoding.UTF8.GetString(TestBytes3) }),
+                new StubCertificateAuthorityConfiguration(new[] { Encoding.UTF8.GetString(TestBytes1), Encoding.UTF8.GetString(TestBytes2), Encoding.UTF8.GetString(TestBytes3) }),
                 ImmutableArray.Create(TestBytes1, TestBytes2, TestBytes3)
             },
             {
-                new LettuceEncryptOptions { AdditionalIssuers = new [] { Encoding.UTF8.GetString(TestBytes1), Encoding.UTF8.GetString(TestBytes3) } },
-                new StubCertificateAuthorityConfiguration(new [] { Encoding.UTF8.GetString(TestBytes2), Encoding.UTF8.GetString(TestBytes4) }),
+                new LettuceEncryptOptions { AdditionalIssuers = new[] { Encoding.UTF8.GetString(TestBytes1), Encoding.UTF8.GetString(TestBytes3) } },
+                new StubCertificateAuthorityConfiguration(new[] { Encoding.UTF8.GetString(TestBytes2), Encoding.UTF8.GetString(TestBytes4) }),
                 ImmutableArray.Create(TestBytes1, TestBytes3, TestBytes2, TestBytes4)
             },
         };
