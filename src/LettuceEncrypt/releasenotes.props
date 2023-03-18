@@ -1,5 +1,16 @@
 <Project>
   <PropertyGroup>
+    <PackageReleaseNotes Condition="$(VersionPrefix.StartsWith('1.3.'))">
+      New features:
+      * Add option (#279) and API (#281) to configure additional valid issuers
+        * This is done by configuring certificates as strings. These are passed to certes internally when verifying the issuer
+        * Those certificates must be parseable by https://github.com/bcgit/bc-csharp/blob/830d9b8c7bdfcec511bff0a6cf4a0e8ed568e7c1/crypto/src/x509/X509CertificateParser.cs#L20
+        * For details, see https://github.com/fszlin/certes/blob/ffa00c6061b49de17901df0cd997cc7531e1607e/src/Certes/Pkcs/PfxBuilder.cs#L66
+
+      Other:
+      * Added support for .NET 6 (#280)
+      * Dropped support for .NET Standard 2.0 and .NET Core 3.1 (#280)
+    </PackageReleaseNotes>
     <PackageReleaseNotes Condition="$(VersionPrefix.StartsWith('1.2.'))">
 New features:
  * add API for configuring EAB (External Account Binding) credentials
