@@ -23,5 +23,5 @@ public interface ICertificateAuthorityConfiguration
     /// if your wondering what certificate formats are supported.
     /// </remarks>
     /// <seealso cref="LettuceEncryptOptions.AdditionalIssuers" />
-    public string[] IssuerCertificates => Array.Empty<string>();
+    string[] IssuerCertificates => Array.Empty<string>();
 }
