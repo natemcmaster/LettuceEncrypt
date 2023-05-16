@@ -30,7 +30,7 @@ offering** from Let's Encrypt® or ISRG™.
 
 This project is 100% organic and best served cold with ranch and carrots. 🥬
 
-### Project status 
+### Project status
 
 This project is in maintenance mode. I lost interest in developing features. I will make a patch if there is a security issue. I'll also consider an update if a new .NET major version breaks and the patch fix required is small. Please see https://github.com/natemcmaster/LettuceEncrypt/security/policy if you wish to report a security concern.
 
@@ -262,7 +262,8 @@ giving up.
 Current supported values:
 * `Http01` - The HTTP-01 challenge, which uses a well-known URL on the server and a HTTP request/response.
 * `TlsAlpn01` - The TLS-ALPN-01 challenge, which uses an auto-generated, ephemeral certificate in the TLS handshake.
-* `Any` - _(default)_ - use HTTP-01 and/or TLS-ALPN-01
+* `Dns01` - The DNS-01 challenge, which uses TXT record under that domain name.
+* `Any` - _(default)_ - use HTTP-01 and/or TLS-ALPN-01 DNS-01
 
 Tip: if you wish to set multiple method types and are use the "appsettings.json" approach, provide a comma-seperated list.
 
@@ -270,11 +271,34 @@ Tip: if you wish to set multiple method types and are use the "appsettings.json"
 ```json
 {
     "LettuceEncrypt": {
-        "AllowedChallengeTypes": "Http01, TlsAlpn01"
+        "AllowedChallengeTypes": "Http01, TlsAlpn01, Dns01"
     }
 }
 ```
 
+
+### When using DNS-01
+
+When using the DNS-01 challenge a `IDnsChallengeProvider` must be add and replace the `NoOpDnsChallengeProvider`
+
+```c#
+public class MyDnsChallengeProvider : IDnsChallengeProvider
+{
+    private readonly ISomeExternalDnsClient _client;
+
+    public MyDnsChallengeProvider(ISomeExternalDnsClient client) => _client = client;
+
+    public Task AddTxtRecordAsync(string domainName, string txt, CancellationToken ct = default)
+    {
+        return _client.AddDnsTxtRecord(domainName, txt, ct);
+    }
+
+    public Task RemoveTxtRecordAsync(string domainName, string txt, CancellationToken ct = default)
+    {
+        return _client.RemoveDnsTxtRecord(domainName, txt, ct);
+    }
+}
+```
 
 ## Testing in development
 

@@ -14,12 +14,14 @@ internal class AcmeClient
     private readonly AcmeContext _context;
     private readonly ILogger<AcmeClient> _logger;
     private readonly IOptions<LettuceEncryptOptions> _options;
+    private readonly IKey _acmeAccountKey;
     private IAccountContext? _accountContext;
 
     public AcmeClient(ILogger<AcmeClient> logger, IOptions<LettuceEncryptOptions> options, Uri directoryUri, IKey acmeAccountKey)
     {
         _logger = logger;
         _options = options;
+        _acmeAccountKey = acmeAccountKey;
         _logger.LogInformation("Using certificate authority {directoryUri}", directoryUri);
         _context = new AcmeContext(directoryUri, acmeAccountKey);
     }
@@ -30,6 +32,12 @@ internal class AcmeClient
         _accountContext = await _context.Account();
         _logger.LogAcmeAction("FetchAccountDetails", _accountContext);
         return await _accountContext.Resource();
+    }
+
+    public IKey? GetAccountKey()
+    {
+        _logger.LogAcmeAction("GetAccountKey");
+        return _acmeAccountKey;
     }
 
     public async Task<int> CreateAccountAsync(string emailAddress)

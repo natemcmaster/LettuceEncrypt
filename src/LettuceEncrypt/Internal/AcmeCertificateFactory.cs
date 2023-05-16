@@ -24,6 +24,7 @@ internal class AcmeCertificateFactory
     private readonly ILogger _logger;
     private readonly IHostApplicationLifetime _appLifetime;
     private readonly TlsAlpnChallengeResponder _tlsAlpnChallengeResponder;
+    private readonly IDnsChallengeProvider _dnsChallengeProvider;
     private readonly TaskCompletionSource<object?> _appStarted = new();
     private AcmeClient? _client;
     private IKey? _acmeAccountKey;
@@ -37,6 +38,7 @@ internal class AcmeCertificateFactory
         IHostApplicationLifetime appLifetime,
         TlsAlpnChallengeResponder tlsAlpnChallengeResponder,
         ICertificateAuthorityConfiguration certificateAuthority,
+        IDnsChallengeProvider dnsChallengeProvider,
         IAccountStore? accountRepository = null)
     {
         _acmeClientFactory = acmeClientFactory;
@@ -46,6 +48,7 @@ internal class AcmeCertificateFactory
         _logger = logger;
         _appLifetime = appLifetime;
         _tlsAlpnChallengeResponder = tlsAlpnChallengeResponder;
+        _dnsChallengeProvider = dnsChallengeProvider;
 
         appLifetime.ApplicationStarted.Register(() => _appStarted.TrySetResult(null));
         if (appLifetime.ApplicationStarted.IsCancellationRequested)
@@ -240,6 +243,12 @@ internal class AcmeCertificateFactory
                 _challengeStore, _appLifetime, _client, _logger, domainName));
         }
 
+        if (_options.Value.AllowedChallengeTypes.HasFlag(ChallengeType.Dns01))
+        {
+            validators.Add(new Dns01DomainValidator(
+                _dnsChallengeProvider, _appLifetime, _client, _logger, domainName));
+        }
+
         if (validators.Count == 0)
         {
             var challengeTypes = string.Join(", ", Enum.GetNames(typeof(ChallengeType)));
@@ -259,7 +268,8 @@ internal class AcmeCertificateFactory
             }
             catch (Exception ex)
             {
-                _logger.LogDebug(ex, "Validation with {validatorType} failed with error: {error}", validator.GetType().Name, ex.Message);
+                _logger.LogDebug(ex, "Validation with {validatorType} failed with error: {error}",
+                    validator.GetType().Name, ex.Message);
             }
         }
 
@@ -289,7 +299,8 @@ internal class AcmeCertificateFactory
 
         var pfxBuilder = acmeCert.ToPfx(privateKey);
 
-        _logger.LogDebug("Adding {IssuerCount} additional issuers to certes before building pfx certificate file", _options.Value.AdditionalIssuers.Length);
+        _logger.LogDebug("Adding {IssuerCount} additional issuers to certes before building pfx certificate file",
+            _options.Value.AdditionalIssuers.Length);
         foreach (var issuer in _options.Value.AdditionalIssuers)
         {
             pfxBuilder.AddIssuer(Encoding.UTF8.GetBytes(issuer));
