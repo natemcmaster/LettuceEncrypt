@@ -173,5 +173,7 @@ internal class AzureKeyVaultCertificateRepository : ICertificateRepository, ICer
     /// Names must follow the regular expression <c>/^[0-9a-zA-Z-]+$/</c>
     /// See https://docs.microsoft.com/en-us/rest/api/keyvault/ImportCertificate/ImportCertificate.
     /// </summary>
-    internal static string NormalizeHostName(string hostName) => hostName.Replace(".", "-");
+    internal static string NormalizeHostName(string hostName) =>
+        hostName.Replace(".", "-")
+            .Replace("*", "-");
 }
