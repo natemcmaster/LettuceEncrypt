@@ -14,6 +14,11 @@ LettuceEncrypt.Acme.ChallengeType
 LettuceEncrypt.Acme.ChallengeType.Any = 65535 -> LettuceEncrypt.Acme.ChallengeType
 LettuceEncrypt.Acme.ChallengeType.Http01 = 1 -> LettuceEncrypt.Acme.ChallengeType
 LettuceEncrypt.Acme.ChallengeType.TlsAlpn01 = 2 -> LettuceEncrypt.Acme.ChallengeType
+LettuceEncrypt.Acme.ChallengeType.Dns01 = 4 -> LettuceEncrypt.Acme.ChallengeType
+LettuceEncrypt.Acme.DnsTxtRecordContext
+LettuceEncrypt.Acme.DnsTxtRecordContext.DnsTxtRecordContext(string! domainName, string! txt) -> void
+LettuceEncrypt.Acme.DnsTxtRecordContext.DomainName.get -> string!
+LettuceEncrypt.Acme.DnsTxtRecordContext.Txt.get -> string!
 LettuceEncrypt.Acme.EabCredentials
 LettuceEncrypt.Acme.EabCredentials.EabCredentials() -> void
 LettuceEncrypt.Acme.EabCredentials.EabKey.get -> string?
@@ -24,6 +29,10 @@ LettuceEncrypt.Acme.EabCredentials.EabKeyId.get -> string?
 LettuceEncrypt.Acme.EabCredentials.EabKeyId.set -> void
 LettuceEncrypt.Acme.ICertificateAuthorityConfiguration
 LettuceEncrypt.Acme.ICertificateAuthorityConfiguration.AcmeDirectoryUri.get -> System.Uri!
+LettuceEncrypt.Acme.ICertificateAuthorityConfiguration.IssuerCertificates.get -> string![]!
+LettuceEncrypt.Acme.IDnsChallengeProvider
+LettuceEncrypt.Acme.IDnsChallengeProvider.AddTxtRecordAsync(string! domainName, string! txt, System.Threading.CancellationToken ct = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<LettuceEncrypt.Acme.DnsTxtRecordContext!>!
+LettuceEncrypt.Acme.IDnsChallengeProvider.RemoveTxtRecordAsync(LettuceEncrypt.Acme.DnsTxtRecordContext! context, System.Threading.CancellationToken ct = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 LettuceEncrypt.FileSystemStorageExtensions
 LettuceEncrypt.ICertificateRepository
 LettuceEncrypt.ICertificateRepository.SaveAsync(System.Security.Cryptography.X509Certificates.X509Certificate2! certificate, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task!
@@ -39,6 +48,8 @@ LettuceEncrypt.KeyAlgorithm.ES512 = 3 -> LettuceEncrypt.KeyAlgorithm
 LettuceEncrypt.LettuceEncryptOptions
 LettuceEncrypt.LettuceEncryptOptions.AcceptTermsOfService.get -> bool
 LettuceEncrypt.LettuceEncryptOptions.AcceptTermsOfService.set -> void
+LettuceEncrypt.LettuceEncryptOptions.AdditionalIssuers.get -> string![]!
+LettuceEncrypt.LettuceEncryptOptions.AdditionalIssuers.set -> void
 LettuceEncrypt.LettuceEncryptOptions.AllowedChallengeTypes.get -> LettuceEncrypt.Acme.ChallengeType
 LettuceEncrypt.LettuceEncryptOptions.AllowedChallengeTypes.set -> void
 LettuceEncrypt.LettuceEncryptOptions.DomainNames.get -> string![]!
