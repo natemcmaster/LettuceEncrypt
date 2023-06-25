@@ -6,7 +6,7 @@
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build",
-      "program": "${workspaceFolder}/.build/Web/bin/Debug/netcoreapp3.1/Web.dll",
+      "program": "${workspaceFolder}/.build/Web/bin/Debug/net7.0/Web.dll",
       "args": [],
       "cwd": "${workspaceFolder}/samples/Web",
       "stopAtEntry": false,
