@@ -57,6 +57,11 @@ public class LettuceEncryptOptions
     /// See https://github.com/fszlin/certes/tree/v3.0.0/src/Certes/Resources/Certificates for context.
     /// </para>
     /// </summary>
+    /// <remarks>
+    /// Lettuce encrypt uses certes internally, while certes depends on BouncyCastle.Cryptography to parse
+    /// certificates. See https://github.com/bcgit/bc-csharp/blob/830d9b8c7bdfcec511bff0a6cf4a0e8ed568e7c1/crypto/src/x509/X509CertificateParser.cs#L20
+    /// if you're wondering what certificate formats are supported.
+    /// </remarks>
     public string[] AdditionalIssuers { get; set; } = Array.Empty<string>();
 
     /// <summary>

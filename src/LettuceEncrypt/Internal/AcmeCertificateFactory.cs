@@ -8,6 +8,7 @@ using Certes.Acme;
 using Certes.Acme.Resource;
 using LettuceEncrypt.Accounts;
 using LettuceEncrypt.Acme;
+using LettuceEncrypt.Internal.PfxBuilder;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -25,6 +26,8 @@ internal class AcmeCertificateFactory
     private readonly IHostApplicationLifetime _appLifetime;
     private readonly TlsAlpnChallengeResponder _tlsAlpnChallengeResponder;
     private readonly IDnsChallengeProvider _dnsChallengeProvider;
+    private readonly ICertificateAuthorityConfiguration _certificateAuthority;
+    private readonly IPfxBuilderFactory _pfxBuilderFactory;
     private readonly TaskCompletionSource<object?> _appStarted = new();
     private AcmeClient? _client;
     private IKey? _acmeAccountKey;
@@ -39,6 +42,7 @@ internal class AcmeCertificateFactory
         TlsAlpnChallengeResponder tlsAlpnChallengeResponder,
         ICertificateAuthorityConfiguration certificateAuthority,
         IDnsChallengeProvider dnsChallengeProvider,
+        IPfxBuilderFactory pfxBuilderFactory,
         IAccountStore? accountRepository = null)
     {
         _acmeClientFactory = acmeClientFactory;
@@ -49,6 +53,8 @@ internal class AcmeCertificateFactory
         _appLifetime = appLifetime;
         _tlsAlpnChallengeResponder = tlsAlpnChallengeResponder;
         _dnsChallengeProvider = dnsChallengeProvider;
+        _certificateAuthority = certificateAuthority;
+        _pfxBuilderFactory = pfxBuilderFactory;
 
         appLifetime.ApplicationStarted.Register(() => _appStarted.TrySetResult(null));
         if (appLifetime.ApplicationStarted.IsCancellationRequested)
@@ -297,16 +303,24 @@ internal class AcmeCertificateFactory
 
         _logger.LogAcmeAction("NewCertificate");
 
-        var pfxBuilder = acmeCert.ToPfx(privateKey);
+        var pfxBuilder = CreatePfxBuilder(acmeCert, privateKey);
+        var pfx = pfxBuilder.Build("HTTPS Cert - " + _options.Value.DomainNames, string.Empty);
+        return new X509Certificate2(pfx, string.Empty, X509KeyStorageFlags.Exportable);
+    }
 
-        _logger.LogDebug("Adding {IssuerCount} additional issuers to certes before building pfx certificate file",
-            _options.Value.AdditionalIssuers.Length);
-        foreach (var issuer in _options.Value.AdditionalIssuers)
+    internal IPfxBuilder CreatePfxBuilder(CertificateChain certificateChain, IKey certKey)
+    {
+        var pfxBuilder = _pfxBuilderFactory.FromChain(certificateChain, certKey);
+
+        _logger.LogDebug(
+            "Adding {IssuerCount} additional issuers to certes before building pfx certificate file",
+            _options.Value.AdditionalIssuers.Length + _certificateAuthority.IssuerCertificates.Length);
+
+        foreach (var issuer in _options.Value.AdditionalIssuers.Concat(_certificateAuthority.IssuerCertificates))
         {
             pfxBuilder.AddIssuer(Encoding.UTF8.GetBytes(issuer));
         }
 
-        var pfx = pfxBuilder.Build("HTTPS Cert - " + _options.Value.DomainNames, string.Empty);
-        return new X509Certificate2(pfx, string.Empty, X509KeyStorageFlags.Exportable);
+        return pfxBuilder;
     }
 }
