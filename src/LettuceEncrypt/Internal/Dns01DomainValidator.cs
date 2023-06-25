@@ -4,6 +4,7 @@
 using Certes;
 using Certes.Acme;
 using Certes.Acme.Resource;
+using LettuceEncrypt.Acme;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -29,7 +30,7 @@ internal class Dns01DomainValidator : DomainOwnershipValidator
         CancellationToken cancellationToken
     )
     {
-        ITxtRecordContext context = new DefaultTxtRecordContext(_domainName, string.Empty);
+        var context = new DnsTxtRecordContext(_domainName, string.Empty);
         try
         {
             context = await PrepareDns01ChallengeResponseAsync(authzContext, _domainName, cancellationToken);
@@ -42,7 +43,7 @@ internal class Dns01DomainValidator : DomainOwnershipValidator
         }
     }
 
-    private async Task<ITxtRecordContext> PrepareDns01ChallengeResponseAsync(
+    private async Task<DnsTxtRecordContext> PrepareDns01ChallengeResponseAsync(
         IAuthorizationContext authorizationContext,
         string domainName,
         CancellationToken cancellationToken
