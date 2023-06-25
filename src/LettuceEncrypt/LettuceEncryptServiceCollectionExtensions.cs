@@ -64,7 +64,8 @@ public static class LettuceEncryptServiceCollectionExtensions
             .AddSingleton<ICertificateRepository>(x => x.GetRequiredService<X509CertStore>())
             .AddSingleton<HttpChallengeResponseMiddleware>()
             .AddSingleton<TlsAlpnChallengeResponder>()
-            .AddSingleton<IStartupFilter, HttpChallengeStartupFilter>();
+            .AddSingleton<IStartupFilter, HttpChallengeStartupFilter>()
+            .AddSingleton<IDnsChallengeProvider, NoOpDnsChallengeProvider>();
 
         services.AddSingleton<IConfigureOptions<LettuceEncryptOptions>>(s =>
         {
