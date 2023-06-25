@@ -23,6 +23,12 @@ public enum ChallengeType
     TlsAlpn01 = 1 << 1,
 
     /// <summary>
+    /// The DNS-01 challenge, which uses TXT record under that domain name.
+    /// See https://letsencrypt.org/docs/challenge-types/#dns-01-challenge
+    /// </summary>
+    Dns01 = 1 << 2,
+
+    /// <summary>
     /// A special flag which represents all known challenge types.
     /// </summary>
     Any = 0xFFFF,

@@ -72,6 +72,7 @@ public sealed class AcmeCertificateFactoryTest
             logger: NullLogger<AcmeCertificateFactory>.Instance,
             appLifetime: new ApplicationLifetime(NullLogger<ApplicationLifetime>.Instance),
             tlsAlpnChallengeResponder: null!,
+            dnsChallengeProvider: new NoOpDnsChallengeProvider(),
             certificateAuthority: certificateAuthority,
             pfxBuilderFactory: new PfxBuilderFactoryStub(pfxBuilder));
     }

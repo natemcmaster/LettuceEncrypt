@@ -1,4 +1,12 @@
 #nullable enable
+LettuceEncrypt.Acme.ChallengeType.Dns01 = 4 -> LettuceEncrypt.Acme.ChallengeType
 LettuceEncrypt.Acme.ICertificateAuthorityConfiguration.IssuerCertificates.get -> string![]!
+LettuceEncrypt.Acme.IDnsChallengeProvider
+LettuceEncrypt.Acme.IDnsChallengeProvider.AddTxtRecordAsync(string! domainName, string! txt, System.Threading.CancellationToken ct = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<LettuceEncrypt.Acme.DnsTxtRecordContext!>!
+LettuceEncrypt.Acme.IDnsChallengeProvider.RemoveTxtRecordAsync(LettuceEncrypt.Acme.DnsTxtRecordContext! context, System.Threading.CancellationToken ct = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+LettuceEncrypt.Acme.DnsTxtRecordContext
+LettuceEncrypt.Acme.DnsTxtRecordContext.DnsTxtRecordContext(string! domainName, string! txt) -> void
+LettuceEncrypt.Acme.DnsTxtRecordContext.DomainName.get -> string!
+LettuceEncrypt.Acme.DnsTxtRecordContext.Txt.get -> string!
 LettuceEncrypt.LettuceEncryptOptions.AdditionalIssuers.get -> string![]!
 LettuceEncrypt.LettuceEncryptOptions.AdditionalIssuers.set -> void

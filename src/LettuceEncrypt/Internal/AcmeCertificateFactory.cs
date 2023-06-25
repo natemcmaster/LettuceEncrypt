@@ -25,6 +25,7 @@ internal class AcmeCertificateFactory
     private readonly ILogger _logger;
     private readonly IHostApplicationLifetime _appLifetime;
     private readonly TlsAlpnChallengeResponder _tlsAlpnChallengeResponder;
+    private readonly IDnsChallengeProvider _dnsChallengeProvider;
     private readonly ICertificateAuthorityConfiguration _certificateAuthority;
     private readonly IPfxBuilderFactory _pfxBuilderFactory;
     private readonly TaskCompletionSource<object?> _appStarted = new();
@@ -40,6 +41,7 @@ internal class AcmeCertificateFactory
         IHostApplicationLifetime appLifetime,
         TlsAlpnChallengeResponder tlsAlpnChallengeResponder,
         ICertificateAuthorityConfiguration certificateAuthority,
+        IDnsChallengeProvider dnsChallengeProvider,
         IPfxBuilderFactory pfxBuilderFactory,
         IAccountStore? accountRepository = null)
     {
@@ -50,6 +52,7 @@ internal class AcmeCertificateFactory
         _logger = logger;
         _appLifetime = appLifetime;
         _tlsAlpnChallengeResponder = tlsAlpnChallengeResponder;
+        _dnsChallengeProvider = dnsChallengeProvider;
         _certificateAuthority = certificateAuthority;
         _pfxBuilderFactory = pfxBuilderFactory;
 
@@ -246,6 +249,12 @@ internal class AcmeCertificateFactory
                 _challengeStore, _appLifetime, _client, _logger, domainName));
         }
 
+        if (_options.Value.AllowedChallengeTypes.HasFlag(ChallengeType.Dns01))
+        {
+            validators.Add(new Dns01DomainValidator(
+                _dnsChallengeProvider, _appLifetime, _client, _logger, domainName));
+        }
+
         if (validators.Count == 0)
         {
             var challengeTypes = string.Join(", ", Enum.GetNames(typeof(ChallengeType)));
@@ -265,7 +274,8 @@ internal class AcmeCertificateFactory
             }
             catch (Exception ex)
             {
-                _logger.LogDebug(ex, "Validation with {validatorType} failed with error: {error}", validator.GetType().Name, ex.Message);
+                _logger.LogDebug(ex, "Validation with {validatorType} failed with error: {error}",
+                    validator.GetType().Name, ex.Message);
             }
         }
 
