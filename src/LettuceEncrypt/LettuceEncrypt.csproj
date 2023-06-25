@@ -23,7 +23,7 @@ This only works with Kestrel, which is the default server configuration for ASP.
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Certes" Version="3.0.3" />
+    <PackageReference Include="Certes" Version="3.0.4" />
   </ItemGroup>
 
   <ItemGroup>
