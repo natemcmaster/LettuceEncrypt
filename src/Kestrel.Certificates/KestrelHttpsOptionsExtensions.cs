@@ -22,7 +22,7 @@ public static class KestrelHttpsOptionsExtensions
         this HttpsConnectionAdapterOptions httpsOptions,
         IServerCertificateSelector certificateSelector)
     {
-        httpsOptions.ServerCertificateSelector = certificateSelector.Select!;
+        httpsOptions.ServerCertificateSelector = certificateSelector.ServerCertificateSelector;
         return httpsOptions;
     }
 }

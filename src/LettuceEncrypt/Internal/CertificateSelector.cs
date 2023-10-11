@@ -86,6 +86,18 @@ internal class CertificateSelector : IServerCertificateSelector
 
     public bool HasCertForDomain(string domainName) => _certs.ContainsKey(domainName);
 
+    public Func<ConnectionContext?, string?, X509Certificate2?>? ServerCertificateSelector
+    {
+        get
+        {
+            if(_certs.Count == 0 && _challengeCerts.Count == 0)
+            {
+                return null;
+            }
+            return Select!;
+        }
+    }
+
     public X509Certificate2? Select(ConnectionContext context, string? domainName)
     {
         if (_challengeCerts.Count > 0)
