@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System.Reflection;
+using LettuceEncrypt.Internal;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.AspNetCore.Server.Kestrel.Https;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,7 +14,7 @@ namespace LettuceEncrypt.UnitTests;
 public class KestrelOptionsSetupTests
 {
     [Fact]
-    public void ItSetsCertificateSelector()
+    public void ItSetsCertificateSelectorWithCerts()
     {
         var services = new ServiceCollection()
             .AddLogging()
@@ -21,6 +22,20 @@ public class KestrelOptionsSetupTests
             .Services
             .BuildServiceProvider(validateScopes: true);
 
+        services.GetRequiredService<CertificateSelector>().Add(TestUtils.CreateTestCert("example.com"));
+
+        var httpsDefaultsFunc = GetHttpsDefaultsFunc(services);
+        var httpsDefaults = new HttpsConnectionAdapterOptions();
+
+        Assert.Null(httpsDefaults.ServerCertificateSelector);
+
+        httpsDefaultsFunc(httpsDefaults);
+
+        Assert.NotNull(httpsDefaults.ServerCertificateSelector);
+    }
+
+    private static Action<HttpsConnectionAdapterOptions> GetHttpsDefaultsFunc(ServiceProvider services)
+    {
         var kestrelOptions = services.GetRequiredService<IOptions<KestrelServerOptions>>().Value;
         // reflection is gross, but there is no public API for this so (shrug)
         var httpsDefaultsProp =
@@ -29,12 +44,25 @@ public class KestrelOptionsSetupTests
         var httpsDefaultsFunc =
             (Action<HttpsConnectionAdapterOptions>)httpsDefaultsProp.GetMethod.Invoke(kestrelOptions,
                 Array.Empty<object>());
+        return httpsDefaultsFunc;
+    }
+
+    [Fact]
+    public void ItDoesNotSetCertificateSelectorWithoutCerts()
+    {
+        var services = new ServiceCollection()
+            .AddLogging()
+            .AddLettuceEncrypt()
+            .Services
+            .BuildServiceProvider(validateScopes: true);
+
+        var httpsDefaultsFunc = GetHttpsDefaultsFunc(services);
         var httpsDefaults = new HttpsConnectionAdapterOptions();
 
         Assert.Null(httpsDefaults.ServerCertificateSelector);
 
         httpsDefaultsFunc(httpsDefaults);
 
-        Assert.NotNull(httpsDefaults.ServerCertificateSelector);
+        Assert.Null(httpsDefaults.ServerCertificateSelector);
     }
 }
