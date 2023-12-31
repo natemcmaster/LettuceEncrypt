@@ -22,7 +22,14 @@ public static class KestrelHttpsOptionsExtensions
         this HttpsConnectionAdapterOptions httpsOptions,
         IServerCertificateSelector certificateSelector)
     {
-        httpsOptions.ServerCertificateSelector = certificateSelector.Select!;
+        var fallbackSelector = httpsOptions.ServerCertificateSelector;
+        httpsOptions.ServerCertificateSelector = (connectionContext, domainName) =>
+        {
+            var primaryCert = certificateSelector.Select(connectionContext!, domainName);
+            // fallback to the original selector if the injected selector fails to find a certificate.
+            return primaryCert ?? fallbackSelector?.Invoke(connectionContext, domainName);
+        };
+
         return httpsOptions;
     }
 }
