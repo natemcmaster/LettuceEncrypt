@@ -17,5 +17,9 @@ This library includes API for dynamically selecting which HTTPS certificate to u
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Update="Microsoft.SourceLink.GitHub" Version="8.0.0" />
+  </ItemGroup>
+
 
 </Project>
