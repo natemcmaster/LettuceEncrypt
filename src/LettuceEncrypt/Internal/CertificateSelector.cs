@@ -84,7 +84,18 @@ internal class CertificateSelector : IServerCertificateSelector
             });
     }
 
-    public bool HasCertForDomain(string domainName) => _certs.ContainsKey(domainName);
+    public bool HasCertForDomain(string domainName)
+    {
+        if (_certs.ContainsKey(domainName))
+        {
+            return true;
+        }
+        if (_certs.Keys.Any(n => n.StartsWith("*") && domainName.EndsWith(n[1..])))
+        {
+            return true;
+        }
+        return false;
+    }
 
     public X509Certificate2? Select(ConnectionContext context, string? domainName)
     {
@@ -102,9 +113,21 @@ internal class CertificateSelector : IServerCertificateSelector
             }
         }
 
-        if (domainName == null || !_certs.TryGetValue(domainName, out var retVal))
+        if (domainName == null || !_certs.TryGetValue(domainName, out var retVal) || !_certs.Keys.Any(n=>n.StartsWith("*")))
         {
             return _options.Value.FallbackCertificate;
+        }
+        else if (_certs.Keys.Any(n => n.StartsWith("*")))
+        {
+            var wildcardDomainName = _certs.Keys.FirstOrDefault(n => n.StartsWith("*") && domainName.EndsWith(n[1..]));
+            if (wildcardDomainName == null || !_certs.TryGetValue(wildcardDomainName, out retVal))
+            {
+                return _options.Value.FallbackCertificate;
+            }
+            else
+            {
+                _logger.LogTrace("Using wildcard cert for {domainName}", domainName);
+            }
         }
 
         return retVal;
@@ -117,7 +140,13 @@ internal class CertificateSelector : IServerCertificateSelector
 
     public bool TryGet(string domainName, out X509Certificate2? certificate)
     {
-        return _certs.TryGetValue(domainName, out certificate);
+        if (_certs.TryGetValue(domainName, out certificate)) return true;
+        var wildcardDomainName = _certs.Keys.FirstOrDefault(n => n.StartsWith("*") && domainName.EndsWith(n[1..]));
+        if (wildcardDomainName != null && _certs.TryGetValue(wildcardDomainName, out certificate))
+        {
+            return true;
+        }
+        return false;
     }
 
     private void PreloadIntermediateCertificates(X509Certificate2 certificate)
