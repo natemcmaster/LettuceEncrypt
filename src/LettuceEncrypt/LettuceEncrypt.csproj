@@ -30,4 +30,8 @@ This only works with Kestrel, which is the default server configuration for ASP.
     <ProjectReference Include="..\Kestrel.Certificates\McMaster.AspNetCore.Kestrel.Certificates.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Update="Microsoft.SourceLink.GitHub" Version="8.0.0" />
+  </ItemGroup>
+
 </Project>
