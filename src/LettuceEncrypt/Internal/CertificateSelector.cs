@@ -113,24 +113,12 @@ internal class CertificateSelector : IServerCertificateSelector
             }
         }
 
-        if (domainName == null || !_certs.TryGetValue(domainName, out var retVal) || !_certs.Keys.Any(n=>n.StartsWith("*")))
+        if (domainName == null || !TryGet(domainName, out var retCert))
         {
             return _options.Value.FallbackCertificate;
         }
-        else if (_certs.Keys.Any(n => n.StartsWith("*")))
-        {
-            var wildcardDomainName = _certs.Keys.FirstOrDefault(n => n.StartsWith("*") && domainName.EndsWith(n[1..]));
-            if (wildcardDomainName == null || !_certs.TryGetValue(wildcardDomainName, out retVal))
-            {
-                return _options.Value.FallbackCertificate;
-            }
-            else
-            {
-                _logger.LogTrace("Using wildcard cert for {domainName}", domainName);
-            }
-        }
 
-        return retVal;
+        return retCert;
     }
 
     public void Reset(string domainName)
