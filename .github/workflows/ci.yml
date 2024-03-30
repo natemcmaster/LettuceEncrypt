@@ -22,7 +22,7 @@ env:
 
 jobs:
   build:
-    if: "!contains(github.event.head_commit.message, 'ci skip') || github.event_name == 'workflow_dispatch'"
+    if: ${{ !contains(github.event.head_commit.message, 'ci skip') || github.event_name == 'workflow_dispatch' }}
     strategy:
       fail-fast: false
       matrix:
@@ -56,7 +56,7 @@ jobs:
           fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
   release:
-    if: "github.event.inputs.release"
+    if: ${{ github.event.inputs.release }}
     needs: build
     runs-on: windows-latest
     env:
@@ -85,7 +85,8 @@ jobs:
           name: ${{ env.PACKAGE_VERSION }}
           tag_name: v${{ env.PACKAGE_VERSION }}
           generate_release_notes: true
-          append_body: |
+          append_body: true
+          body: |
             ### How to get this update
 
             Packages have been posted to these feeds:
