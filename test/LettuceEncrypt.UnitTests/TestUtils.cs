@@ -35,7 +35,31 @@ public class TestUtils
         }
 
         var cert = csr.CreateSelfSigned(DateTimeOffset.Now.AddMinutes(-1), expires.Value);
-        // https://github.com/dotnet/runtime/issues/29144
-        return new X509Certificate2(cert.Export(X509ContentType.Pfx), "", X509KeyStorageFlags.PersistKeySet | X509KeyStorageFlags.Exportable);
+        int retries = 5;
+        while (retries > 0)
+        {
+            try
+            {
+                // https://github.com/dotnet/runtime/issues/29144
+                var certWithKey = cert.Export(X509ContentType.Pfx);
+                return new X509Certificate2(certWithKey, "", X509KeyStorageFlags.PersistKeySet | X509KeyStorageFlags.Exportable);
+            }
+            catch
+            {
+                retries--;
+                if (retries > 0)
+                {
+                    // For unclear reasons, on macOS it takes times for certs to be available for re-export.
+                    // Retries appear to work.
+                    Thread.Sleep(50);
+                    continue;
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
+        throw new Exception($"Could not create self signed cert for {domainNames}");
     }
 }

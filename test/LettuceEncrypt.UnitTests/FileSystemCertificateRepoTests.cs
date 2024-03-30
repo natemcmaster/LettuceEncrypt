@@ -4,7 +4,6 @@
 #nullable enable
 using System.Security.Cryptography.X509Certificates;
 using LettuceEncrypt.Internal;
-using McMaster.Extensions.Xunit;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Hosting.Internal;
@@ -16,8 +15,7 @@ using static TestUtils;
 
 public class FileSystemCertificateRepoTests
 {
-    [SkippableTheory]
-    [SkipOnOS(OS.MacOS)] // started failing with macOS 12. I don't really know why. If this matters to you, please send a PR to fix.
+    [Theory]
     [InlineData(null)]
     [InlineData("")]
     public async Task ItCanSaveCertsWithoutPassword(string? password)
