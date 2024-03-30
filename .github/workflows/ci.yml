@@ -86,7 +86,8 @@ jobs:
         with:
           name: ${{ env.PACKAGE_VERSION }}
           tag_name: v${{ env.PACKAGE_VERSION }}
-          body: |
+          generate_release_notes: true
+          append_body: |
             ### How to get this update
 
             Packages have been posted to these feeds:

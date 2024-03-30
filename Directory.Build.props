@@ -42,6 +42,10 @@
     <SourceRevisionId Condition="'$(SourceRevisionId)' == ''">$(BUILD_SOURCEVERSION)</SourceRevisionId>
     <PackageVersion>$(VersionPrefix)</PackageVersion>
     <PackageVersion Condition="'$(IncludePreReleaseLabelInPackageVersion)' == 'true'">$(PackageVersion)-$(VersionSuffix)</PackageVersion>
+
+    <PackageReleaseNotes>
+      See release notes at https://github.com/natemcmaster/LettuceEncrypt/releases/tag/v$(PackageVersion).
+    </PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup>
