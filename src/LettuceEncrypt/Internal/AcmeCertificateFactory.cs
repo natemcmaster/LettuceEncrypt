@@ -298,7 +298,8 @@ internal class AcmeCertificateFactory
         {
             CommonName = commonName,
         };
-        var privateKey = KeyFactory.NewKey((Certes.KeyAlgorithm)_options.Value.KeyAlgorithm);
+        var privateKeyAlgorithm = (Certes.KeyAlgorithm)_options.Value.KeyAlgorithm;
+        var privateKey = KeyFactory.NewKey(privateKeyAlgorithm, _options.Value.KeySize);
         var acmeCert = await _client.GetCertificateAsync(csrInfo, privateKey, order);
 
         _logger.LogAcmeAction("NewCertificate");
