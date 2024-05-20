@@ -89,6 +89,11 @@ public class LettuceEncryptOptions
     public KeyAlgorithm KeyAlgorithm { get; set; } = KeyAlgorithm.ES256;
 
     /// <summary>
+    /// The key size used for generating a private key for certificates
+    /// </summary>
+    public int? KeySize { get; set; }
+
+    /// <summary>
     /// Specifies which kinds of ACME challenges LettuceEncrypt can use to verify domain ownership.
     /// Defaults to <see cref="ChallengeType.Any"/>.
     /// </summary>
