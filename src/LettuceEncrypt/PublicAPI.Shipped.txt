@@ -62,6 +62,8 @@ LettuceEncrypt.LettuceEncryptOptions.FallbackCertificate.get -> System.Security.
 LettuceEncrypt.LettuceEncryptOptions.FallbackCertificate.set -> void
 LettuceEncrypt.LettuceEncryptOptions.KeyAlgorithm.get -> LettuceEncrypt.KeyAlgorithm
 LettuceEncrypt.LettuceEncryptOptions.KeyAlgorithm.set -> void
+LettuceEncrypt.LettuceEncryptOptions.KeySize.get -> int?
+LettuceEncrypt.LettuceEncryptOptions.KeySize.set -> void
 LettuceEncrypt.LettuceEncryptOptions.LettuceEncryptOptions() -> void
 LettuceEncrypt.LettuceEncryptOptions.RenewalCheckPeriod.get -> System.TimeSpan?
 LettuceEncrypt.LettuceEncryptOptions.RenewalCheckPeriod.set -> void

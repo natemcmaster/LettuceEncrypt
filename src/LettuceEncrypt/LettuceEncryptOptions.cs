@@ -87,7 +87,7 @@ public class LettuceEncryptOptions
     /// The asymmetric algorithm used for generating a private key for certificates: RS256, ES256, ES384, ES512
     /// </summary>
     public KeyAlgorithm KeyAlgorithm { get; set; } = KeyAlgorithm.ES256;
-    
+
     /// <summary>
     /// The key size used for generating a private key for certificates
     /// </summary>
