@@ -48,7 +48,7 @@ See ["Securing An Azure App Service with Let's Encrypt"](https://www.hanselman.c
 
 ## Usage
 
-Install this package into your project using NuGet ([see details here][nuget-url]).
+Install this package into your project using NuGet ([see details here][nuget]).
 
 The primary API usage is to call `IServiceCollection.AddLettuceEncrypt` in the `Startup` class `ConfigureServices` method.
 
